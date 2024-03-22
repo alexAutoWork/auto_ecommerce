@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PRODUCTS - AUTOLECTRONIX</title>
+    <link rel="icon" type="image/x-icon" href="public/global_assets/logo_assets/Simplified_ver_white_border_square.png">
+    <!-- Bootstrap -->
+	<link href="public/bootstrap.min.css" rel="stylesheet">
+	<!-- FontAwesome Icons -->
+    <link href="public/all.min.css" rel="stylesheet">
+    <!-- Our Files -->
+    <link href="public/nav.css" rel="stylesheet">
+	<link href="public/global.css" rel="stylesheet">
+    <link href="public/products.css" rel="stylesheet">
+	<link href="public/global_admin.css" rel="stylesheet">
+	<script src="public/jquery.min.js"></script>
+
+<!--
+:~-._                                                 _.-~:
+: :.~^o._        ________---------________        _.o^~.:.:
+ : ::.`?88booo~~~.::::::::...::::::::::::..~~oood88P'.::.:
+ :  ::: `?88P .:::....         ........:::::. ?88P' :::. :
+  :  :::. `? .::.            . ...........:::. P' .:::. :
+   :  :::   ... ..  ...       .. .::::......::.   :::. :
+   `  :' .... ..  .:::::.     . ..:::::::....:::.  `: .'
+    :..    ____:::::::::.  . . ....:::::::::____  ... :
+   :... `:~    ^~-:::::..  .........:::::-~^    ~::.::::
+   `.::. `\   (8)  \b:::..::.:.:::::::d/  (8)   /'.::::'
+    ::::.  ~-._v    |b.::::::::::::::d|    v_.-~..:::::
+    `.:::::... ~~^?888b..:::::::::::d888P^~...::::::::'
+     `.::::::::::....~~~ .:::::::::~~~:::::::::::::::'
+      `..:::::::::::   .   ....::::    ::::::::::::,'
+        `. .:::::::    .      .::::.    ::::::::'.'
+          `._ .:::    .        :::::.    :::::_.'
+             `-. :    .        :::::      :,-'
+                :.   :___     .:::___   .::
+      ..--~~~~--:+::. ~~^?b..:::dP^~~.::++:--~~~~--..
+        ___....--`+:::.    `~8~'    .:::+'--....___
+      ~~   __..---`_=:: ___gd8bg___ :==_'---..__   ~~
+       -~~~  _.--~~`-.~~~~~~~~~~~~~~~,-' ~~--._ ~~~-
+          -~~            ~~~~~~~~~             ~~-
+-->
+
+  </head>
+  <body>
+  	
+	<!-- body code goes here -->
+	<div class="container-fluid">
+		<div class="row global_admin_main_row">
+			<div class="col-3 global_admin_nav">
+				<nav class="nav flex-column">
+					<h1 class="global_admin_font_1 global_admin_nav_header">ADMIN PANEL</h1>
+					<ul class="nav">
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-house global_admin_nav_icons" id="global_admin_nav_dashboard_icon"></i> DASHBOARD</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-square-poll-horizontal global_admin_nav_icons" id="global_admin_nav_orders_icon"></i> ORDERS</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-screwdriver-wrench global_admin_nav_icons" id="global_admin_nav_repairs_icon"></i> REPAIRS</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link active" href=""><i class="fa-solid fa-barcode global_admin_nav_icons" id="global_admin_nav_products_icon"></i> PRODUCTS</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-list-ul global_admin_nav_icons" id="global_admin_nav_categories_icon"></i> CATEGORIES</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-receipt global_admin_nav_icons" id="global_admin_nav_invoices_icon"></i> INVOICES</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-square-caret-left global_admin_nav_icons" id="global_admin_nav_returns_icon"></i> RETURNS</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-users global_admin_nav_icons" id="global_admin_nav_customers_icon"></i> CUSTOMERS</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-gear global_admin_nav_icons" id="global_admin_nav_settings_icon"></i> SETTINGS</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+			<div class="col-9 global_admin_main_col">
+				<div class="container-fluid">
+					<div class="container global_admin_main_header_cont">
+						<h1 class="global_admin_font_1 global_admin_main_header global_admin_header_1">PRODUCTS</h1>
+					</div>
+					<div class="container global_admin_nav_pill_cont">
+						<ul class="nav nav-pills mb-3 global_admin_font_3" id="products_nav" role="tablist">
+							<li class="nav-item">
+								<a class="nav-link active" id="products_home_tab" data-toggle="pill" href="#products_home" role="tab" aria-controls="products_home" aria-selected="true">PRODUCTS</a>
+							</li>
+							<li class="global_admin_nav_line">
+								<img src="images/global_assets/nav_assets/nav_line_desktop.png">
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" id="products_models_tab" data-toggle="pill" href="#products_models" role="tab" aria-controls="products_models" aria-selected="false">MODELS</a>
+							</li>
+							<li class="global_admin_nav_line">
+								<img src="images/global_assets/nav_assets/nav_line_desktop.png">
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" id="products_stocks_tab" data-toggle="pill" href="#products_stocks" role="tab" aria-controls="products_stocks" aria-selected="false">STOCK</a>
+							</li>
+						</ul>
+					</div>
+					
+					<div class="tab-content" id="products_tab_content">
+						
+						<div class="tab-pane fade show active" id="products_home" role="tabpanel" aria-labelledby="products_home_tab">
+							<div class="container">
+								<div class="container d-flex flex-column">
+									<div class="p-2 ml-auto">
+										<button type="button" class="btn global_admin_red_select_btn_2 global_admin_remove_shadow global_admin_font_3" data-toggle="modal" data-target="#products_home_add_product_popup">ADD PRODUCT <i class="fa-solid fa-plus global_admin_red_select_btn_2_icon"></i></button>
+									</div>
+									<div class="p-2">
+										<button type="button" class="btn global_admin_font_3 global_admin_remove_shadow global_admin_red_select_btn_1">FILTER <i class="fa-solid fa-square-caret-down"></i></button> <button type="button" class="btn global_admin_font_3 global_admin_remove_shadow global_admin_red_select_btn_1">SORT <i class="fa-solid fa-square-caret-down"></i></button>
+									</div>
+								</div>
+								<div class="modal fade" id="products_home_add_product_popup" tabindex="-1" role="dialog" aria-hidden="true">
+									<div class="modal-dialog modal-dialog-centered global_admin_popup_style1_cont">
+										<div class="modal-content">
+											<div class="container global_admin_popup_cont_inner">
+												<h2>ADD NEW PRODUCT</h2>
+												<div class="global_admin_popup_scroll_cont">
+													<div class="form-row">
+														<div class="form-group col">
+															<label for="my_account_add_address_province" class="global_font_3 login_signup_label">ID</label>
+                        									<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_province" name="my_account_add_address_province">
+														</div>
+														<div class="form-group col">
+															<label for="my_account_add_address_province" class="global_font_3 login_signup_label">NAME</label>
+                        									<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_province" name="my_account_add_address_province">
+														</div>
+													</div>
+													<div class="form-row">
+														<div class="form-group col">
+															<label for="my_account_add_address_city" class="global_font_3 login_signup_label">BRAND</label>
+															<select class="selectpicker global_remove_shadow global_font_4 global_text_input form-control" id="my_account_add_address_city">
+																<option selected>Choose...</option>
+																<option>One</option>
+																<option>Two</option>
+																<option>Three</option>
+															</select>
+														</div>
+														<div class="form-group col">
+															<label for="my_account_add_address_city" class="global_font_3 login_signup_label">CATEGORY</label>
+															<select class="selectpicker global_remove_shadow global_font_4 global_text_input form-control" id="my_account_add_address_city">
+																<option selected>Choose...</option>
+																<option>One</option>
+																<option>Two</option>
+																<option>Three</option>
+															</select>
+														</div>
+													</div>
+													<div class="form-row">
+														<div class="form-group col">
+															<label for="my_account_add_address_province" class="global_font_3 login_signup_label">WIDTH (CM)</label>
+                        									<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_province" name="my_account_add_address_province">
+														</div>
+														<div class="form-group col">
+															<label for="my_account_add_address_province" class="global_font_3 login_signup_label">LENGTH (CM)</label>
+                        									<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_province" name="my_account_add_address_province">
+														</div>
+														<div class="form-group col">
+															<label for="my_account_add_address_province" class="global_font_3 login_signup_label">HEIGHT (CM)</label>
+                        									<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_province" name="my_account_add_address_province">
+														</div>
+														<div class="form-group col">
+															<label for="my_account_add_address_province" class="global_font_3 login_signup_label">WEIGHT (KG)</label>
+                        									<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_province" name="my_account_add_address_province">
+														</div>
+													</div>
+													<div class="row">
+														<div class="col">
+															<button type="button" class="btn global_red_select_btn_2 global_remove_shadow" id="my_account_apply_for_return_review_return_next">UPLOAD PRODUCT IMAGE</button>
+														</div>
+														<div class="col">
+															<button type="button" class="btn global_red_select_btn_2 global_remove_shadow" id="my_account_apply_for_return_review_return_next">UPLOAD THUMBNAIL IMAGE</button>
+														</div>
+													</div>
+													<div class="container">
+														<p>*UPLOADED PRODUCT IMAGE MUST BE EITHER PNG, JPG, JPEG OR WEBP</p>
+														<p>*MUST BE 1000PX x 1000PX FOR PRODUCT IMAGE, 500PX x 500PX FOR THUMBNAIL IMAGE</p>
+													</div>
+													<div class="form-row">
+														<div class="form-group col">
+															<label for="my_account_add_address_province" class="global_font_3 login_signup_label">WARRANTY</label>
+                        									<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_province" name="my_account_add_address_province">
+														</div>
+													</div>
+													<hr/>
+													<div class="form-row">
+														<div class="form-check col">
+															<input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+                                                            <label class="form-check-label" for="defaultCheck1">IS REPAIRABLE?</label>
+														</div>
+													</div>
+													<div class="form-row">
+														<div class="form-check col">
+															<input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+                                                            <label class="form-check-label" for="defaultCheck1">EXCHANGE UNIT?</label>
+														</div>
+														<div class="form-check col">
+															<input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+                                                            <label class="form-check-label" for="defaultCheck1">SALE?</label>
+														</div>
+														<div class="form-check col">
+															<input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+                                                            <label class="form-check-label" for="defaultCheck1">SECOND-HAND?</label>
+														</div>
+													</div>
+													<div class="form-row">
+														<div class="form-group col">
+															<label for="my_account_add_address_province" class="global_font_3 login_signup_label">PRICE EXCL.</label>
+                        									<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_province" name="my_account_add_address_province">
+														</div>
+														<div class="form-group col">
+															<label for="my_account_add_address_province" class="global_font_3 login_signup_label">PRICE INCL.</label>
+                        									<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_province" name="my_account_add_address_province">
+														</div>
+														<div class="form-group col">
+															<label for="my_account_add_address_province" class="global_font_3 login_signup_label">PRICE VAT.</label>
+                        									<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_province" name="my_account_add_address_province">
+														</div>
+													</div>
+												</div>
+												<div class="d-flex flex-row">
+													<div class="p-2 ml-auto">
+														<button type="button" class="btn global_red_select_btn_2 global_remove_shadow" id="my_account_apply_for_return_review_return_next">SUBMIT</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+								<div class="container global_admin_table_scroll">
+									<table class="table global_admin_table">
+										<thead class="global_admin_font_3">
+											<tr>
+												<th scope="col" class="global_admin_table_header_products_id">ID</th>
+												<th scope="col" class="global_admin_table_header_products_name">NAME</th>
+												<th scope="col" class="global_admin_table_header_products_stock_amt">STOCK AVAILABLE</th>
+												<th scope="col" class="global_admin_table_header_products_price">PRICE EXCL</th>
+												<th scope="col" class="global_admin_table_header_products_brand">BRAND</th>
+												<th scope="col" class="global_admin_table_header_products_category">CATEGORY</th>
+												<th scope="col" class="global_admin_table_data_sticky_icons global_admin_table_data_sticky_products"></th>
+											</tr>
+										</thead>
+										<tbody class="global_admin_font_4">
+											<tr>
+												<td>MB021</td>
+												<td>MERCEDES-BENZ BASE MODULE</td>
+												<td>25 UNITS</td>
+												<td>R5000</td>
+												<td>MERCEDES</td>
+												<td>CATEGORY 1</td>
+												<td class="global_admin_table_data_sticky_icons global_admin_table_data_sticky_products"><button type="button" class="btn global_admin_remove_shadow global_admin_black_icon_btn global_admin_font_3 global_admin_table_data_sticky_icon_btns global_admin_table_data_sticky_icon_products_edit_icon_btn"><i class="fa-solid fa-pen-to-square"></i></button> <button type="button" class="btn global_admin_remove_shadow global_admin_black_icon_btn global_admin_font_3 global_admin_table_data_sticky_icon_btns global_admin_table_data_sticky_icon_products_trash_icon_btn"><i class="fa-solid fa-trash"></i></button></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								
+							</div>
+						</div>
+						
+						<div class="tab-pane fade" id="products_models" role="tabpanel" aria-labelledby="products_models_tab">
+							<div class="container">
+								<div class="container d-flex flex-column">
+									<div class="p-2 ml-auto">
+										<button type="button" class="btn global_admin_red_select_btn_2 global_admin_remove_shadow global_admin_font_3" data-toggle="modal" data-target="#products_models_add_model_popup">ADD MODEL <i class="fa-solid fa-plus global_admin_red_select_btn_2_icon"></i></button>
+									</div>
+									<div class="p-2">
+										<button type="button" class="btn global_admin_font_3 global_admin_remove_shadow global_admin_red_select_btn_1">FILTER <i class="fa-solid fa-square-caret-down"></i></button> <button type="button" class="btn global_admin_font_3 global_admin_remove_shadow global_admin_red_select_btn_1">SORT <i class="fa-solid fa-square-caret-down"></i></button>
+									</div>
+								</div>
+								<div class="modal fade" id="products_models_add_model_popup" tabindex="-1" role="dialog" aria-hidden="true">
+									<div class="modal-dialog modal-dialog-centered global_admin_popup_style1_cont">
+										<div class="modal-content">
+											<div class="container global_admin_popup_cont_inner">
+												<h2>ADD NEW MODEL</h2>
+												<div class="form-row">
+													<div class="form-group col">
+														<label for="my_account_add_address_city" class="global_font_3 login_signup_label">PRODUCT</label>
+                                                        <select class="selectpicker global_remove_shadow global_font_4 global_text_input form-control" id="my_account_add_address_city">
+                                                            <option selected>Choose...</option>
+                                                            <option>One</option>
+                                                            <option>Two</option>
+                                                            <option>Three</option>
+                                                        </select>
+													</div>
+													<div class="form-group col">
+														<label for="my_account_add_address_province" class="global_font_3 login_signup_label">MODEL NUMBER</label>
+                                                        <input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_province" name="my_account_add_address_province">
+													</div>
+												</div>
+												<div class="d-flex flex-row">
+													<div class="p-2 ml-auto">
+														<button type="button" class="btn global_red_select_btn_2 global_remove_shadow" id="my_account_apply_for_return_review_return_next">SUBMIT</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+								<div class="container global_admin_table_scroll">
+									<table class="table global_admin_table">
+										<thead class="global_admin_font_3">
+											<tr>
+												<th scope="col" class="global_admin_table_header_models_product_id">PRODUCT ID</th>
+												<th scope="col" class="global_admin_table_header_models_product_name">PRODUCT NAME</th>
+												<th scope="col" class="global_admin_table_header_models_no">MODEL NUMBER</th>
+												<th scope="col" class="global_admin_table_data_sticky_icons global_admin_table_data_sticky_product_models"></th>
+											</tr>
+										</thead>
+										<tbody class="global_admin_font_4">
+											<tr>
+												<td>MB021</td>
+												<td>MERCEDES-BENZ BASE MODULE</td>
+												<td>A 001 004 687 312</td>
+												<td class="global_admin_table_data_sticky_icons global_admin_table_data_sticky_product_models"><button type="button" class="btn global_admin_remove_shadow global_admin_black_icon_btn global_admin_font_3 global_admin_table_data_sticky_icon_btns global_admin_table_data_sticky_icon_product_models_edit_icon_btn"><i class="fa-solid fa-pen-to-square"></i></button> <button type="button" class="btn global_admin_remove_shadow global_admin_black_icon_btn global_admin_font_3 global_admin_table_data_sticky_icon_btns global_admin_table_data_sticky_icon_product_models_trash_icon_btn"><i class="fa-solid fa-trash"></i></button></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								
+							</div>
+						</div>
+						
+						<div class="tab-pane fade" id="products_stocks" role="tabpanel" aria-labelledby="products_stocks_tab">
+							<div class="container">
+								
+								<div class="container d-flex flex-column">
+									<div class="p-2 ml-auto">
+										<button type="button" class="btn global_admin_red_select_btn_2 global_admin_remove_shadow global_admin_font_3" data-toggle="modal" data-target="#products_stock_add_stock_popup">ADD STOCK <i class="fa-solid fa-plus global_admin_red_select_btn_2_icon"></i></button>
+									</div>
+									<div class="p-2">
+										<button type="button" class="btn global_admin_font_3 global_admin_remove_shadow global_admin_red_select_btn_1">FILTER <i class="fa-solid fa-square-caret-down"></i></button> <button type="button" class="btn global_admin_font_3 global_admin_remove_shadow global_admin_red_select_btn_1">SORT <i class="fa-solid fa-square-caret-down"></i></button>
+									</div>
+								</div>
+								<div class="modal fade" id="products_stock_add_stock_popup" tabindex="-1" role="dialog" aria-hidden="true">
+									<div class="modal-dialog modal-dialog-centered global_admin_popup_style1_cont">
+										<div class="modal-content">
+											<div class="container global_admin_popup_cont_inner">
+												<h2>ADD NEW STOCK</h2>
+												<div class="form-row">
+													<div class="form-group col">
+														<label for="my_account_add_address_city" class="global_font_3 login_signup_label">PRODUCT</label>
+                                                        <select class="selectpicker global_remove_shadow global_font_4 global_text_input form-control" id="my_account_add_address_city">
+                                                            <option selected>Choose...</option>
+                                                            <option>One</option>
+                                                            <option>Two</option>
+                                                            <option>Three</option>
+                                                        </select>
+													</div>
+													<div class="form-group col">
+														<label for="my_account_add_address_city" class="global_font_3 login_signup_label">TYPE</label>
+                                                        <select class="selectpicker global_remove_shadow global_font_4 global_text_input form-control" id="my_account_add_address_city">
+                                                            <option selected>Choose...</option>
+                                                            <option>One</option>
+                                                            <option>Two</option>
+                                                            <option>Three</option>
+                                                        </select>
+													</div>
+												</div>
+												<div class="form-group">
+													<label for="my_account_add_address_province" class="global_font_3 login_signup_label">STOCK NUMBER</label>
+                                                    <input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_province" name="my_account_add_address_province">
+												</div>
+												<div class="d-flex flex-row">
+													<div class="p-2 ml-auto">
+														<button type="button" class="btn global_red_select_btn_2 global_remove_shadow" id="my_account_apply_for_return_review_return_next">SUBMIT</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+								<div class="container global_admin_table_scroll">
+									<table class="table global_admin_table">
+										<thead class="global_admin_font_3">
+											<tr>
+												<th scope="col" class="global_admin_table_header_stock_date_added">DATE ADDED</th>
+												<th scope="col" class="global_admin_table_header_stock_product_id">PRODUCT ID</th>
+												<th scope="col" class="global_admin_table_header_stock_product_name">PRODUCT NAME</th>
+												<th scope="col" class="global_admin_table_header_stock_no">STOCK NUMBER</th>
+												<th scope="col" class="global_admin_table_header_stock_type">TYPE</th>
+												<th scope="col" class="global_admin_table_header_stock_status">STATUS</th>
+												<th scope="col" class="global_admin_table_header_stock_status_date">STATUS DATE</th>
+												<th scope="col" class="global_admin_table_data_sticky_icons global_admin_table_data_sticky_product_stock"></th>
+											</tr>
+										</thead>
+										<tbody class="global_admin_font_4">
+											<tr>
+												<td>02/03/2023</td>
+												<td>MB021</td>
+												<td>MERCEDES-BENZ BASE MODULE</td>
+												<td>AX1922309092023</td>
+												<td>EXCHANGE UNIT</td>
+												<td>PURCHASED</td>
+												<td>02/02/2023</td>
+												<td class="global_admin_table_data_sticky_icons global_admin_table_data_sticky_product_stock"><button type="button" class="btn global_admin_remove_shadow global_admin_black_icon_btn global_admin_font_3 global_admin_table_data_sticky_icon_btns global_admin_table_data_sticky_icon_product_stock_edit_icon_btn"><i class="fa-solid fa-pen-to-square"></i></button> <button type="button" class="btn global_admin_remove_shadow global_admin_black_icon_btn global_admin_font_3 global_admin_table_data_sticky_icon_btns global_admin_table_data_sticky_icon_product_stock_trash_icon_btn"><i class="fa-solid fa-trash"></i></button></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								
+							</div>
+						</div>
+						
+					</div>
+					
+				</div>
+			</div>
+		</div>  
+	</div>
+	  
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	  
+	  
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script src="public/popper.min.js"></script>
+	<script src="public/bootstrap.min.js"></script>
+    <script src="public/all.min.js"></script>
+  </body>
+</html>

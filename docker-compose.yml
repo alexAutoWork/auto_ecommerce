@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+
+  api:
+    build:
+      context: ./AUTO_WEBSITE
+      dockerfile: ./DOCKER/API.Dockerfile
+    restart: unless-stopped
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./AUTO_WEBSITE:/code
+      - ./AUTO_WEBSITE_MEDIA:/code/media
+      - /code/AUTO_WEBSITE/__pycache__
+      - /code/AUTO_WEBSITE_ECOMMERCE/__pycache__/
+      - /code/AUTO_WEBSITE_ECOMMERCE/migrations/
+    ports:
+      - 8000:8000
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+      - DB_DATABASE=test_schema
+      - DB_USERNAME=root
+      - DB_PASSWORD=admin
+
+  frontend:
+    build:
+      context: ./AUTO_WEBSITE_FRONTEND
+      dockerfile: ./DOCKER/FRONTEND.Dockerfile
+    restart: unless-stopped
+    command: nodemon server.js
+    volumes:
+      - ./AUTO_WEBSITE_FRONTEND:/opt/node_app
+      - ./AUTO_WEBSITE_MEDIA:/opt/node_app/media
+      - /opt/node_app/node_modules/
+    ports:
+      - 3000:3000

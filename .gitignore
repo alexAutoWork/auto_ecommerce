@@ -1,0 +1,5 @@
+**/__pycache__
+**/AUTO_WEBSITE_VENV
+**/node_modules
+**/migrations
+**/.idea

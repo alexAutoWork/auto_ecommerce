@@ -1,0 +1,89 @@
+@font-face {
+    font-family: Audiowide Regular;
+    src: url("../fonts/Audiowide-Regular.ttf");
+    font-weight: regular;
+}
+
+@font-face {
+    font-family: Brandon Grotesque;
+    src: url("../fonts/Brandon_bld.otf");
+    font-weight: bold;
+}
+
+@font-face{
+    font-family: Roboto;
+    src: url("../fonts/Roboto-Light.ttf");
+    font-weight: light;
+}
+
+.my_account_add_address_cont {
+	padding: 20px;
+}
+
+.custom-control-label::before {
+	left: 0.5rem;
+}
+
+.custom-control-label::after {
+	left: 0.5rem;
+}
+
+#my_account_add_address_is_regional_label {
+	padding-left: 35px;
+}
+
+.my_account_address_book_edit_delete_btn_cont {
+	padding: 0;
+}
+
+.my_account_address_book_edit_delete_btn_cont_inner {
+	padding: 0;
+}
+
+.my_account_address_book_edit_btn_cont, .my_account_address_book_delete_btn_cont {
+	padding-right: 0 !important;
+	padding-bottom: 0 !important;
+}
+
+.my_account_address_book_set_default_btn {
+	width: 169px;
+}
+
+.my_account_address_book_set_default_btn_cont {
+	padding-top: 0 !important;
+}
+
+@media (max-width: 767px) {
+	.my_account_address_book_header_n_btn_cont {
+		padding: 0;
+	}
+	
+	.my_account_address_book_header_cont {
+		text-align: center;
+	}
+	
+	.my_account_address_book_header_cont, .my_account_address_book_add_address_btn_cont, .my_account_address_book_add_address_btn {
+		width: 100%;
+		max-width: 100%;
+	}
+	
+	.my_account_address_book_delete_btn_cont {
+		padding: 0 3px 0 0 !important;
+		width: 50%;
+	}
+	
+	.my_account_address_book_edit_btn_cont {
+		padding: 0 0 0 3px !important;
+		width: 50%;
+	}
+	
+	.my_account_address_book_delete_btn, .my_account_address_book_edit_btn {
+		width: 100%;
+		max-width: 100%;
+	}
+	
+	.my_account_address_book_set_default_btn {
+		width: 100%;
+		max-width: 100%;
+	}
+}

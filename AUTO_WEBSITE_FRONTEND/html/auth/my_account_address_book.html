@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PRODUCTS - AUTOLECTRONIX</title>
+    <link rel="icon" type="image/x-icon" href="public/global_assets/logo_assets/Simplified_ver_white_border_square.png">
+    <!-- Bootstrap -->
+	<link href="public/bootstrap.min.css" rel="stylesheet">
+	<!-- FontAwesome Icons -->
+    <link href="public/all.min.css" rel="stylesheet">
+    <!-- Our Files -->
+    <link href="public/nav.css" rel="stylesheet">
+	<link href="public/global.css" rel="stylesheet">
+	<link href="public/global_2.css" rel="stylesheet">
+    <link href="public/products.css" rel="stylesheet">
+	<link href="public/my_account_tabs.css" rel="stylesheet">
+	<link href="public/my_account_address_book.css" rel="stylesheet">
+	<script src="public/jquery.min.js"></script>
+
+<!--
+:~-._                                                 _.-~:
+: :.~^o._        ________---------________        _.o^~.:.:
+ : ::.`?88booo~~~.::::::::...::::::::::::..~~oood88P'.::.:
+ :  ::: `?88P .:::....         ........:::::. ?88P' :::. :
+  :  :::. `? .::.            . ...........:::. P' .:::. :
+   :  :::   ... ..  ...       .. .::::......::.   :::. :
+   `  :' .... ..  .:::::.     . ..:::::::....:::.  `: .'
+    :..    ____:::::::::.  . . ....:::::::::____  ... :
+   :... `:~    ^~-:::::..  .........:::::-~^    ~::.::::
+   `.::. `\   (8)  \b:::..::.:.:::::::d/  (8)   /'.::::'
+    ::::.  ~-._v    |b.::::::::::::::d|    v_.-~..:::::
+    `.:::::... ~~^?888b..:::::::::::d888P^~...::::::::'
+     `.::::::::::....~~~ .:::::::::~~~:::::::::::::::'
+      `..:::::::::::   .   ....::::    ::::::::::::,'
+        `. .:::::::    .      .::::.    ::::::::'.'
+          `._ .:::    .        :::::.    :::::_.'
+             `-. :    .        :::::      :,-'
+                :.   :___     .:::___   .::
+      ..--~~~~--:+::. ~~^?b..:::dP^~~.::++:--~~~~--..
+        ___....--`+:::.    `~8~'    .:::+'--....___
+      ~~   __..---`_=:: ___gd8bg___ :==_'---..__   ~~
+       -~~~  _.--~~`-.~~~~~~~~~~~~~~~,-' ~~--._ ~~~-
+          -~~            ~~~~~~~~~             ~~-
+-->
+
+  </head>
+  <body>
+  	<!-- body code goes here -->
+    <nav class="navbar navbar-expand-sm sticky-top d-none d-lg-block" id="add_nav"> <!-- address/email on top on navbar -->
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link add_nav" href="/contact_us"><i class="fa-solid fa-location-dot fa-lg"></i> UNIT 5, LUBEX HOUSE, 4 IVY ROAD, PINETOWN, 3610</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link add_nav" href="/contact_us"><i class="fa-solid fa-envelope fa-lg"></i> OFFICE@AUTOLECTRONIX.CO.ZA</a>
+                </li>
+            </ul>
+        </div>
+      </nav> <!-- end of mini navbar -->
+      <nav class="navbar navbar-expand-lg sticky-top container_hide_mobi" id="main_nav"> <!-- navbar -->
+        <a class="navbar-brand" href="/home">AUTOLECTRONIX</a>
+        <button class="navbar-toggler toggler-example hamburger_menu " type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><i class="fas fa-bars fa-xl"></i></button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown"> <!-- among us dropdown -->
+                    <a class="nav-link dropdown-toggle" href="#" id="a_nav" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        ABOUT US
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="a_nav" id="a_m_r_nav">
+                        <a class="dropdown-item" href="/about_us" id="a2_nav">ABOUT OUR<br> COMPANY</a> <!-- mission & vision -->
+                        <a class="nav_dropdown_line" href="#"><img src="images/global_assets/nav_assets/nav_line_dropdown.png" alt=""></a>
+                        <a class="dropdown-item" href="/our_mission_and_vision" id="m_nav">OUR MISSION <br>&amp; VISION</a> <!-- mission & vision -->
+                        <a class="nav_dropdown_line" href="#"><img src="images/global_assets/nav_assets/nav_line_dropdown.png" alt=""></a>
+                        <a class="dropdown-item" href="/research_and_development" id="r_nav">RESEARCH &amp; <br>DEVELOPMENT</a> <!-- research & development -->
+                    </div>
+                </li> <!-- end of among us dropdown -->
+                <li class="nav-item nav_line d-none d-lg-block"> <!-- line -->
+                    <img src="images/global_assets/nav_assets/nav_line_desktop.png" alt="">
+                </li>
+                <li class="nav-item nav_line_mobi d-lg-none d-xl-none"> <!-- line -->
+                    <img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" alt="">
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/quote" id="q_nav">GET A QUOTE</a> <!-- quote nav -->
+                </li>
+                <li class="nav-item nav_line d-none d-lg-block"> <!-- line -->
+                    <img src="images/global_assets/nav_assets/nav_line_desktop.png" alt="">
+                </li>
+                <li class="nav-item nav_line_mobi d-lg-none d-xl-none"> <!-- line -->
+                    <img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" alt="">
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/products" id="pds_nav_active">PRODUCTS</a> <!-- shop nav -->
+                </li>
+                <li class="nav-item nav_line d-none d-lg-block"> <!-- line -->
+                    <img src="images/global_assets/nav_assets/nav_line_desktop.png" alt="">
+                </li>
+                <li class="nav-item nav_line_mobi d-lg-none d-xl-none"> <!-- line -->
+                    <img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" alt="">
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/faq" id="faq_nav">FAQ</a> <!-- faq nav -->
+                </li>
+                <li class="nav-item nav_line d-none d-lg-block"> <!-- line -->
+                    <img src="images/global_assets/nav_assets/nav_line_desktop.png" alt="">
+                </li>
+                <li class="nav-item nav_line_mobi d-lg-none d-xl-none"> <!-- line -->
+                    <img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" alt="">
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact_us" id="c_nav">CONTACT US</a> <!-- contact us nav -->
+                </li>
+                <li class="nav-item d-none d-xl-block">
+                    <a class="nav-link p_nav" href="/contact_us"><i class="fa-solid fa-phone-volume fa-lg"></i> 031 700 1420</a> <!-- contact us nav -->
+                </li>
+            </ul>
+        </div>
+    </nav> <!-- nav end -->
+	  <!-- my account orders page start -->
+	  <div class="container-fluid container_hide_mobi">
+		<div class="container">
+			<div class="container my_account_header d-flex flex-row">
+				<div class="p-2">
+                    <button type="button" class="btn global_font_3 global_remove_shadow global_white_select_btn d-md-block d-lg-none"><i class="fa-solid fa-chevron-left"></i> BACK</button>
+                </div>
+                <div class="p-2">
+                    <h1 class="global_font_1 global_header_1 d-none d-sm-none d-md-none d-lg-block d-xl-block">MY ACCOUNT</h1>
+                </div>
+				<div class="p-2 ml-auto d-md-block d-lg-none col_filter">
+                  <button class="btn global_remove_shadow shop_options_2 global_font_3" type="button" id="account_btn_mobi">
+                      <i class="fa-solid fa-user"></i>
+                  </button>
+              	</div>
+				<div class="p-2 d-none d-lg-block col_cart ml-auto">
+					<button class="btn global_remove_shadow shop_options_2" type="button" id="cart_btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<i class="fa-solid fa-cart-shopping"></i>
+						<i class="fa-solid fa-square-caret-down"></i>
+					</button>
+					<div class="dropdown-menu">
+						<div class="container shop_options_cont shop_options_cart global_font_3">
+							<div class="container shop_options_cart_products">
+								<div class="row">
+									<div class="col-4">
+										insert image here
+									</div>
+									<div class="col">
+										<div class="container shop_options_cart_product_name_w_remove_cont">
+											<div class="row">
+												<div class="col">
+													<p class="global_font_3 shop_options_cart_product_name">BASE MODULE</p>
+													<p class="global_font_4 shop_options_cart_product_type">type: exchange unit</p>
+												</div>
+												<div class="col-1">
+													<i class="fa-solid fa-trash"></i>
+												</div>
+											</div>
+										</div>
+										<div class="container shop_options_cart_product_price_qty_cont">
+											<div class="row">
+												<div class="col shop_options_cart_product_qty global_font_4">
+													QTY: 1
+												</div>
+												<div class="col shop_options_cart_product_price global_font_3">
+													R5000
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+								<hr />
+								
+								<div class="row">
+									<div class="col-4">
+										insert image here
+									</div>
+									<div class="col">
+										<div class="container shop_options_cart_product_name_w_remove_cont">
+											<div class="row">
+												<div class="col">
+													<p class="global_font_3 shop_options_cart_product_name">BASE MODULE</p>
+													<p class="global_font_4 shop_options_cart_product_type">type: exchange unit</p>
+												</div>
+												<div class="col-1">
+													<i class="fa-solid fa-trash"></i>
+												</div>
+											</div>
+										</div>
+										<div class="container shop_options_cart_product_price_qty_cont">
+											<div class="row">
+												<div class="col shop_options_cart_product_qty global_font_4">
+													QTY: 1
+												</div>
+												<div class="col shop_options_cart_product_price global_font_3">
+													R5000
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+							</div>
+							<div class="container shop_options_cart_bottom_info">
+								<p class="shop_options_cart_total">TOTAL: R10,000</p>
+								<button type="button" class="btn global_red_select_btn_2 shop_options_cart_checkout_btn global_remove_shadow">CHECKOUT</button>
+							</div>
+						</div>
+					</div>
+				</div>
+                <div class="p-2 d-none d-lg-block col_account">
+					<button class="btn global_remove_shadow shop_options_2" type="button" id="acc_btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<i class="fa-solid fa-user"></i>
+						<i class="fa-solid fa-square-caret-down"></i>
+					</button>
+					<div class="dropdown-menu global_font_3 shop_options_account_cont">
+						<a class="dropdown-item shop_options_account shop_options_global_hover" href="#">MY ACCOUNT</a>
+						<li class="nav_dropdown_line"><img src="images/global_assets/nav_assets/nav_line_dropdown.png" alt=""></li>
+						<a class="dropdown-item shop_options_account shop_options_global_hover" href="#">TRACK ORDER</a>
+						<li class="nav_dropdown_line"><img src="images/global_assets/nav_assets/nav_line_dropdown.png" alt=""></li>
+						<a class="dropdown-item shop_options_account shop_options_global_hover" href="#">RETURNS</a>
+						<li class="nav_dropdown_line"><img src="images/global_assets/nav_assets/nav_line_dropdown.png" alt=""></li>
+						<a class="dropdown-item shop_options_account shop_options_global_hover" href="#">INVOICES</a>
+						<li class="nav_dropdown_line"><img src="images/global_assets/nav_assets/nav_line_dropdown.png" alt=""></li>
+						<a class="dropdown-item shop_options_account shop_options_global_hover" href="#">LOGOUT</a>
+					</div>
+				</div>
+            </div>
+			<div class="row my_account_main_cont">
+				<div class="col-4 d-none d-sm-none d-md-none d-lg-block d-xl-block global_font_3">
+					<div class="container my_account_tabs_cont">
+						<div class="container my_account_tabs_header_cont">
+							<h4 class="my_account_tabs_header">ORDERS</h4>
+						</div>
+						<ul class="nav flex-column nav-pills my_account_tab_links_cont">
+							<li class="nav-item">
+								<a class="nav-link my_account_tab_link" href="">ORDERS <i class="fa-solid fa-chevron-right"></i></a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link my_account_tab_link" href="">INVOICES <i class="fa-solid fa-chevron-right"></i></a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link my_account_tab_link" href="">RETURNS <i class="fa-solid fa-chevron-right"></i></a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link my_account_tab_link" href="">REPAIRS <i class="fa-solid fa-chevron-right"></i></a>
+							</li>
+						</ul>
+					</div>
+					<div class="container my_account_tabs_cont">
+						<div class="container my_account_tabs_header_cont">
+							<h4 class="my_account_tabs_header">CUSTOMER DETAILS</h4>
+						</div>
+						<ul class="nav flex-column nav-pills my_account_tab_links_cont">
+							<li class="nav-item">
+								<a class="nav-link my_account_tab_link" href="">ACCOUNT DETAILS <i class="fa-solid fa-chevron-right"></i></a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link my_account_tab_link active" href="">ADDRESS BOOK <i class="fa-solid fa-chevron-right"></i></a>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="col global_font_3">
+					<div class="container">
+						<div class="container d-flex flex-column-reverse flex-sm-column-reverse flex-md-row flex-lg-row flex-xl-row my_account_address_book_header_n_btn_cont">
+							<div class="p-2 my_account_address_book_header_cont">
+								<h3 class="global_font_2">ADDRESS BOOK</h3>
+							</div>
+							<div class="p-2 ml-auto my_account_address_book_add_address_btn_cont">
+								<button type="button" class="btn global_red_select_btn_2 global_remove_shadow my_account_address_book_add_address_btn" data-toggle="modal" data-target="#my_account_add_address_popup1">ADD ADDRESS <i class="fa-solid fa-plus fa-lg"></i></button>
+							</div>
+						</div>
+					</div>
+					<div class="modal fade" id="my_account_add_address_popup1" tabindex="-1" role="dialog" aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered" role="document">
+							<div class="modal-content">
+								<div class="container my_account_add_address_cont">
+									<h4 class="global_font_2">INPUT NEW ADDRESS</h4>
+									<div class="form-group">
+										<label for="my_account_add_address_name" class="global_font_3 login_signup_label">NAME</label>
+                        				<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_name" name="my_account_add_address_name">
+									</div>
+									<div class="form-group">
+										<label for="my_account_add_address_unit_number" class="global_font_3 login_signup_label">UNIT NUMBER</label>
+                        				<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_unit_number" name="my_account_add_address_unit_number">
+									</div>
+									<div class="form-group">
+										<label for="my_account_add_address_address_line_1" class="global_font_3 login_signup_label">ADDRESS LINE 1</label>
+                        				<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_address_line_1" name="my_account_add_address_address_line_1">
+									</div>
+									<div class="form-group">
+										<label for="my_account_add_address_address_line_2" class="global_font_3 login_signup_label">ADDRESS LINE 2</label>
+                        				<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_address_line_2" name="my_account_add_address_address_line_2">
+									</div>
+									<div class="form-row">
+										<div class="form-group col">
+											<label for="my_account_add_address_city" class="global_font_3 login_signup_label">CITY</label>
+											<select class="selectpicker form-control global_option_select_1_cont" id="my_account_add_address_city" name="status_select" data-style=" global_option_select_1 global_remove_shadow global_font_4" data-dropup-auto=false>
+											  <option class="global_option_select_class_1 global_font_4" name="status_option">Beaufort West</option>
+											  <option class="global_option_select_class_1 global_font_4" name="status_option">Bloemfontein</option>
+											  <option class="global_option_select_class_1 global_font_4" name="status_option">Cape Town</option>
+											  <option class="global_option_select_class_1 global_font_4" name="status_option">Durban</option>
+											  <option class="global_option_select_class_1 global_font_4" name="status_option">East London</option>
+											</select>
+										</div>
+										<div class="form-group col">
+											<label for="my_account_add_address_province" class="global_font_3 login_signup_label">PROVINCE/REGION</label>
+                        					<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_province" name="my_account_add_address_province">
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="form-group col">
+											<label for="my_account_add_address_postal_code" class="global_font_3 login_signup_label">POSTAL CODE</label>
+                        					<input type="text" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_postal_code" name="my_account_add_address_postal_code">
+										</div>
+										<div class="form-check form-group custom-control custom-checkbox col" id="my_account_add_address_is_regional_col">
+											<input class="form-check-input custom-control-input" type="checkbox" value="True" id="my_account_add_address_is_regional" name="my_account_add_address_is_regional">
+                        					<label class="form-check-label form_header_2 custom-control-label" for="my_account_add_address_is_regional" id="my_account_add_address_is_regional_label">IS IT REGIONAL? <br><span>(30km away from city)</span></label>
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="my_account_add_address_contact_no" class="global_font_3 login_signup_label">CONTACT NUMBER</label>
+                                        <input type="tel" class="form-control global_remove_shadow global_font_4 global_text_input login_signup_input" id="my_account_add_address_contact_no" name="my_account_add_address_contact_no">
+									</div>
+									<div class="d-flex flex-row">
+										<div class="p-2 ml-auto">
+											<button type="button" class="btn global_red_select_btn_2 global_remove_shadow" id="my_account_add_address_submit">SUBMIT</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="container my_account_main_item_cont">
+						<div class="row">
+							<div class="col-12 col-sm-12 col-md-8 col-lg-7 col-xl-7 global_font_4">
+								<p>JOHN SMITH</p>
+								<p>14 DISTRO HOUSE<br>
+									5 RECESS RD<br>
+									ALVERSTONE<br>
+									DURBAN<br>
+									3610<br>
+									+27875683434</p>
+							</div>
+							<div class="col">
+								<div class="d-flex flex-column my_account_main_item_btn_col">
+									<div class="p-2 ml-md-auto ml-lg-auto ml-xl-auto">
+										<p class="global_font_4 global_font_italic">(DEFAULT)</p>
+									</div>
+									<div class="p-2 mt-md-auto ml-md-auto mt-lg-auto ml-lg-auto mt-xl-auto ml-xl-auto my_account_address_book_edit_delete_btn_cont">
+										<div class="d-flex flex-row my_account_address_book_edit_delete_btn_cont_inner">
+											<div class="p-2 my_account_address_book_delete_btn_cont">
+                                                 <button type="button" class="btn global_red_select_btn_2 global_remove_shadow my_account_address_book_delete_btn">DELETE</button>
+											</div>
+											<div class="p-2 my_account_address_book_edit_btn_cont">
+												 <button type="button" class="btn global_red_select_btn_2 global_remove_shadow my_account_address_book_edit_btn">EDIT</button>
+											</div>
+										</div>
+									</div>
+									<div class="p-2 ml-md-auto ml-lg-auto ml-xl-auto my_account_address_book_set_default_btn_cont">
+										<button type="button" class="btn global_red_select_btn_2 global_remove_shadow my_account_address_book_set_default_btn">SET DEFAULT</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	  </div>
+	  <!-- my account orders page end -->
+	  <div class="container-fluid shop_options_menu_account_cont_mobi d-lg-none d-xl-none ">
+          <button class="btn global_remove_shadow global_font_3 back_btn_mobi" type="button" aria-haspopup="true" aria-expanded="false">
+                <i class="fa-solid fa-caret-left"></i> BACK
+          </button>
+          <div class="dropdown_mobi">
+		  	<button class="btn global_remove_shadow shop_options_mobi global_font_3" type="button" aria-haspopup="true" aria-expanded="false">
+                  ACCOUNT <i class="fa-solid fa-caret-down"></i>
+            </button>
+			<div class="dropdown_menu_mobi shop_options_account_cont_mobi global_font_3">
+				<div class="shop_options_account_item_cont_mobi">
+					<a class="shop_options_account_item_mobi shop_options_global_hover" href="#">MY ACCOUNT</a>
+				</div>
+				<li class="shop_options_line"><img src="images/global_assets/nav_assets/nav_line_dropdown.png" alt=""></li>
+				<div class="shop_options_account_item_cont_mobi">
+					<a class="shop_options_account_item_mobi shop_options_global_hover" href="#">TRACK ORDER</a>
+				</div>
+				<li class="shop_options_line"><img src="images/global_assets/nav_assets/nav_line_dropdown.png" alt=""></li>
+				<div class="shop_options_account_item_cont_mobi">
+					<a class="shop_options_account_item_mobi shop_options_global_hover" href="#">RETURNS</a>
+				</div>
+				<li class="shop_options_line"><img src="images/global_assets/nav_assets/nav_line_dropdown.png" alt=""></li>
+				<div class="shop_options_account_item_cont_mobi">
+					<a class="shop_options_account_item_mobi shop_options_global_hover" href="#">INVOICES</a>
+				</div>
+				<li class="shop_options_line"><img src="images/global_assets/nav_assets/nav_line_dropdown.png" alt=""></li>
+				<div class="shop_options_account_item_cont_mobi">
+					<a class="shop_options_account_item_mobi shop_options_global_hover" href="#">LOGOUT</a>
+				</div>
+			</div>
+		  </div>
+          <button class="btn global_remove_shadow shop_options_mobi global_font_3" type="button" id="shopping_cart_btn_mobi" aria-haspopup="true" aria-expanded="false">
+                SHOPPING CART (2 ITEMS)
+          </button>
+	  </div>
+
+          <footer class="container-fluid auto_footer container_hide_mobi"> <!-- footer -->
+        <div class="d-flex flex-xl-row flex-lg-row flex-md-row flex-sm-column flex-column auto_footer_container">
+            <div class="p-2 justify-content-start" id="footer_col1"> <!-- company -->
+                <p class="footer_headers">AUTOLECTRONIX</p>
+                <p><img class="footer_logo" src="images/global_assets/logo_assets/global_auto_logo_whiteB_nT.webp" alt=""></p>
+                <p class="footer_logo_txt">PROVIDING THE<br> TRANSPORT INDUSTRY<br> WITH VIABLE ALTERNATIVES</p>
+            </div> <!-- end of company -->
+            <div class="p-2 justify-content-start" id="footer_col2"><!-- contact links -->
+                <p class="footer_headers">CONTACT US</p>
+                <p><i class="fa-solid fa-envelope fa-lg footer_contact_icons" id="email_icon"></i>OFFICE<span class="footer_links_br">@AUTOLECTRONIX.CO.ZA</span><br>
+                <i class="fa-brands fa-facebook fa-lg footer_contact_icons" id="fb_icon"></i><a href="https://www.facebook.com/autolectronix/" class="a_footer_links">FACEBOOK.COM<span class="footer_links_br">/AUTOLECTRONIX</span></a><br>
+                <i class="fa-solid fa-phone fa-lg footer_contact_icons" id="phone_icon"></i>031 700 1420<br>
+                <i class="fa-brands fa-whatsapp fa-xl footer_contact_icons" id="wh_icon"></i>031 700 1420<br>
+                <br>
+                <i class="fa-solid fa-clock fa-lg footer_contact_icons" id="clock_icon"></i>MON-THU: 8:00-16:00<br><span id="clock_br">FRI: 8:00-14:00</span></p>
+            </div> <!-- end of contact links -->
+            <div class="p-2 justify-content-start" id="footer_col3"> <!-- nav links -->
+                <p class="footer_headers">NAVIGATION</p>
+                <p class="footer_links"><a href="/home" class="a_footer_links">HOME</a><br>
+                    <a href="/about_us" class="a_footer_links">ABOUT US</a><br>
+                    <a href="/our_mission_and_vision" class="a_footer_links">OUR MISSION AND VISION</a><br>
+                    <a href="/research_and_development" class="a_footer_links">RESEARCH &amp; DEVELOPMENT</a><br>
+                    <a href="/quote" class="a_footer_links">GET A QUOTE</a><br>
+                    <a href="/products" class="a_footer_links">PRODUCTS</a><br>
+                    <a href="/faq" class="a_footer_links">FAQ</a><br>
+                    <a href="/contact_us" class="a_footer_links">CONTACT US</a></p>
+            </div> <!-- end of nav links -->
+        </div>
+        <div class="container-fluid footer_copyr"> <!-- copyright -->
+             COPYRIGHT @ 2023 AUTOLECTRONIX PTY LTD. ALL RIGHT RESERVED
+        </div>
+    </footer> <!-- end of footer -->
+	<script src="public/global.js"></script>
+	<script src="public/my_account_address_book.js"></script>
+	
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script src="public/popper.min.js"></script>
+	<script src="public/bootstrap.min.js"></script>
+    <script src="public/all.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+  </body>
+</html>

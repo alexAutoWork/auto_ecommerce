@@ -1,0 +1,204 @@
+@charset "utf-8";
+/* CSS Document */
+
+@font-face {
+    font-family: Audiowide Regular;
+    src: url("../fonts/Audiowide-Regular.ttf");
+    font-weight: regular;
+}
+
+@font-face {
+    font-family: Brandon Grotesque;
+    src: url("../fonts/Brandon_bld.otf");
+    font-weight: bold;
+}
+
+@font-face{
+    font-family: Roboto;
+    src: url("../fonts/Roboto-Light.ttf");
+    font-weight: light;
+}
+
+#P_header_cont {
+    background-image: url("../images/indi_page_assets/products_assets/header/products_header.webp");
+    background-position: 0px 0px;
+    background-size: 1300px;
+}
+
+.subH_products {
+    font-family: Brandon Grotesque;
+    letter-spacing: 3px;
+    background-color: #BB3333;
+    padding-top: 25px;
+    padding-bottom: 20px;
+    color: white;
+}
+
+#product_cont {
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu a::after {
+  transform: rotate(-90deg);
+  position: absolute;
+  right: 6px;
+  top: .8em;
+}
+
+.dropdown-submenu .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-left: .1rem;
+  margin-right: .1rem;
+}
+
+.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
+  background-color: black!important;
+  border: black;
+}
+
+.custom-checkbox .custom-control-input:checked:focus ~ .custom-control-label::before {
+  box-shadow: 0 0 0 1px #fff, 0 0 0 0.2rem black;
+  border: red;
+}
+.custom-checkbox .custom-control-input:focus ~ .custom-control-label::before {
+  box-shadow: 0 0 0 1px #fff, 0 0 0 0.2rem black;
+  border: none;
+}
+.custom-checkbox .custom-control-input:active ~ .custom-control-label::before {
+  background-color: black;
+  border: none;
+}
+
+.product_item_row {
+  gap: 30px;
+}
+
+.product_item {
+  border: none;
+  width: 300px;
+}
+
+.product_item_header {
+  font-family: Brandon Grotesque;
+  font-size: 20px;
+}
+
+.product_item_img {
+  margin-top: -1px;
+}
+
+.product_item_desc {
+  font-family: Roboto;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.product_item_view_btn {
+	margin-top: 16px;
+	max-width: 100%;
+	width: 100%;
+	font-size: 18px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+@media (max-width: 379px) {
+  #P_header_cont {
+    background-image: url("../images/indi_page_assets/products_assets/header/mobi_assets/products_header_mobi.webp");
+    background-size: 800px;
+    background-position: -300px -100px;
+  }
+
+  .product_item_row {
+    gap: 10px;
+  }
+
+  .product_item {
+    width: 250px;
+  }
+}
+
+@media (min-width: 380px) and (max-width: 445px) {
+  #P_header_cont {
+    background-image: url("../images/indi_page_assets/products_assets/header/mobi_assets/products_header_mobi.webp");
+    background-size: 800px;
+    background-position: -300px -100px;
+  }
+
+  .product_item_row {
+    gap: 10px;
+  }
+}
+
+@media (min-width: 446px) and (max-width: 609px) {
+  #P_header_cont {
+    background-image: url("../images/indi_page_assets/products_assets/header/mobi_assets/products_header_mobi.webp");
+    background-size: 800px;
+    background-position: -250px -100px;
+  }
+
+  .product_item_row {
+    gap: 10px;
+  }
+}
+
+@media (min-width: 610px) and (max-width: 779px) {
+  #P_header_cont {
+    background-image: url("../images/indi_page_assets/products_assets/header/mobi_assets/products_header_mobi.webp");
+    background-size: 800px;
+    background-position: -180px -100px;
+  }
+
+  .product_item_row {
+    gap: 10px;
+  }
+}
+
+@media (min-width: 780px) and (max-width: 990px) {
+  #P_header_cont {
+    background-image: url("../images/indi_page_assets/products_assets/header/mobi_assets/products_header_mobi.webp");
+    background-size: 800px;
+    background-position: -100px -100px;
+  }
+}
+
+@media (min-width: 991px) and (max-width: 1229px) {
+  #P_header_cont {
+    background-size: 1200px;
+    background-position: -200px -50px;
+  }
+}
+
+@media (min-width: 1230px) and (max-width: 1377px) {
+  #P_header_cont {
+    background-size: 1200px;
+    background-position: -80px -50px;
+  }
+}
+
+@media (min-width: 1700px) and (max-width: 1919px) {
+  #P_header_cont {
+    background-size: 1500px;
+    background-position: 0px -100px;
+  }
+}
+
+@media (min-width: 1920px) and (max-width: 2249px) {
+  #P_header_cont {
+    background-size: 2000px;
+    background-position: 0px -250px;
+  }
+}
+
+@media (min-width: 2250px) {
+  #P_header_cont {
+    background-size: 2500px;
+    background-position: 0px -400px;
+  }
+}

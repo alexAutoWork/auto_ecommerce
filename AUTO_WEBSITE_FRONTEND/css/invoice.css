@@ -1,0 +1,173 @@
+/* CSS Document */
+
+@font-face {
+    font-family: Audiowide Regular;
+    src: url("../fonts/Audiowide-Regular.ttf");
+    font-weight: regular;
+}
+
+@font-face {
+    font-family: Brandon Grotesque;
+    src: url("../fonts/Brandon_bld.otf");
+    font-weight: bold;
+}
+
+@font-face{
+    font-family: Roboto;
+    src: url("../fonts/Roboto-Light.ttf");
+    font-weight: light;
+}
+
+.invoice_global_1_cont {
+	margin-top: 20px;
+	margin-bottom: 80px;
+}
+
+.invoice_global_1_inner_cont {
+	margin-top: 20px;
+}
+
+.invoice_global_2_cont {
+	margin-top: 20px;
+	margin-bottom: 40px;
+}
+
+table.invoice_table_global > tbody > tr > th {
+	padding: 0px 0px 4px 0px;
+	margin: 0px;
+}
+
+table.invoice_table_global > tbody > tr > td {
+	padding: 0px 0px 4px 0px;
+	margin: 0px;
+}
+
+.invoice_table_global_data {
+	text-align: right;
+}
+
+.invoice_global_auto_logo_text {
+	margin-top: 15px;
+	margin-bottom: 10px;
+}
+
+.invoice_global_items_cont {
+	margin-bottom: 30%;
+}
+
+.invoice_table_stock_code {
+	width: 15%;
+	max-width: 15%;
+}
+
+.invoice_table_stock_unit_no {
+	width: 18%;
+	max-width: 18%;
+}
+
+.invoice_table_item {
+	width: 20%;
+	max-width: 20%;
+}
+
+.invoice_table_qty {
+	width: 1%;
+	max-width: 1%;
+}
+
+.invoice_table_unit_price {
+	width: 13%;
+	max-width: 13%;
+}
+
+.invoice_table_excl {
+	width: 11%;
+	max-width: 11%;
+}
+
+.invoice_table_vat {
+	width: 11%;
+	max-width: 11%;
+}
+
+.invoice_table_inc {
+	width: 11%;
+	max-width: 11%;
+}
+
+.invoice_table_global_total_head, .invoice_table_global_total_data {
+	font-size: 2em;
+	padding-top: 20px !important;
+}
+
+.invoices_not_supposed_to_see {
+	background-color: #BB3333;
+	width: 100vw;
+	height: 100vh;
+}
+
+.invoices_not_supposed_to_see_cont {
+	padding-top: 20vh;
+	color: white;
+}
+
+@media (max-width: 1106px) {
+	table.invoice_table_global_2 > thead > tr > th {
+		padding: 20px 10px 20px 0px;
+		margin: 0px;
+	}
+
+	table.invoice_table_global_2 > tbody > tr > td {
+		padding: 0px 10px 10px 0px;
+		margin: 0px;
+	}
+	
+	.invoice_table_stock_unit_no {
+		width: 18%;
+		min-width: 18%;
+		max-width: 18%;
+	}
+	
+	.invoice_table_stock_code {
+		width: 15%;
+		min-width: 15%;
+		max-width: 15%;
+	}
+	
+	.invoice_table_unit_price {
+		min-width: 12%;
+		max-width: 12%;
+		width: 12%;
+	}
+	
+	.invoice_table_item {
+		min-width: 15%;
+		max-width: 15%;
+		width: 15%;
+	}
+	
+	.invoice_table_qty {
+		min-width: 2%;
+		width: 2%;
+		max-width: 2%;
+	}
+	
+	.invoice_table_excl {
+		width: 10%;
+		min-width: 10%;
+		max-width: 10%;
+	}
+
+	.invoice_table_vat {
+		width: 10%;
+		min-width: 10%;
+		max-width: 10%;
+	}
+
+	.invoice_table_inc {
+		width: 10%;
+		min-width: 10%;
+		max-width: 10%;
+	}
+
+}

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PRODUCTS - AUTOLECTRONIX</title>
+    <link rel="icon" type="image/x-icon" href="public/global_assets/logo_assets/Simplified_ver_white_border_square.png">
+    <!-- Bootstrap -->
+	<link href="public/bootstrap.min.css" rel="stylesheet">
+	<!-- FontAwesome Icons -->
+    <link href="public/all.min.css" rel="stylesheet">
+    <!-- Our Files -->
+    <link href="public/nav.css" rel="stylesheet">
+	<link href="public/global.css" rel="stylesheet">
+    <link href="public/products.css" rel="stylesheet">
+	<link href="public/global_admin.css" rel="stylesheet">
+	<script src="public/jquery.min.js"></script>
+
+<!--
+:~-._                                                 _.-~:
+: :.~^o._        ________---------________        _.o^~.:.:
+ : ::.`?88booo~~~.::::::::...::::::::::::..~~oood88P'.::.:
+ :  ::: `?88P .:::....         ........:::::. ?88P' :::. :
+  :  :::. `? .::.            . ...........:::. P' .:::. :
+   :  :::   ... ..  ...       .. .::::......::.   :::. :
+   `  :' .... ..  .:::::.     . ..:::::::....:::.  `: .'
+    :..    ____:::::::::.  . . ....:::::::::____  ... :
+   :... `:~    ^~-:::::..  .........:::::-~^    ~::.::::
+   `.::. `\   (8)  \b:::..::.:.:::::::d/  (8)   /'.::::'
+    ::::.  ~-._v    |b.::::::::::::::d|    v_.-~..:::::
+    `.:::::... ~~^?888b..:::::::::::d888P^~...::::::::'
+     `.::::::::::....~~~ .:::::::::~~~:::::::::::::::'
+      `..:::::::::::   .   ....::::    ::::::::::::,'
+        `. .:::::::    .      .::::.    ::::::::'.'
+          `._ .:::    .        :::::.    :::::_.'
+             `-. :    .        :::::      :,-'
+                :.   :___     .:::___   .::
+      ..--~~~~--:+::. ~~^?b..:::dP^~~.::++:--~~~~--..
+        ___....--`+:::.    `~8~'    .:::+'--....___
+      ~~   __..---`_=:: ___gd8bg___ :==_'---..__   ~~
+       -~~~  _.--~~`-.~~~~~~~~~~~~~~~,-' ~~--._ ~~~-
+          -~~            ~~~~~~~~~             ~~-
+-->
+
+  </head>
+  <body>
+  	
+	<!-- body code goes here -->
+	<div class="container-fluid">
+		<div class="row global_admin_main_row">
+			<div class="col-3 global_admin_nav">
+				<nav class="nav flex-column">
+					<h1 class="global_admin_font_1 global_admin_nav_header">ADMIN PANEL</h1>
+					<ul class="nav">
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-house global_admin_nav_icons" id="global_admin_nav_dashboard_icon"></i> DASHBOARD</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-square-poll-horizontal global_admin_nav_icons" id="global_admin_nav_orders_icon"></i> ORDERS</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-screwdriver-wrench global_admin_nav_icons" id="global_admin_nav_repairs_icon"></i> REPAIRS</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-barcode global_admin_nav_icons" id="global_admin_nav_products_icon"></i> PRODUCTS</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-list-ul global_admin_nav_icons" id="global_admin_nav_categories_icon"></i> CATEGORIES</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link active" href=""><i class="fa-solid fa-receipt global_admin_nav_icons" id="global_admin_nav_invoices_icon"></i> INVOICES</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-square-caret-left global_admin_nav_icons" id="global_admin_nav_returns_icon"></i> RETURNS</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-users global_admin_nav_icons" id="global_admin_nav_customers_icon"></i> CUSTOMERS</a>
+						</li>
+						<li class="nav-item global_admin_nav_line_item">
+							<img src="images/global_assets/nav_assets/mobi/nav_line_mobi.png" class="global_admin_nav_line_2">
+						</li>
+						<li class="nav-item global_admin_nav_item">
+							<a class="nav-link global_admin_font_3 global_admin_nav_link" href=""><i class="fa-solid fa-gear global_admin_nav_icons" id="global_admin_nav_settings_icon"></i> SETTINGS</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+			<div class="col-9 global_admin_main_col">
+				<div class="container-fluid">
+					
+					<div class="container global_admin_main_header_cont">
+						<h1 class="global_admin_font_1 global_admin_header_1 global_admin_main_header">INVOICE #435624587</h1>
+					</div>
+					
+					<div class="container global_admin_nav_pill_cont">
+						<ul class="nav nav-pills mb-3 global_admin_font_3" id="indi_invoice_nav" role="tablist">
+							<li class="nav-item">
+								<a class="nav-link active" id="invoice_details_tab" data-toggle="pill" href="#invoice_details" role="tab" aria-controls="invoice_details" aria-selected="true">DETAILS</a>
+							</li>
+							<li class="global_admin_nav_line">
+								<img src="images/global_assets/nav_assets/nav_line_desktop.png">
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" id="invoice_orders_tab" data-toggle="pill" href="#invoice_orders" role="tab" aria-controls="invoice_orders" aria-selected="false">ORDERS</a>
+							</li>
+							<li class="global_admin_nav_line">
+								<img src="images/global_assets/nav_assets/nav_line_desktop.png">
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" id="invoice_returns_tab" data-toggle="pill" href="#invoice_returns" role="tab" aria-controls="invoice_returns" aria-selected="false">RETURNS</a>
+							</li>
+						</ul>
+					</div>
+					
+					<div class="tab-content" id="indi_invoice_tab_content">
+						
+						<div class="tab-pane fade show active" id="invoice_details" role="tabpanel" aria-labelledby="invoice_details_tab">
+							<div class="container">
+								
+								<div class="container d-flex flex-row">
+									<div class="p-2 ml-auto">
+										<button type="button" class="btn global_admin_red_select_btn_2 global_admin_remove_shadow global_admin_font_3">DOWNLOAD <i class="fa-solid fa-file-arrow-down global_admin_red_select_btn_2_icon"></i></button> <button type="button" class="btn global_admin_red_select_btn_2 global_admin_remove_shadow global_admin_font_3">SYNC TO SAGE <i class="fa-solid fa-arrows-rotate global_admin_red_select_btn_2_icon"></i></button>
+									</div>
+								</div>
+								
+								<div class="container global_admin_invoice_invoices_main_invoice_cont">
+                                   <div class="row">
+
+                                      <div class="col-6">
+
+                                          <div class="container">
+                                              <h1 class="global_admin_font_2">TAX INVOICE</h1>
+                                              <table class="table table-borderless global_admin_invoices_invoice_table">
+                                                  <tbody>
+                                                      <tr class="global_admin_invoices_invoice_table_row">
+                                                          <td class="global_admin_font_3">INVOICE NUMBER</td>
+                                                          <td class="global_admin_font_4 global_admin_invoices_invoice_table_data global_admin_font_italic">INV11567</td>
+                                                      </tr>
+                                                      <tr class="global_admin_invoices_invoice_table_row">
+                                                          <td class="global_admin_font_3">ORDER NUMBER</td>
+                                                          <td class="global_admin_font_4 global_admin_invoices_invoice_table_data global_admin_font_italic">435624587</td>
+                                                      </tr>
+                                                      <tr class="global_admin_invoices_invoice_table_row">
+                                                          <td class="global_admin_font_3">DATE</td>
+                                                          <td class="global_admin_font_4 global_admin_invoices_invoice_table_data global_admin_font_italic">20/10/2023</td>
+                                                      </tr>
+                                                  </tbody>
+                                              </table>
+                                          </div>
+
+                                          <div class="container">
+                                              <h2 class="global_admin_font_2">CUSTOMER DETAILS</h2>
+                                              <table class="table table-borderless global_admin_invoices_invoice_table">
+                                                  <tbody>
+                                                      <tr class="global_admin_invoices_invoice_table_row">
+                                                          <td class="global_admin_font_3 invoice_table_global_head">NAME</td>
+                                                          <td class="global_admin_font_4 global_admin_invoices_invoice_table_data global_admin_font_italic">JOHN SMITH</td>
+                                                      </tr>
+                                                      <tr class="global_admin_invoices_invoice_table_row">
+                                                          <td class="global_admin_font_3 invoice_table_global_head">EMAIL</td>
+                                                          <td class="global_admin_font_4 global_admin_invoices_invoice_table_data global_admin_font_italic">JOHNSMITH@GMAIL.COM</td>
+                                                      </tr>
+                                                      <tr class="global_admin_invoices_invoice_table_row">
+                                                          <td class="global_admin_font_3 invoice_table_global_head">MOBILE NO.</td>
+                                                          <td class="global_admin_font_4 global_admin_invoices_invoice_table_data global_admin_font_italic">+27875683434</td>
+                                                      </tr>
+                                                      <tr class="global_admin_invoices_invoice_table_row">
+                                                          <td class="global_admin_font_3 invoice_table_global_head">COMPANY</td>
+                                                          <td class="global_admin_font_4 global_admin_invoices_invoice_table_data global_admin_font_italic">JOHN LOCKING TRUCKERS CO.</td>
+                                                      </tr>
+                                                      <tr class="global_admin_invoices_invoice_table_row">
+                                                          <td class="global_admin_font_3 invoice_table_global_head">REG NO.</td>
+                                                          <td class="global_admin_font_4 global_admin_invoices_invoice_table_data global_admin_font_italic">2016/4438465/54</td>
+                                                      </tr>
+                                                      <tr class="global_admin_invoices_invoice_table_row">
+                                                          <td class="global_admin_font_3 invoice_table_global_head">VAT NO.</td>
+                                                          <td class="global_admin_font_4 global_admin_invoices_invoice_table_data global_admin_font_italic">9054645677</td>
+                                                      </tr>
+                                                  </tbody>
+                                              </table>
+                                          </div>
+                                      </div>
+
+                                      <div class="col-4 ml-auto">
+                                          <div class="container invoice_global_auto_logo text-center">
+                                              <img src="images/global_assets/logo_assets/global_auto_logo_blackB_nT.webp" style="width: 40%;">
+                                              <h3 class="global_admin_font_1 global_admin_invoices_invoice_auto_logo_text">AUTOLECTRONIX</h3>
+                                          </div>
+                                          <div class="container">
+                                              <table class="table table-borderless global_admin_invoices_invoice_table">
+                                                  <tbody>
+                                                      <tr class="global_admin_invoices_invoice_table_row">
+                                                          <td class="global_admin_font_3 invoice_table_global_head">REG NO.</td>
+                                                          <td class="global_admin_font_4 global_admin_invoices_invoice_table_data global_admin_font_italic">2014/251650/07</td>
+                                                      </tr>
+                                                      <tr class="global_admin_invoices_invoice_table_row">
+                                                          <td class="global_admin_font_3 invoice_table_global_head">VAT NO.</td>
+                                                          <td class="global_admin_font_4 global_admin_invoices_invoice_table_data global_admin_font_italic">4830269454</td>
+                                                      </tr>
+                                                      <tr class="global_admin_invoices_invoice_table_row_table_global_row">
+                                                          <td class="global_admin_font_3 invoice_table_global_head">MOBILE NO.</td>
+                                                          <td class="global_admin_font_4 global_admin_invoices_invoice_table_data global_admin_font_italic">031 700 1420</td>
+                                                      </tr>
+                                                      <tr class="global_admin_invoices_invoice_table_row">
+                                                          <td class="global_admin_font_3 invoice_table_global_head">ADDRESS</td>
+                                                          <td class="global_admin_font_4 global_admin_invoices_invoice_table_data global_admin_font_italic">UNIT 5 LUBEX HOUSE<br>
+                                                          4 IVY RD<br>
+                                                          PINETOWN<br>
+                                                          DURBAN<br>
+                                                          3610</td>
+                                                      </tr>
+                                                  </tbody>
+                                              </table>
+                                          </div>
+                                      </div>
+
+                                      </div>
+
+                                      <hr />
+
+                                      <div class="container global_admin_invoices_invoice_table_items_cont">
+                                          <h2 class="global_admin_font_2">INVOICE ITEMS</h2>
+                                          <table class="table table-borderless global_admin_invoices_invoice_table">
+                                              <thead>
+                                                  <tr class="global_admin_font_3 invoice_global_row_2">
+                                                      <th scope="col" class="invoice_table_global_head_2 global_admin_invoices_invoice_table_stock_code">STOCK CODE</th>
+                                                      <th scope="col" class="invoice_table_global_head_2 global_admin_invoices_invoice_table_stock_unit_no">STOCK UNIT NO.</th>
+                                                      <th scope="col" class="invoice_table_global_head_2 global_admin_invoices_invoice_table_item">ITEM</th>
+                                                      <th scope="col" class="invoice_table_global_head_2 global_admin_invoices_invoice_table_qty">QTY</th>
+                                                      <th scope="col" class="invoice_table_global_head_2 global_admin_invoices_invoice_table_unit_price">UNIT PRICE</th>
+                                                      <th scope="col" class="invoice_table_global_head_2 global_admin_invoices_invoice_table_excl">EXCL</th>
+                                                      <th scope="col" class="invoice_table_global_head_2 global_admin_invoices_invoice_table_vat">VAT</th>
+                                                      <th scope="col" class="invoice_table_global_head_2 global_admin_invoices_invoice_table_incl">INC</th>
+                                                  </tr>
+                                              </thead>
+                                              <tbody class="global_admin_font_italic">
+                                                  <tr class="global_admin_font_4 invoice_global_row_2">
+                                                      <td class="invoice_table_global_data_2 text-break invoice_table_stock_code">MB039</td>
+                                                      <td class="invoice_table_global_data_2 text-break invoice_table_stock_unit_no">AX1799230102023</td>
+                                                      <td class="invoice_table_global_data_2 text-break invoice_table_item">MERCEDES-BENZ BASE MODULE (SALE)</td>
+                                                      <td class="invoice_table_global_data_2 text-break invoice_table_qty">1</td>
+                                                      <td class="invoice_table_global_data_2 text-break invoice_table_unit_price">R6000</td>
+                                                      <td class="invoice_table_global_data_2 text-break invoice_table_excl">R600000.25</td>
+                                                      <td class="invoice_table_global_data_2 text-break invoice_table_vat">R90000.25</td>
+                                                      <td class="invoice_table_global_data_2 text-break invoice_table_inc">R690000.25</td>
+                                                  </tr>
+                                              </tbody>
+                                          </table>
+                                      </div>
+
+                                      <hr />
+
+                                      <div class="container">
+                                          <div class="row">
+                                              <div class="col">
+
+                                              </div>
+                                              <div class="col-5">
+                                                  <div class="container">
+                                                      <table class="table table-borderless global_admin_invoices_invoice_table">
+                                                          <tbody>
+                                                              <tr class="global_admin_invoices_invoice_table_row">
+                                                                  <td class="global_admin_font_3 invoice_table_global_head">SHIPPING</td>
+                                                                  <td class="global_admin_font_4 global_admin_font_italic global_admin_invoices_invoice_table_data global_font_italic">R55</td>
+                                                              </tr>
+                                                              <tr class="global_admin_invoices_invoice_table_row">
+                                                                  <td class="global_admin_font_3 invoice_table_global_head">TOTAL EXCLUSIVE</td>
+                                                                  <td class="global_admin_font_4 global_admin_font_italic global_admin_invoices_invoice_table_data global_font_italic">R12055</td>
+                                                              </tr>
+                                                              <tr class="global_admin_invoices_invoice_table_row">
+                                                                  <td class="global_admin_font_3 invoice_table_global_head">TOTAL VAT (15%)</td>
+                                                                  <td class="global_admin_font_4 global_admin_font_italic global_admin_invoices_invoice_table_data global_font_italic">R1808.25</td>
+                                                              </tr>
+                                                              <tr class="global_admin_invoices_invoice_table_row">
+                                                                  <td class="global_admin_font_3  global_admin_invoices_invoice_table_total_head">TOTAL</td>
+                                                                  <td class="global_admin_font_3 global_admin_invoices_invoice_table_data global_admin_invoices_invoice_table_total_data">R13863.25</td>
+                                                              </tr>
+                                                          </tbody>
+                                                      </table>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+
+                                </div>
+								
+							</div>
+						</div>
+						
+						<div class="tab-pane fade" id="invoice_orders" role="tabpanel" aria-labelledby="invoice_orders_tab">
+							<div class="container">
+								<div class="container">
+									<h2 class="global_admin_font_2">ORDERS</h2>
+								</div>
+								
+								<div class="container global_admin_table_scroll">
+									<table class="table global_admin_table">
+										<thead class="global_admin_font_3">
+											<tr>
+												<th scope="col" class="global_admin_table_header_order_date">DATE</th>
+												<th scope="col" class="global_admin_table_header_order_no">ORDER NO.</th>
+												<th scope="col" class="global_admin_table_header_order_status">STATUS</th>
+												<th scope="col" class="global_admin_table_header_order_status_date">STATUS DATE</th>
+												<th scope="col" class="global_admin_table_header_order_shipping_method">SHIPPING METHOD</th>
+												<th scope="col" class="global_admin_table_header_order_shipping_price">SHIPPING PRICE</th>
+												<th scope="col" class="global_admin_table_header_order_total_excl">TOTAL EXCL</th>
+												<th scope="col" class="global_admin_table_header_order_total_incl">TOTAL INCL</th>
+												<th scope="col" class="global_admin_table_header_order_total_vat">TOTAL VAT</th>
+												<th scope="col" class="global_admin_table_data_sticky_icons global_admin_table_data_sticky_orders"></th>
+											</tr>
+										</thead>
+										<tbody class="global_admin_font_4">
+											<tr>
+												<td>10/10/2023</td>
+												<td>#435624587</td>
+												<td>ORDER PLACED</td>
+												<td>10/10/2023</td>
+												<td>DELIVER WITH OUR COURIER</td>
+												<td>R9000</td>
+												<td>R6000</td>
+												<td>R7000</td>
+												<td>R1000</td>
+												<td class="global_admin_table_data_sticky_icons global_admin_table_data_sticky_orders"><button type="button" class="btn global_admin_remove_shadow global_admin_black_icon_btn global_admin_font_3 global_admin_table_data_sticky_icon_btns global_admin_table_data_sticky_icon_orders_edit_icon_btn"><i class="fa-solid fa-pen-to-square"></i></button></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								
+							</div>
+								
+						</div>
+						
+						<div class="tab-pane fade" id="invoice_returns" role="tabpanel" aria-labelledby="invoice_returns_tab">
+							<div class="container">
+								<div class="container">
+									<h2 class="global_admin_font_2">RETURNS</h2>
+								</div>
+								
+								<div class="container global_admin_table_scroll">
+									<table class="table global_admin_table">
+										<thead class="global_admin_font_3">
+											<tr>
+												<th scope="col" class="global_admin_table_header_returns_date">DATE</th>
+												<th scope="col" class="global_admin_table_header_returns_no">RETURN NO.</th>
+												<th scope="col" class="global_admin_table_header_returns_item_no">ITEM NO.</th>
+												<th scope="col" class="global_admin_table_header_returns_status">STATUS</th>
+												<th scope="col" class="global_admin_table_header_returns_status_date">STATUS DATE</th>
+												<th scope="col" class="global_admin_table_header_returns_product_id">PRODUCT ID</th>
+												<th scope="col" class="global_admin_table_header_returns_product_name">PRODUCT NAME</th>
+												<th scope="col" class="global_admin_table_header_returns_pref_outcome">PREFFERED OUTCOME</th>
+												<th scope="col" class="global_admin_table_data_sticky_icons global_admin_table_data_sticky_returns"></th>
+											</tr>
+										</thead>
+										<tbody class="global_admin_font_4">
+											<tr>
+												<td>10/10/2023</td>
+												<td>#435624587</td>
+												<td>#435624587</td>
+												<td>JOHN SMITH</td>
+												<td>10/10/2023</td>
+												<td>10/10/2023</td>
+												<td>10/10/2023</td>
+												<td>10/10/2023</td>
+												<td class="global_admin_table_data_sticky_icons global_admin_table_data_sticky_returns"><button type="button" class="btn global_admin_remove_shadow global_admin_black_icon_btn global_admin_font_3 global_admin_table_data_sticky_icon_btns global_admin_table_data_sticky_icon_returns_edit_icon_btn"><i class="fa-solid fa-pen-to-square"></i></button></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+					
+				</div>
+			</div>
+		</div>  
+	</div>
+	  
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	  
+	  
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script src="public/popper.min.js"></script>
+	<script src="public/bootstrap.min.js"></script>
+    <script src="public/all.min.js"></script>
+  </body>
+</html>

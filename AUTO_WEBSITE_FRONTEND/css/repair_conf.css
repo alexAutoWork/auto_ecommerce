@@ -1,0 +1,115 @@
+/* CSS Document */
+
+.repair_conf_cont {
+	margin-top: 10px;
+	margin-bottom: 20px;
+}
+
+.repair_conf_thank_you_cont {
+	text-align: center;
+	background-color: #BB3333;
+	color: white;
+	border-radius: 15px;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+.repair_conf_thank_you_p3 {
+	margin-bottom: 0px;
+}
+
+.repair_conf_shipping_details_cont {
+	display: flex;
+	align-self: center;
+	padding-left: 70px;
+	padding-right: 70px;
+	margin-top: 30px;
+}
+
+.repair_conf_collection_cont {
+	max-width: 50%;
+	width: 50%;
+}
+
+
+table.repair_conf_shipping_summary_table > tbody > tr > th {
+	border:0px;
+	padding: 0px 0px 8px 0px;
+	margin: 0px;
+}
+
+table.repair_conf_shipping_summary_table > tbody > tr > td {
+	border:0px;
+	padding: 0px 0px 8px 0px;
+	margin: 0px;
+}
+
+table.repair_conf_shipping_summary_table > tbody > tr > td.repair_conf_shipping_summary_table_blank {
+	border:0px;
+	padding: 0px 0px 50px 0px;
+	margin: 0px;
+}
+
+.repair_conf_shipping_summary_table_data {
+	text-align: right;
+}
+
+.repair_conf_shipping_summary_cont {
+	max-width: 50%;
+	align-self: flex-start;
+}
+
+.repair_conf_repair_summary_cont {
+	padding-left: 92px;
+	padding-right: 92px;
+}
+
+.repair_conf_repair_summary_p1, .repair_conf_repair_summary_p3 {
+	margin-bottom: 0px;
+}
+
+.repair_conf_repair_items_cont {
+	padding-left: 92px;
+	padding-right: 92px;
+}
+
+.repair_conf_repair_items_product_cont {
+	max-width: 100%;
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
+}
+
+.repair_conf_repair_items_product_img {
+	max-width: 20%;
+	width: 20%;
+}
+
+.repair_conf_repair_items_product_details {
+	max-width: 60%;
+	width: 60%;
+}
+
+@media (max-width: 767px) {
+	.repair_conf_shipping_details_cont {
+		max-width: 100%;
+		width: 100%;
+		margin: 20px 0 0 0;
+		padding: 0;
+	}
+	
+	.repair_conf_collection_cont, .repair_conf_collection_method_cont, .repair_conf_collection_address_cont, .repair_conf_shipping_summary_cont {
+		max-width: 100%;
+		width: 100%;
+		margin: 0 0 0 0;
+		padding: 0;
+	}
+	
+	.repair_conf_repair_summary_cont, .repair_conf_repair_items_cont, .repair_conf_repair_items_product_cont, .repair_conf_repair_items_product_cont_row {
+		padding: 0;
+	}
+	
+	.repair_conf_repair_summary_cont, .repair_conf_repair_items_cont {
+		margin-left: 8px;
+	}
+}

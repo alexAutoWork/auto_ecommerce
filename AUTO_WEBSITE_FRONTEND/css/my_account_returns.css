@@ -1,0 +1,80 @@
+@font-face {
+    font-family: Audiowide Regular;
+    src: url("../fonts/Audiowide-Regular.ttf");
+    font-weight: regular;
+}
+
+@font-face {
+    font-family: Brandon Grotesque;
+    src: url("../fonts/Brandon_bld.otf");
+    font-weight: bold;
+}
+
+@font-face{
+    font-family: Roboto;
+    src: url("../fonts/Roboto-Light.ttf");
+    font-weight: light;
+}
+
+.my_account_apply_for_return_cont {
+	padding: 20px;
+}
+
+.my_account_apply_for_return_scroll_cont {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	height: 350px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.my_account_apply_for_return_indi_item_cont {
+	border-radius: 15px;
+	box-shadow: 0px 10px 8px 0px rgba(204, 204, 204, 1);
+	padding: 15px 20px 15px 20px;
+	margin-bottom: 20px;
+}
+
+.my_account_apply_for_return_order_number {
+	margin-bottom: 0;
+}
+
+.my_account_apply_for_return_order_date {
+	color: #BB3333;
+	margin-bottom: 0;
+}
+
+.my_account_apply_for_return_order_img_cont, .my_account_apply_for_return_order_img_cont_inner {
+	margin: 0;
+	padding: 0;
+}
+
+.my_account_apply_for_return_order_item_img {
+	width: 90px;
+	margin: 0;
+}
+
+.my_account_apply_for_return_item_name, .my_account_apply_for_return_item_type {
+	margin-bottom: 0;
+}
+
+.my_account_apply_for_return_item_img {
+	width: 110px;
+}
+
+.my_account_apply_for_return_item_number {
+	color: #BB3333;
+	margin-bottom: 0;
+}
+
+/*
+#my_account_apply_for_return_reason_cont .my_account_apply_for_return_indi_item_cont {
+	border: 0;
+}*/
+
+@media (max-width: 767px) {
+	.my_account_return_btn_cont, .my_account_return_btn {
+		max-width: 100%;
+		width: 100%;
+	}
+}

@@ -11,10 +11,15 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'AUTO_WEBSITE', 'media')
+
+MEDIA_URL = '/media/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -25,7 +30,7 @@ SECRET_KEY = 'django-insecure-ki^s18o+m(&zqr!g^bn%qv=xwr43nnf)$44l(8b%4+tl+qoo_o
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', 'localhost:8000']
 
 
 # Application definition
@@ -37,6 +42,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'AUTO_WEBSITE_ECOMMERCE',
+    'phonenumber_field',
+    'django_extensions',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'django_filters',
+    'corsheaders'
+    # 'dj_rest_auth',
+    # 'allauth',
+    # 'allauth.account',
+    # 'dj_rest_auth.registration',
 ]
 
 MIDDLEWARE = [
@@ -47,6 +64,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    # 'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'AUTO_WEBSITE.urls'
@@ -75,8 +95,12 @@ WSGI_APPLICATION = 'AUTO_WEBSITE.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ecommerce_db',
+        'USER': 'root',
+        'PASSWORD': 'admin',
+        'HOST': 'host.docker.internal',
+        'PORT': '3306',
     }
 }
 
@@ -99,6 +123,79 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'AUTO_WEBSITE_ECOMMERCE.UserLogin'
+AUTHENTICATION_BACKENDS = [
+    'AUTO_WEBSITE_ECOMMERCE.models.EmailBackend',
+]
+
+# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+# ACCOUNT_EMAIL_REQUIRED = True
+# ACCOUNT_UNIQUE_EMAIL = True
+# ACCOUNT_USERNAME_REQUIRED = False
+# ACCOUNT_AUTHENTICATION_METHOD = 'email'
+# ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+# ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/?verification=1'
+# ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/?verification=1'
+
+# AUTHENTICATION_BACKENDS = ['users.auth_backends.EmailBackend']
+
+SITE_ID = 1
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'LOGS/django_log.log',
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        }
+    }
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
+    'DEFAULT_METADATA_CLASS': 'rest_framework.metadata.SimpleMetadata',
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework.filters.OrderingFilter',
+        'rest_framework.filters.SearchFilter',
+    ),
+    'SEARCH_PARAM': 'filter[search]',
+    'TEST_REQUEST_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
+    'TEST_REQUEST_DEFAULT_FORMAT': 'vnd.api+json'
+}
+
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'AUTO_WEBSITE_ECOMMERCE.reg.reg_serializers.UserLoginSerializer',
+}
+
+SESSION_COOKIE_AGE = 86400
+
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:3000',
+# ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -121,3 +218,21 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+TWILIO_ACCOUNT_SID = 'ACcb2c34498adc3a223f1cad1eebb081d4'
+TWILIO_AUTH_TOKEN = '3872358d07a81a609c1447dc8feb7a2b'
+TWILIO_MOBILE_NO = '+12096770058'
+
+SAGE_TEST_API_KEY = '{4FE2E815-3D46-4C68-A55B-6B3570159B57}'
+SAGE_USERNAME = 'alex@autolectronix.co.za'
+SAGE_PASSWORD = 'sAT@.132758884.2004#'
+SAGE_URL = 'https://resellers.accounting.sageone.co.za'
+SAGE_VER = '2.0.0'
+
+# Email Setting (user created)
+EMAIL_HOST = 'mail.autolectronix.co.za'
+EMAIL_HOST_USER = 'noreply@autolectronix.co.za'
+EMAIL_HOST_PASSWORD = 'EM@.Ub1n0r3ply.#'
+EMAIL_PORT = 465
+EMAIL_USE_SSL =  True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
