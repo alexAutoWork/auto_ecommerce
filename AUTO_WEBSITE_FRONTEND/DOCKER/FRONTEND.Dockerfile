@@ -15,4 +15,4 @@ COPY . .
 
 RUN mkdir /opt/node_app/media
 
-EXPOSE 3000
+EXPOSE 8080

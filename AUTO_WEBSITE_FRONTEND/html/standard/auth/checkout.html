@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PRODUCTS - AUTOLECTRONIX</title>
+    <link rel="icon" type="image/x-icon" href="public/global_assets/logo_assets/Simplified_ver_white_border_square.png">
+    <!-- Bootstrap -->
+	<link href="public/bootstrap.min.css" rel="stylesheet">
+	<!-- FontAwesome Icons -->
+    <link href="public/all.min.css" rel="stylesheet">
+    <!-- Our Files -->
+    <link href="public/nav.css" rel="stylesheet">
+	<link href="public/global.css" rel="stylesheet">
+	<link href="public/global_2.css" rel="stylesheet">
+	<link href="public/checkout.css" rel="stylesheet">
+    <link href="public/products.css" rel="stylesheet">
+	<script src="public/jquery.min.js"></script>
+
+<!--
+:~-._                                                 _.-~:
+: :.~^o._        ________---------________        _.o^~.:.:
+ : ::.`?88booo~~~.::::::::...::::::::::::..~~oood88P'.::.:
+ :  ::: `?88P .:::....         ........:::::. ?88P' :::. :
+  :  :::. `? .::.            . ...........:::. P' .:::. :
+   :  :::   ... ..  ...       .. .::::......::.   :::. :
+   `  :' .... ..  .:::::.     . ..:::::::....:::.  `: .'
+    :..    ____:::::::::.  . . ....:::::::::____  ... :
+   :... `:~    ^~-:::::..  .........:::::-~^    ~::.::::
+   `.::. `\   (8)  \b:::..::.:.:::::::d/  (8)   /'.::::'
+    ::::.  ~-._v    |b.::::::::::::::d|    v_.-~..:::::
+    `.:::::... ~~^?888b..:::::::::::d888P^~...::::::::'
+     `.::::::::::....~~~ .:::::::::~~~:::::::::::::::'
+      `..:::::::::::   .   ....::::    ::::::::::::,'
+        `. .:::::::    .      .::::.    ::::::::'.'
+          `._ .:::    .        :::::.    :::::_.'
+             `-. :    .        :::::      :,-'
+                :.   :___     .:::___   .::
+      ..--~~~~--:+::. ~~^?b..:::dP^~~.::++:--~~~~--..
+        ___....--`+:::.    `~8~'    .:::+'--....___
+      ~~   __..---`_=:: ___gd8bg___ :==_'---..__   ~~
+       -~~~  _.--~~`-.~~~~~~~~~~~~~~~,-' ~~--._ ~~~-
+          -~~            ~~~~~~~~~             ~~-
+-->
+
+  </head>
+  <body>
+  	<!-- body code goes here -->
+	  
+	  <!-- my account orders page start -->
+	  <div class="container-fluid">
+		<div class="container">
+			<div class="container">
+				<div class="d-flex flex-column-reverse flex-sm-column-reverse flex-md-row flex-lg-row flex-xl-row">
+					<div class="p-2">
+						<h1 class="global_font_1 global_header_1">CHECKOUT</h1>
+					</div>
+					<div class="p-2 ml-auto global_font_3">
+						<button type="button" class="btn global_remove_shadow global_white_select_btn"><i class="fa-solid fa-cart-shopping"></i> BACK TO CART</button>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12 col-sm-12 col-md-12 col-lg-7 col-xl-8">
+					<div class="checkout_items_for_delivery_cont container checkout_items_cont">
+						<h2 class="global_font_2 checkout_items_for_delivery_header">ITEMS FOR DELIVERY</h2>	
+							<div class="container checkout_items_for_delivery_indi_item_cont">
+								<div class="row">
+									<div class="col-2">
+										insert img here
+									</div>
+									<div class="col">
+										<div class="d-flex flex-column">
+											<div class="p-2">
+												<h3 class="global_font_3 checkout_items_for_delivery_product_name">MERCEDES-BENZ BASE MODULE</h3>
+												<p class="global_font_4 global_font_italic checkout_items_for_delivery_product_type">TYPE: EXCHANGE UNIT</p>
+												<p class="global_font_4 global_font_italic checkout_items_for_delivery_product_qty">QTY: 1</p>
+											</div>
+											<div class="p-2">
+												<h3 class="global_font_3 checkout_items_for_delivery_product_price">R6000</h3>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+					</div>
+					
+					<hr />
+
+					<div class="modal fade" id="checkout_exchange_unit_file_delete" tabindex="-1" role="dialog" aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered" role="document">
+							<div class="modal-content">
+								<div class="container">
+									<h4>ARE YOU SURE?</h4>
+									<p>You are about to delete this file, are you sure?</p>
+									<div class="d-flex flex-row">
+										<div class="p-2 ml-auto">
+											<button type="button" class="btn global_red_select_btn_2 global_remove_shadow" id="checkout_change_delivery_address_cont_submit">YES</button>
+											<button type="button" class="btn global_red_select_btn_2 global_remove_shadow" id="checkout_change_delivery_address_cont_close">CANCEL</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="container global_font_4 checkout_exchange_unit_cont" style="display:none;">
+						<h2 class="global_font_2">EXCHANGE UNIT</h2>
+						<p class="checkout_exchange_unit_condition_p1 global_font_italic">ATTENTION! In order to provide our customers with the best service, we are required to verify a customer's unit before the purchase of an exchange unit.<br>
+						<span class="checkout_exchange_unit_condition_p2 global_font_italic_bold">Please upload a photo below for each individual unit being exchanged</span></p>
+						<!-- <button type="button" class="btn global_font_3 global_red_select_btn_2 global_remove_shadow checkout_exchange_unit_upload_file">UPLOAD FILE <i class="fa-solid fa-chevron-down "></i></button> -->
+						<label class="btn global_font_3 global_red_select_btn_2 global_remove_shadow checkout_exchange_unit_upload_file"><input type="file" id="checkout_exchange_unit_upload"/>UPLOAD FILE <i class="fa-solid fa-chevron-down"></i></label>
+						<div class="container checkout_exchange_unit_photo_file_cont">
+							<p class="checkout_exchange_unit_photo_file_name global_font_italic">exchange_unit_photo_1.png <button type="button" class="btn global_remove_shadow global_black_icon_btn checkout_exchange_unit_photo_file_remove"><i class="fa-solid fa-trash fa-sm"></i></button></p>
+							<p class="checkout_exchange_unit_photo_file_name global_font_italic">exchange_unit_photo_1.png <button type="button" class="btn global_remove_shadow global_black_icon_btn checkout_exchange_unit_photo_file_remove"><i class="fa-solid fa-trash fa-sm"></i></button></p>
+						</div>
+						<p class="checkout_exchange_unit_condition_p3 global_font_italic">*THE EXCHANGE UNIT(S) WILL ONLY BE RELEASED AS SOON AS WE HAVE RECIEVED YOUR OLD UNIT(S), OTHERWISE WE WILL REFUND THE AMOUNT PAID FOR THE EXCHANGE UNIT(S)</p>
+						<div class="form-check custom-control custom-checkbox">
+                          	<input class="form-check-input custom-control-input" type="checkbox" value="True" id="vat_check" name="vat_check">
+                    		<label class="form-check-label form_header_2 custom-control-label global_font_italic_bold" for="vat_check">I HAVE READ AND UNDERSTAND THE FOLLOWING CONDITIONS</label>
+                        </div>
+						
+					</div>
+					
+					<hr />
+					
+					<div class="container global_font_3 checkout_delivery_method_cont">
+						<h2 class="global_font_2 checkout_delivery_method_header">DELIVERY METHOD</h2>
+						<button type="button" class="btn global_remove_shadow global_red_select_btn_1 checkout_delivery_method_btns" data-shipping-method-id="1">DELIVER WITH OUR COURIER</button><button type="button" class="btn global_remove_shadow global_red_select_btn_1 checkout_delivery_method_btns" data-shipping-method-id="1">DELIVER WITH OWN COURIER</button><br>
+						<button type="button" class="btn global_remove_shadow global_red_select_btn_1 checkout_delivery_method_btns" data-shipping-method-id="1">COLLECT FROM DURBAN</button><button type="button" class="btn global_remove_shadow global_red_select_btn_1 checkout_delivery_method_btns" data-shipping-method-id="1">COLLECT FROM CAPE TOWN</button>
+					</div>
+					
+					<hr />
+
+					<div class="modal fade" id="checkout_delivery_address_change_popup" tabindex="-1" role="dialog" aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered" role="document">
+							<div class="modal-content">
+								<div class="container">
+									<h4 class="global_font_2">SELECT DELIVERY ADDRESS</h4>
+									<div class="container" id="checkout_delivery_address_scroll_cont">
+										<!-- scroll cont -->
+										<div class="container checkout_delivery_address_indi_item" data-shipping-address-id="">
+											<!-- indi item -->
+											<p>JOHN SMITH</p>
+											<p>14 DISTRO HOUSE<br>
+											5 RECESS RD<br>
+											ALVERSTONE<br>
+											DURBAN<br>
+											3610<br>
+											+27875683434</p>
+										</div>
+									</div>
+									<div class="d-flex flex-row">
+										<div class="p-2 ml-auto">
+											<button type="button" class="btn global_red_select_btn_2 global_remove_shadow" id="checkout_change_delivery_address_cont_submit">SUBMIT</button>
+											<button type="button" class="btn global_red_select_btn_2 global_remove_shadow" id="checkout_change_delivery_address_cont_close">CLOSE</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="container global_font_3 checkout_delivery_address_cont checkout_user_addresses" style="display:none;">
+						<div class="d-flex flex-row checkout_delivery_address_header_btn_cont">
+                            <div class="p-2 checkout_delivery_address_header_cont">
+                                <h2 class="global_font_2">DELIVERY ADDRESS</h2>
+                            </div>
+                            <div class="p-2 ml-auto">
+                                <button type="button" class="btn global_remove_shadow global_white_select_btn" id="checkout_delivery_address_change">CHANGE</button>
+                            </div>
+                        </div>
+						<div class="container checkout_delivery_address" data-shipping-address-id="2">
+							<p>JOHN SMITH</p>
+							<p>14 DISTRO HOUSE<br>
+							5 RECESS RD<br>
+							ALVERSTONE<br>
+							DURBAN<br>
+							3610<br>
+							+27875683434</p>
+							<p><i class="fa-solid fa-xmark"></i> REGIONAL</p>
+						</div>
+					</div>
+					
+					<hr />
+					
+					<div class="container global_font_3 checkout_pickup_address">
+						<h2 class="global_font_2">PICKUP ADDRESS</h2>
+						<p>AUTOLECTRONIX</p>
+						<p>UNIT 5 LUBEX HOUSE<br>
+						4 IVY RD<br>
+						PINETOWN<br>
+						DURBAN<br>
+						3610<br>
+						031 700 1420</p>
+					</div>
+					
+					<hr />
+					
+					<div class="container global_font_3 checkout_courier_notice_cont">
+						<!-- <h2 class="global_font_2 checkout_product_details_header">PRODUCT DETAILS</h2>
+						<p class="checkout_product_details_total_dims">TOTAL DIMENSION OF ALL ITEMS: 10cm(H) x 10cm(L) x 10cm(W)</p>
+						<p class="checkout_product_details_total_weight">TOTAL WEIGHT OF ALL ITEMS: 10kg</p> -->
+						<p class="global_font_4 global_font_italic">*NOTE: WE ARE NOT RESPONSIBLE FOR THE DAMAGE OCCURED BY USE OF A THIRD-PARTY COURIER. PLEASE BE ADVISED WHEN CHOOSING THIS METHOD</p>
+						<div class="form-check custom-control custom-checkbox global_font_4">
+                          	<input class="form-check-input custom-control-input" type="checkbox" value="True" id="vat_check" name="vat_check">
+                    		<label class="form-check-label form_header_2 custom-control-label global_font_italic_bold" for="vat_check">I HAVE READ AND UNDERSTAND THE FOLLOWING CONDITIONS</label>
+                        </div>
+					</div>
+					
+					<hr />
+				</div>
+				<div class="col checkout_summary_col">
+					<div class="container checkout_summary_cont global_red_summary global_font_3">
+						<h2 class="global_font_2 checkout_summary_header">CHECKOUT SUMMARY</h2>
+						<p class="global_font_4 global_font_italic checkout_summary_subheader">(including shipping)</p>
+						<table class="table checkout_summary_table">
+                            <tbody>
+                                <tr class="checkout_summary_table_row"> 
+                                    <td class="checkout_summary_table_head" id="checkout_summary_quantity">2 ITEMS</td>
+                                    <td class="checkout_summary_table_data" id="checkout_summary_subtotal_excl">R12000</td>
+                                </tr>
+                                <tr class="checkout_summary_table_row">
+                                    <td class="checkout_summary_table_head">SHIPPING</td>
+                                    <td class="checkout_summary_table_data" id="checkout_summary_shipping">R55</td>
+                                </tr>
+                                <tr class="checkout_summary_table_row">
+                                    <td class="checkout_summary_table_head">SUBTOTAL</td>
+                                    <td class="checkout_summary_table_data" id="checkout_summary_subtotal_incl">R12055</td>
+                                </tr>
+								<tr class="checkout_summary_table_row">
+                                    <td class="checkout_summary_table_head">VAT (15%)</td>
+                                    <td class="checkout_summary_table_data" id="checkout_summary_vat">1808.25</td>
+                                </tr>
+                                <tr class="checkout_summary_table_row">
+                                    <td class="checkout_summary_table_blank"></td>
+                                    <td class="checkout_summary_table_blank"></td>
+                                </tr>
+                                <tr class="checkout_summary_table_row">
+                                    <td class="checkout_summary_table_head">TOTAL:</td>
+                                    <td class="checkout_summary_table_data checkout_summary_table_total_data" id="checkout_summary_total">R13863.25</td>
+                                </tr>
+                            </tbody>
+						</table>
+						<button type="button" class="btn global_remove_shadow global_black_select_btn_1 checkout_summary_payment_btn">PROCEED TO PAYMENT</button>
+						<p class="checkout_payment_message"></p>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	  </div>
+	  <!-- my account orders page end -->
+	
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script src="public/popper.min.js"></script>
+	<script src="public/bootstrap.min.js"></script>
+    <script src="public/all.min.js"></script>
+  </body>
+</html>

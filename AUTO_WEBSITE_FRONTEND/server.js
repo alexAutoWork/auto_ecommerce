@@ -5,132 +5,156 @@ const cors = require('cors');
 const fs = require('fs');
 const bootstrap_email = require('bootstrap-email');
 const server_funct = require('./server_functions.js');
-const email_render = require('./js/email_render.js');
+const email_render = require('./js/shared/email_render.js');
+const invoice_render = require('./js/shared/invoice_render.js')
 
-const whitelist = ['http://localhost:8000'];
+const whitelist = ['http://localhost:3000', 'http://host.docker.internal:3000'];
+
+const allowed_headers = ['Content-Type', 'Accept', 'Authorization']
 
 const cors_options = {
-    origin: false,
-    optionsSuccessStatus: 200
+    origin: whitelist,
+    optionsSuccessStatus: 200,
+    allowedHeaders: allowed_headers
 }
 
-// let cors_options_delegate = function(req, callback) {
-//     let cors_options;
-//     if (whitelist.indexOf(req.header('Origin')) !== -1) {
-//         cors_options = {origin: true}
-//     } else {
-//         cors_options = {origin: false}
-//     }
-//     callback(null, cors_options)
-// }
+const global_cors = cors(cors_options)
 
 const app = express();
 
-app.use(cors(cors_options));
+app.use(global_cors);
+app.options('*', global_cors);
 app.use(express.json());
 
-app.use('/public', express.static('js'));
-app.use('/public', express.static('images'));
+app.use('/public', express.static('esbuild_js'));
+app.use('/public', express.static('assets'));
 app.use('/public', express.static('css'));
+app.use('/public', express.static('media/product_images'));
 app.use('/public', express.static('node_modules/bootstrap/dist/css'));
 app.use('/public', express.static('node_modules/bootstrap/dist/js'));
 app.use('/public', express.static('node_modules/jquery/dist'));
-app.use('/public', express.static('node_modules/popper.js/dist'));
 app.use('/public', express.static('node_modules/@fortawesome/fontawesome-free/css'));
 app.use('/public', express.static('node_modules/@fortawesome/fontawesome-free/js'));
 
 app.get('/products', (req, res) => {
-    const _retfile = path.join(__dirname, './html/standard/products.html');
+    const _retfile = path.join(__dirname, './html/standard/standard/products.html');
 
     res.sendFile(_retfile);
 });
+
+app.get('/products/:id', (req, res) => {
+    const _retfile = path.join(__dirname, './html/standard/standard/products_page.html');
+
+    res.sendFile(_retfile);
+})
+
+app.get('/forgot', (req, res) => {
+    const _retfile = path.join(__dirname, './html/auth/forgot.html');
+
+    res.sendFile(_retfile);
+})
+
+app.get('/repair/:id', (req, res) => {
+    const _retfile = path.join(__dirname, './html/auth/repair_conf.html');
+
+    res.sendFile(_retfile);
+})
+
+app.post('render-invoice', async (req, res) => {
+    const data = req.body;
+    try {
+        invoice_render(data);
+        res.json({message: 'successful'});
+    } catch (err) {
+        console.log(err);
+    }
+})
 
 app.post('/html-email', async (req, res) => {
     const needs_render = req.body.needs_render;
     if (needs_render === true) {
         try {
-            const render_data = req.body;
-            const html_type = render_data.html_template_type;
+            const data = req.body;
+            const html_type = data.html_template_type;
             let _retfile;
             switch (html_type) {
                 case 'OTP':
-                    let _retfile = await email_render.new_otp_email(render_data);
+                    _retfile = await email_render.new_otp_email(data);
                     break;
-                // case 'status':
-                //     _retfile = './html/other/otp_email.html';
-                //     break;
-                // case 'order-conf':
-                //     _retfile = './html/other/otp_email.html';
-                //     break;
-                // case 'repair-conf':
-                //     _retfile = './html/other/otp_email.html';
-                //     break;
-                // case 'return-conf':
-                //     _retfile = './html/other/otp_email.html';
-                //     break;
+                case 'conf':
+                    _retfile = await email_render.new_status_email(data);
+                    break;
+                case 'status':
+                    _retfile = await email_render.new_conf_email(data);
                 default:
                     res.json({message: 'not a valid html type!'});
             }
-            const filename = render_data.filename;
-            const file = path.join(__dirname, `../media/html/${filename}.html`)
-            const compiled_email = await new bootstrap_email(file);
+            const compiled_email = await new bootstrap_email(_retfile);
             compiled_email.compileAndSave(file);
+            console.log('compiled');
             res.json({message: 'render successful'});
         } catch (err) {
             console.log(err);
         }
-        // axios.get('http://172.19.0.3:8000/send-comm/render-email').then((res) => {
-        //         render_email_data = res.data;
-        //         const html_type = render_email_data.html_template_type;
-        //         switch (html_type) {
-        //             case 'OTP':
-        //                 let _retfile = email_render.new_otp_email(render_email_data);
-        //                 break;
-        //             // case 'status':
-        //             //     _retfile = './html/other/otp_email.html';
-        //             //     break;
-        //             // case 'order-conf':
-        //             //     _retfile = './html/other/otp_email.html';
-        //             //     break;
-        //             // case 'repair-conf':
-        //             //     _retfile = './html/other/otp_email.html';
-        //             //     break;
-        //             // case 'return-conf':
-        //             //     _retfile = './html/other/otp_email.html';
-        //             //     break;
-        //         }
-        //         const filename = render_email_data.filename
-        //         const compiled_email = new bootstrap_email(_retfile, './css/global_email.css');
-        //         compiled_email.compileAndSave(`./media/html/${filename}.html`);
-        //         axios.post('http://172.19.0.3:8000/send-comm/return-email', {'is_rendered': True}).then((res) => {
-        //             console.log(res);
-        //         }).catch((err) => {
-        //             console.log(err);
-        //         })
-        //     }).catch((err) => {
-        //         console.log(err)
-        //     })
     }
 })
 
-app.post('/test', (req, res) => {
-    const message = req.body.message
-    if (message === 'sent') {
-        res.json({is_send: "sent"}).catch((err) => {
-            console.log((err));
-        });
+app.get('/test', async (req, res) => {
+    try {
+        const res = await axios.get('http://host.docker.internal:3000/products');
+        console.log(res);
+    }
+    catch (err) {
+        console.log(err);
     }
     // res.end();
 })
 
+app.get('/checkout/:type/:id', (req, res) => {
+    const type = req.params.type;
+    let _retfile;
+    if (type === 'order') {
+        _retfile = path.join(__dirname, './html/standard/auth/checkout.html');
+    }
+    if (type === 'repair') {
+        _retfile = path.join(__dirname, './html/standard/auth/request_repair.html');
+    }
+
+    res.sendFile(_retfile);
+})
+
+app.get('/:type1/:type2/:id', (req, res) => {
+    const type1 = req.params.type1;
+    const type2 = req.params.type2;
+    let _retfile;
+    if (type1 === 'conf') {
+        if (type2 === 'order') {
+            _retfile = path.join(__dirname, './html/standard/auth/checkout.html');
+        }
+        if (type2 === 'repair') {
+            _retfile = path.join(__dirname, './html/standard/auth/request_repair.html');
+        }
+    }
+    if (type1 === 'cancel') {
+        _retfile = path.join(__dirname, './html/standard/auth/checkout_cancel.html');
+    }
+    res.sendFile(_retfile);
+})
+
+app.get('/order-conf/:id', (req, res) => {
+    const _retfile = path.join(__dirname, './html/standard/other/order_conf.html');
+
+    res.sendFile(_retfile);
+})
+
 app.post('/pdf-email', (req, res) => {
-    const _retfile = path.join(__dirname, './html/other/otp_email.html');
+    const _retfile = path.join(__dirname, './html/standard/other/otp_email.html');
 
     res.sendFile(_retfile);
 })
 
 app.get('/register', (req, res) => {
-    const _retfile = path.join(__dirname, './html/auth/sign_up.html');
+    const _retfile = path.join(__dirname, './html/standard/auth/sign_up.html');
 
     res.sendFile(_retfile);
 })
@@ -172,7 +196,7 @@ app.get('/invoice-email', (req, res) => {
 })
 
 app.get('/order-conf', (req, res) => {
-    const _retfile = path.join(__dirname, './html/auth/order_conf.html');
+    const _retfile = path.join(__dirname, './html/standard/auth/order_conf.html');
 
     res.sendFile(_retfile);
 })
@@ -184,25 +208,25 @@ app.get('/repair-conf', (req, res) => {
 })
 
 app.get('/return-page', (req, res) => {
-    const _retfile = path.join(__dirname, './html/auth/my_account_returns_return_page.html');
+    const _retfile = path.join(__dirname, './html/standard/auth/my_account_returns_return_page.html');
 
     res.sendFile(_retfile);
 })
 
 app.get('/order-page', (req, res) => {
-    const _retfile = path.join(__dirname, './html/auth/my_account_orders_order_page.html');
+    const _retfile = path.join(__dirname, './html/standard/auth/my_account_orders_order_page.html');
 
     res.sendFile(_retfile);
 })
 
 app.get('/shopping-cart', (req, res) => {
-    const _retfile = path.join(__dirname, './html/auth/shopping_cart.html');
+    const _retfile = path.join(__dirname, './html/standard/standard/auth/shopping_cart.html');
 
     res.sendFile(_retfile);
 })
 
 app.get('/invoice', (req, res) => {
-    const _retfile = path.join(__dirname, './html/auth/invoice_download.html');
+    const _retfile = path.join(__dirname, './html/standard/auth/invoice_download.html');
 
     res.sendFile(_retfile);
 })
@@ -213,6 +237,12 @@ app.get('/admin-order-page', (req, res) => {
     res.sendFile(_retfile);
 })
 
-app.listen(3000, () => {
-    console.log('Listening on port ' + 3000);
+app.get('/address-book', (req, res) => {
+    const _retfile = path.join(__dirname, './html/standard/auth/my_account_address_book.html');
+
+    res.sendFile(_retfile);
+})
+
+app.listen(8080, () => {
+    console.log('Listening on port ' + 8080);
 });
