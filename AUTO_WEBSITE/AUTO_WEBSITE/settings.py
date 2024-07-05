@@ -13,25 +13,26 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'AUTO_WEBSITE', 'media')
+# MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'media')
 
-MEDIA_URL = '/media/'
+# MEDIA_URL = '/media/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ki^s18o+m(&zqr!g^bn%qv=xwr43nnf)$44l(8b%4+tl+qoo_o'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'localhost:8000']
-
+ALLOWED_HOSTS = ['localhost', 'localhost:8080', 'host.docker.internal', 'host.docker.internal:3000']
 
 # Application definition
 
@@ -41,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'django.contrib.sites',
     'AUTO_WEBSITE_ECOMMERCE',
     'phonenumber_field',
@@ -57,6 +57,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -65,7 +66,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'AUTO_WEBSITE_ECOMMERCE.middleware.auth_token'
     # 'allauth.account.middleware.AccountMiddleware',
 ]
 
@@ -87,6 +90,23 @@ TEMPLATES = [
     },
 ]
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': os.getenv('REDIS_DB1'),
+    }
+}
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        'OPTIONS': {
+            'location': os.path.join(os.path.dirname(BASE_DIR), 'media'),
+            'base_url': '/media/',
+        }
+    }
+}
+
 WSGI_APPLICATION = 'AUTO_WEBSITE.wsgi.application'
 
 
@@ -96,11 +116,11 @@ WSGI_APPLICATION = 'AUTO_WEBSITE.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ecommerce_db',
-        'USER': 'root',
-        'PASSWORD': 'admin',
-        'HOST': 'host.docker.internal',
-        'PORT': '3306',
+        'NAME': os.getenv('DATABASE_NAME'),
+        'USER': os.getenv('DATABASE_USER'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+        'HOST': os.getenv('DATABASE_HOST'),
+        'PORT': os.getenv('DATABASE_PORT'),
     }
 }
 
@@ -149,8 +169,9 @@ LOGGING = {
     'handlers': {
         'file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'filename': 'LOGS/django_log.log',
+            'maxBytes': 17000
         }
     },
     'loggers': {
@@ -185,10 +206,7 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'vnd.api+json'
 }
 
-REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'AUTO_WEBSITE_ECOMMERCE.reg.reg_serializers.UserLoginSerializer',
-}
-
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 SESSION_COOKIE_AGE = 86400
 
 # CORS_ALLOWED_ORIGINS = [
@@ -219,20 +237,53 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-TWILIO_ACCOUNT_SID = 'ACcb2c34498adc3a223f1cad1eebb081d4'
-TWILIO_AUTH_TOKEN = '3872358d07a81a609c1447dc8feb7a2b'
-TWILIO_MOBILE_NO = '+12096770058'
+# TWILIO INTEGRATION SETTINGS
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+TWILIO_MOBILE_NO = os.getenv('TWILIO_MOBILE_NO')
 
-SAGE_TEST_API_KEY = '{4FE2E815-3D46-4C68-A55B-6B3570159B57}'
-SAGE_USERNAME = 'alex@autolectronix.co.za'
-SAGE_PASSWORD = 'sAT@.132758884.2004#'
-SAGE_URL = 'https://resellers.accounting.sageone.co.za'
-SAGE_VER = '2.0.0'
+# SAGE INTEGRATION SETTINGS
+SAGE_API_KEY = os.getenv('SAGE_TEST_API_KEY')
+SAGE_USERNAME = os.getenv('SAGE_USERNAME')
+SAGE_PASSWORD = os.getenv('SAGE_PASSWORD')
+SAGE_URL = os.getenv('SAGE_URL')
+SAGE_VER = os.getenv('SAGE_VER')
 
 # Email Setting (user created)
-EMAIL_HOST = 'mail.autolectronix.co.za'
-EMAIL_HOST_USER = 'noreply@autolectronix.co.za'
-EMAIL_HOST_PASSWORD = 'EM@.Ub1n0r3ply.#'
-EMAIL_PORT = 465
-EMAIL_USE_SSL =  True
+MAILJET_API_KEY = os.getenv('MAILJET_API_KEY')
+MAILJET_SECRET_KEY = os.getenv('MAILJET_SECRET_KEY')
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_USE_TLS =  True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# BOBGO INTEGRATION SETTINGS
+BOBGO_API_KEY = os.getenv('BOBGO_API_KEY')
+BOBGO_URL = os.getenv('BOBGO_URL')
+BOBGO_DEFAULT_COLLECTION_ADDRESS = {
+    'company': 'Autolectronix',
+    'name': 'Autolectronix Admin',
+    'contact_number': '0317001420',
+    'email_address': 'office@autolectronix.co.za',
+    'street_address': '4 Ivy Road',
+    'local_area': 'Pinetown CBD',
+    'city': 'Durban',
+    'zone': 'KZN',
+    'code': '3610'
+}
+BOBGO_DEFAULT_HEADERS = {
+    'Content-Type': 'application/json',
+    'Authorization': BOBGO_API_KEY
+}
+
+# PAYFAST INTEGRATION SETTINGS
+PAYFAST_ID = os.getenv('PAYFAST_ID')
+PAYFAST_KEY = os.getenv('PAYFAST_KEY')
+PAYFAST_PASS_PHRASE = os.getenv('PAYFAST_PASS_PHRASE')
+
+# CELERY SETTINGS
+CELERY_BROKER_URL = os.getenv('REDIS_DB2')
+CELERY_RESULT_BACKEND = os.getenv('REDIS_DB3')
+CELERY_TIMEZONE = os.getenv('CELERY_TIMEZONE')

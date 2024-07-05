@@ -19,4 +19,4 @@ RUN set -e; \
     /usr/local/bin/python -m pip install --upgrade pip ;\
     python -m pip install -r /code/requirements.txt ;
 
-EXPOSE 8000
+EXPOSE 3000

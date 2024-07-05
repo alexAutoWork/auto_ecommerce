@@ -2,35 +2,45 @@ from rest_framework import permissions
 
 EDIT_METHODS = ('PUT', 'PATCH')
 
-class ChildObjectAuthUserPermissionMixin():
-    def has_child_object_permission(self, request, view, obj):
-        if request.type in permission.SAFE_METHODS:
-            SystemObjectAuthUserViewSetMixin.get_parent_queryset(request, model_parent_id, field_parent_id, model_parent)
-            if True:
-                SystemObjectAuthUserViewSetMixin.get_child_queryset(request, model_parent_id, field_parent_id, model_parent, model_serializer)
-            return False
-
-    def has_child_object_permission_edit_or_delete(self, request, view, obj):
-        if request.type == EDIT_METHODS or request.type == 'DELETE':
-            SystemObjectAuthUserViewSetMixin.get_parent_queryset(request, model_parent_id, field_parent_id, model_parent)
-            if True:
-                SystemObjectAuthUserViewSetMixin.get_child_queryset(request, model_parent_id, field_parent_id, model_parent, model_serializer)
-            return False
-
 class ChildObjectAuthUserViewSetMixin():
-    def get_parent_queryset(self, request, model_parent_id, field_parent_id, model_parent):
-        user_id = self.request.user
-        model_parent_id = self.request.data[model_parent_id]
-        field_name = field_parent_id
-        field_name_iexact = field_name + '__iexact'
-        if model_parent.objects.filter(**{field_name_iexact: model_parent_id}, user_id=user_id).exists():
+    model_parent = None
+    model_parent_id = None
+    child_model = None
+    field_name = None
+
+    def get_parent_queryset(self, request):
+        user_id = request.user.user_id
+        model_parent_id = request.query_params[self.model_parent_id]
+        # field_name = self.model_parent_id
+        # field_name_iexact = field_name + '__iexact'
+        if self.model_parent.objects.filter(**{str(self.field_name): model_parent_id}, user_id=user_id).exists():
             return True
 
-    def get_child_queryset(self, request, model_parent_id, field_parent_id, model_parent, model_serializer):
-        user_id = self.request.user
-        model_parent_id = self.request.data[model_parent_id]
-        field_name = field_parent_id
-        field_name_iexact = field_name + '__iexact'
-        queryset = model_parent.objects.filter(**{field_name_iexact: model_parent_id})
-        serializer = model_serializer(data=queryset, many=True)
-        return serializer.data
+    def get_child_queryset(self, request, **kwargs):
+        self.get_parent_queryset(request)
+        if True:
+            user_id = request.user.user_id
+            model_parent_id = request.query_params[self.model_parent_id]
+            if kwargs is not None:
+                prefetch_related_field = kwargs.pop('prefetch_related')
+                queryset = self.child_model.objects.prefetch_related(prefetch_related_field).filter(**{str(self.field_name): model_parent_id})
+            # field_name = self.model_parent_id
+            # field_name_iexact = field_name + '__iexact'
+            else:
+                queryset = self.child_model.objects.filter(**{str(self.field_name): model_parent_id})
+            # queryset = self.child_model.objects.filter(**{str(self.field_name): model_parent_id})
+            return queryset
+
+class ChildObjectAuthUserPermissionMixin(ChildObjectAuthUserViewSetMixin):
+
+    def has_child_object_permission(self, request):
+        queryset = super().get_child_queryset(request)
+        if queryset.exists():
+            return True
+        else:
+            return False
+    # def has_child_object_permission_edit_or_delete(self, request):
+    #     super().get_parent_queryset(request)
+    #     if True:
+    #         return super().get_child_queryset(request)
+    #     return False

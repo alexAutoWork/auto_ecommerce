@@ -38,7 +38,7 @@ class UserLogin(AbstractUser):
     date_joined = None
     groups = None
     user_permissions = None
-    user_id = models.AutoField(primary_key=True)
+    user_id = models.AutoField(primary_key=True, db_column='user_id')
     email = models.EmailField(_('email address'), unique=True)
     password = models.CharField(max_length=500)
     mobile_no = PhoneNumberField(max_length=45)
@@ -49,6 +49,7 @@ class UserLogin(AbstractUser):
     is_blacklisted = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    # synced
 
     def __str__(self):
         return self.email
@@ -58,34 +59,39 @@ class UserLogin(AbstractUser):
         db_table = 'user_login'
 
 class UserAddresses(models.Model):
-    address_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey(UserLogin, on_delete=models.RESTRICT)
+    address_id = models.AutoField(primary_key=True, db_column='address_id')
+    user_id = models.ForeignKey(UserLogin, on_delete=models.RESTRICT, db_column='user_id')
+    company = models.CharField(max_length=45, blank=True, null=True)
     name = models.CharField(max_length=45)
     unit_number = models.CharField(max_length=45, blank=True, null=True)
     address_line_1 = models.CharField(max_length=45)
-    address_line_2 = models.CharField(max_length=45, blank=True, null=True)
+    area = models.CharField(max_length=45)
     city = models.CharField(max_length=45)
-    region = models.CharField(max_length=45)
+    province = models.CharField(max_length=45)
     postal_code = models.CharField(max_length=45)
-    mobile_no = PhoneNumberField(max_length=45)
-    is_regional = models.BooleanField()
+    contact_number = PhoneNumberField(max_length=45)
+    email_address = models.EmailField(blank=True, null=True)
+    # is_regional = models.BooleanField()
     is_active = models.BooleanField()
+    is_default = models.BooleanField()
+    #synced
 
     class Meta:
         managed = False
         db_table = 'user_addresses'
 
 class UserDetails(models.Model):
-    user_id = models.ForeignKey(UserLogin, on_delete=models.RESTRICT, primary_key=True)
+    user_id = models.ForeignKey(UserLogin, on_delete=models.RESTRICT, primary_key=True, db_column='user_id')
     name = models.CharField(max_length=45)
     surname = models.CharField(max_length=45, blank=True, null=True)
     company = models.CharField(max_length=45, blank=True, null=True)
-    default_address = models.ForeignKey(UserAddresses, on_delete=models.RESTRICT, blank=True, null=True)
+    default_address_id = models.ForeignKey(UserAddresses, on_delete=models.RESTRICT, blank=True, null=True, db_column='default_address_id')
     # shop_city = models.ForeignKey(Cities, on_delete=models.RESTRICT, blank=True, null=True)
     company_reg_no = models.CharField(max_length=45, blank=True, null=True)
     vat_no = models.IntegerField(blank=True, null=True)
-    is_synced = models.BooleanField()
+    is_synced = models.BooleanField(default=False)
     sage_id = models.IntegerField(blank=True, null=True, unique=True)
+    #synced, deleted shop_city_id
 
     class Meta:
         managed = False

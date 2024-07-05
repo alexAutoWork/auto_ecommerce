@@ -3,10 +3,10 @@ from . import st_views
 from django.urls import path, include
 
 router = routers.DefaultRouter()
-router.register(r'products', st_views.StandardProductsViewSet, 'products')
-router.register(r'product-models', st_views.ProductModelsViewSet, 'product-models')
+router.register(r'products', st_views.ProductsViewSet, 'products')
 router.register(r'brands', st_views.BrandsViewSet, 'brands')
 router.register(r'categories', st_views.CategoriesViewSet, 'categories')
+router.register(r'cities', st_views.CitiesViewSet, 'cities')
 
 st_urls = router.urls
 

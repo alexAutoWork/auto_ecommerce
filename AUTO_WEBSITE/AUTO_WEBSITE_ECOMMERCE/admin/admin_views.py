@@ -1,120 +1,293 @@
 from rest_framework import viewsets, status, views
 from . import admin_permissions
-from .. import mixins as custom_mixins, serializers as custom_serializers, utils as custom_utils
-from ..standard import st_serializers, st_models
-from ..reg import reg_serializers, reg_models
-from ..auth import auth_model_serializers
-from . import admin_model_serializers
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from django.db.models import Prefetch
+from .admin_mixins import UniversalAdminMixin
 
-class ProductsAdminViewSet(viewsets.ModelViewSet):
-    queryset = st_models.Products.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType1Permission]
-    serializer_class = st_serializers.ProductsSerializer()
+class ProductAdminViewSet(UniversalAdminMixin, viewsets.ViewSet):
 
-class ProductConfigAdminViewSet(viewsets.ModelViewSet):
-    # queryset = st_models.ProductConfig.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType1Permission]
-    serializer_class = st_serializers.ProductConfigSerializer()
+    def list(self, request):
+        '''
+        list products, models, stock
+        '''
+        items = {
+            'products': {},
+            'stocks': {},
+            'models': {}
+        }
+        data = self.fetch_list(items=items)
+        return Response(data, status=status.HTTP_200_OK)
 
-    def get_queryset(self):
-        
+    def retrieve(self, request, pk=None):
+        '''
+        get product details, including related:
+        - models
+        - stock
+        '''
+        self.item_type = 'products'
+        related = {
+            'models': {},
+            'stocks': {
+                'select_related': ['product_config_id']
+            },
+            'orders': {
+                'item_hierachy': 'child',
+                'select_related': ['sku_no__product_config_id']
+            },
+            'repairs': {},
+            'invoices': {
+                'item_hierachy': 'child',
+                'select_related': ['order_item_id__sku_no__product_config_id']
+            },
+            'returns': {
+                'select_related': ['order_item_id__sku_no__product_config_id']
+            }
+        }
+        data = self.fetch_main(pk=pk, related=related)
+        return Response(data, status=status.HTTP_200_OK)
 
-class ProductModelsAdminViewSet(viewsets.ModelViewSet):
-    queryset = st_models.ProductModels.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType1Permission]
-    serializer_class = st_serializers.ProductModelsSerializer()
+    @action(detail=True)
+    def stock(self, request, pk=None):
+        '''
+        get stock details, including related:
+        - orders
+        - invoices
+        - returns
+        '''
+        self.item_type = 'stocks'
+        related = {
+            'orders': {
+                'item_hierachy': 'child'
+            },
+            'invoices': {
+                'item_hierachy': 'child',
+                'select_related': ['order_item_id__sku_no']
+            },
+            'returns': {}
+        }
+        data = self.fetch_main(pk=pk, related=related)
+        return Response(data, status=status.HTTP_200_OK)
 
-class ProductStockAdminViewSet(viewsets.ModelViewSet):
-    queryset = st_models.ProductStock.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType1Permission]
-    serializer_class = st_serializers.ProductStockSerializer()
+    @action(detail=True)
+    def models(self, request, pk=None):
+        '''
+        get model details
+        '''
+        self.item_type = 'model'
+        data = self.fetch_main(pk=pk)
+        return Response(data, status=status.HTTP_200_OK)
 
-class BrandsAdminViewSet(viewsets.ModelViewSet):
-    queryset = st_models.Brands.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType1Permission]
-    serializer_class = st_serializers.BrandsSerializer()
+class CategoriesAdminViewSet(UniversalAdminMixin, viewsets.ViewSet):
 
-class CategoriesAdminViewSet(viewsets.ModelViewSet):
-    queryset = st_models.Categories.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType1Permission]
-    serializer_class = st_serializers.CategoriesSerializer()
+    def list(self, request):
+        '''
+        list categories and brands
+        '''
+        items = {
+            'categories': {},
+            'brands': {}
+        }
+        data = self.fetch_list(items=items)
+        return Response(data, status=status.HTTP_200_OK)
 
-class StatusesAdminViewSet(viewsets.ModelViewSet):
-    queryset = st_models.Statuses.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType1Permission]
-    serializer_class = st_serializers.StatusesSerializer()
+    @action(detail=True)
+    def category(self, request, pk=None):
+        '''
+        get category details, including related:
+        - products
+        '''
+        self.item_type = 'categories'
+        related = {
+            'products': {}
+        }
+        data = self.fetch_main(pk=pk, related=related)
+        return Response(data, status=status.HTTP_200_OK)
 
-class UserLoginAdminViewSet(viewsets.ModelViewSet):
-    queryset = reg_models.UserLogin.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType2Permission]
-    serializer_class = admin_model_serializers.UserLoginAdminSerializer()
+    @action(detail=True)
+    def brand(self, request, pk=None):
+        '''
+        get brand details, including related:
+        - products
+        '''
+        self.item_type = 'brands'
+        related = {
+            'products': {}
+        }
+        data = self.fetch_main(pk=pk, related=related)
+        return Response(data, status=status.HTTP_200_OK)
 
-class UserDetailsAdminViewSet(viewsets.ModelViewSet):
-    queryset = reg_models.UserDetails.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType4Permission]
-    serializer_class = admin_model_serializers.UserDetailsAdminSerializer()
+class OrdersAdminViewSet(UniversalAdminMixin, viewsets.ViewSet):
+    
+    def list(self, request):
+        '''
+        list orders
+        '''
+        items = {
+            'orders': {}
+        }
+        data = self.fetch_list(items=items)
+        return Response(data, status=status.HTTP_200_OK)
 
-class UserAddressesAdminViewSet(viewsets.ModelViewSet):
-    queryset = reg_models.UserAddresses.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType1Permission]
-    serializer_class = auth_model_serializers.UserAddressSerializer()
+    def retrieve(self, request, pk=None):
+        '''
+        get order details, including related:
+        - exchange unit photos
+        - invoices
+        - returns
+        - communication
+        - history
+        '''
+        self.item_type = 'orders'
+        related = {
+            'invoices': {},
+            'returns': {}
+        }
+        data = self.fetch_main(pk=pk, related=related, comm_history=True)
+        return Response(data, status=status.HTTP_200_OK)
 
-class OrdersAdminViewSet(viewsets.ModelViewSet):
-    queryset = auth_models.Orders.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType3Permission]
-    serializer_class = admin_model_serializers.OrdersAdminSerializer()
+class InvoicesAdminViewSet(UniversalAdminMixin, viewsets.ViewSet):
 
-class OrderItemsAdminViewSet(viewsets.ModelViewSet):
-    queryset = auth_models.OrderItems.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType5Permission]
-    serializer_class = auth_model_serializers.OrderItemsSerializer()
+    def list(self, request):
+        '''
+        list invoices
+        '''
+        items = {
+            'invoices': {
+                'prefetch_related': ['order_id']
+            }
+        }
+        data = self.fetch_list(items=items)
+        return Response(data, status=status.HTTP_200_OK)
 
-class OrderHistoryAdminViewSet(viewsets.ModelViewSet):
-    queryset = auth_models.OrderHistory.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType5Permission]
-    serializer_class = auth_model_serializers.OrderHistorySerializer()
+    def retrieve(self, request, pk=None):
+        '''
+        get invoice details, including related:
+        - orders
+        - returns
+        '''
+        self.item_type = 'invoices'
+        related = {
+            'orders': {},
+            'returns': {
+                'item_hierachy': 'reverse',
+                'parent_id_field': 'order_id'
+            }
+        }
+        data = self.fetch_main(pk=pk, related=related)
+        return Response(data, status=status.HTTP_200_OK)
 
-class OrderCommunicationHistoryAdminViewSet(viewsets.ModelViewSet):
-    queryset = auth_models.OrderCommunicationHistory.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType4Permission]
-    serializer_class = auth_model_serializers.OrderCommunicationHistorySerializer()
+class RepairsAdminViewSet(UniversalAdminMixin, viewsets.ViewSet):
 
-class InvoiceAdminViewSet(viewsets.ModelViewSet):
-    queryset = auth_models.Invoices.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType4Permission]
-    serializer_class = auth_model_serializers.InvoicesSerializer()
+    def list(self, request):
+        '''
+        list repairs
+        '''
+        items = {
+            'repairs': {
+                'prefetch_related': ['product_id']
+            }
+        }
+        data = self.fetch_list(items=items)
+        return Response(data, status=status.HTTP_200_OK)
 
-class InvoiceItemsAdminViewSet(viewsets.ModelViewSet):
-    queryset = auth_models.InvoiceItems.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType4Permission]
-    serializer_class = auth_model_serializers.InvoiceItemsSerializer()
+    def retrieve(self, request, pk=None):
+        '''
+        list repair details, including related:
+        - communication
+        - history
+        '''
+        self.item_type = 'repairs'
+        data = self.fetch_main(pk=pk, comm_history=True)
+        return Response(data, status=status.HTTP_200_OK)
 
-class ReturnsAdminViewSet(viewsets.ModelViewSet):
-    queryset = auth_models.Returns.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType3Permission]
-    serializer_class = admin_model_serializers.ReturnsAdminSerializer()
+class ReturnsAdminViewSet(UniversalAdminMixin, viewsets.ViewSet):
+    
+    def list(self, request):
+        '''
+        list returns
+        '''
+        items = {
+            'returns': {
+                'prefetch_related': ['order_item_id__sku_no']
+            }
+        }
+        data = self.fetch_list(items=items)
+        return Response(data, status=status.HTTP_200_OK)
 
-class ReturnHistoryAdminViewSet(viewsets.ModelViewSet):
-    queryset = auth_models.ReturnHistory.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType5Permission]
-    serializer_class = auth_model_serializers.ReturnHistorySerializer()
+    def retrieve(self, request, pk=None):
+        '''
+        get return details, including related:
+        - orders
+        - invoices
+        - communication
+        - history
+        '''
+        self.item_type = 'returns'
+        related = {
+            'orders': {
+                'item_hierachy': 'reverse'
+            },
+            'invoices': {
+                'item_hierachy': 'reverse',
+                'parent_id_field': 'order_id'
+            }
+        }
+        data = self.fetch_main(pk=pk, related=related, comm_history=True)
+        return Response(data, status=status.HTTP_200_OK)
 
-class ReturnCommunicationHistoryAdminViewSet(viewsets.ModelViewSet):
-    queryset = auth_models.ReturnCommunicationHistory.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType4Permission]
-    serializer_class = auth_model_serializers.ReturnCommunicationHistorySerializer()
+class CustomersAdminViewSet(UniversalAdminMixin, viewsets.ViewSet):
 
-class RepairsAdminViewSet(viewsets.ModelViewSet):
-    queryset = auth_models.Repairs.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType3Permission]
-    serializer_class = admin_model_serializers.RepairsAdminSerializer()
+    def list(self, request):
+        '''
+        list customers
+        '''
+        items = {
+            'details': {}
+        }
+        data = self.fetch_list(items=items)
+        return Response(data, status=status.HTTP_200_OK)
+    
+    def retrieve(self, request, pk=None):
+        '''
+        get customer details, including related:
+        addresses
+        orders
+        invoices
+        returns
+        communication
+        '''
+        self.item_type = 'details'
+        related = {
+            'addresses': {},
+            'orders': {},
+            'invoices': {},
+            'repairs': {},
+            'returns': {},
+            'orders_comm_history': {},
+            'invoices_comm_history': {},
+            'repairs_comm_history': {},
+            'returns_comm_history': {}
+        }
+        data = self.fetch_main(pk=pk, related=related)
+        return Response(data, status=status.HTTP_200_OK)
 
-class RepairHistoryAdminViewSet(viewsets.ModelViewSet):
-    queryset = auth_models.RepairHistory.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType5Permission]
-    serializer_class = auth_model_serializers.RepairHistorySerializer()
+class SettingsAdminViewSet(UniversalAdminMixin, viewsets.ViewSet):
 
-class RepairCommunicationHistoryAdminViewSet(viewsets.ModelViewSet):
-    queryset = auth_models.RepairCommunicationHistory.objects.all()
-    permission_classes = [admin_permissions.AdminObjectType4Permission]
-    serializer_class = auth_model_serializers.RepairCommunicationHistorySerializer()
+    def list(self, request):
+        '''
+        list statuses
+        '''
+        items = {
+            'statuses': {}
+        }
+        data = self.fetch_list(items=items)
+        return Response(data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, pk=None):
+        '''
+        get status details
+        '''
+        self.item_type = 'statuses'
+        data = self.fetch_main(pk=pk)
+        return Response(data, status=status.HTTP_200_OK)

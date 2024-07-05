@@ -19,43 +19,43 @@ class BaseAuthUserPermission(auth_mixins.ChildObjectAuthUserPermissionMixin, per
 
     def has_object_permission(self, request, view, obj):
 
-        if request.type in permissions.SAFE_METHODS:
-            if obj.user_id == request.user:
+        if request.method in permissions.SAFE_METHODS:
+            if obj.user_id == request.user.user_id:
                 return True
-            else:
-                self.has_child_object_permission()
+            # else:
+            #     return super().has_child_object_permission(request)
             return False
 
-        if request.type == 'POST':
-            return True
+        # if request.method == 'POST':
+        #     return True
             # if obj.owner == request.user:
             #     return True
             # return False
 
-        if request.type in EDIT_METHODS or request.type == 'DELETE':
-            if obj.user_id == request.user:
+        if request.method in EDIT_METHODS or request.type == 'DELETE':
+            if obj.user_id == request.user.user_id:
                 return True
-            else:
-                self.has_child_object_permission_edit_or_delete()
+            # else:
+            #     return super().has_child_object_permission(request)
             return False
 
         return False
 
-    def has_child_object_permission(self, request, view, obj):
+    # def has_child_object_permission(self, request, view, obj):
 
-        if request.type in permissions.SAFE_METHODS:
-            get_parent_queryset(request, model_parent_id, field_parent_id, model_parent)
-            if True:
-                get_child_queryset(request, model_parent_id, field_parent_id, model_parent)
-            return False
+    #     if request.method in permissions.SAFE_METHODS:
+    #         get_parent_queryset(request, model_parent_id, field_parent_id, model_parent)
+    #         if True:
+    #             get_child_queryset(request, model_parent_id, field_parent_id, model_parent)
+    #         return False
 
-    def has_child_object_permission_edit_or_delete(self, request, view, obj):
+    # def has_child_object_permission_edit_or_delete(self, request, view, obj):
 
-        if request.type in EDIT_METHODS or request.type == 'DELETE':
-            get_parent_queryset(request, model_parent_id, field_parent_id, model_parent)
-            if True:
-                get_child_queryset(request, model_parent_id, field_parent_id, model_parent)
-            return False
+    #     if request.method in EDIT_METHODS or request.type == 'DELETE':
+    #         get_parent_queryset(request, model_parent_id, field_parent_id, model_parent)
+    #         if True:
+    #             get_child_queryset(request, model_parent_id, field_parent_id, model_parent)
+    #         return False
         
 class ObjectAuthUserPermission(auth_mixins.ChildObjectAuthUserPermissionMixin, permissions.BasePermission):
     def has_permission(self, request, view):
@@ -69,28 +69,28 @@ class ObjectAuthUserPermission(auth_mixins.ChildObjectAuthUserPermissionMixin, p
 
     def has_object_permission(self, request, view, obj):
         
-        if request.type in permissions.SAFE_METHODS:
-            if obj.user_id == request.user:
+        if request.method in permissions.SAFE_METHODS:
+            if obj.user_id == request.user.user_id:
                 return True
-            else:
-                self.has_child_object_permission()
+            # else:
+            #     return super().has_child_object_permission(request)
             return False
 
-        if request.type == 'POST':
-            return True
+        # if request.method == 'POST':
+        #     return True
             # if obj.owner == request.user:
             #     return True
             # return False
 
         return False
 
-    def has_child_object_permission(self, request, view, obj):
+    # def has_child_object_permission(self, request, view, obj):
 
-        if request.type in permissions.SAFE_METHODS:
-            get_parent_queryset(request, model_parent_id, field_parent_id, model_parent)
-            if True:
-                get_child_queryset(request, model_parent_id, field_parent_id, model_parent)
-            return False
+    #     if request.method in permissions.SAFE_METHODS:
+    #         get_parent_queryset(request, model_parent_id, field_parent_id, model_parent)
+    #         if True:
+    #             get_child_queryset(request, model_parent_id, field_parent_id, model_parent)
+    #         return False
 
 class SystemObjectAuthUserPermission(auth_mixins.ChildObjectAuthUserPermissionMixin, permissions.BasePermission):
     def has_permission(self, request, view):
@@ -104,17 +104,17 @@ class SystemObjectAuthUserPermission(auth_mixins.ChildObjectAuthUserPermissionMi
 
     def has_object_permission(self, request, view, obj):
 
-        if request.type in permissions.SAFE_METHODS:
-            if obj.user_id == request.user:
+        if request.method in permissions.SAFE_METHODS:
+            if obj.user_id == request.user.user_id:
                 return True
-            else:
-                self.has_child_object_permission()
+            # else:
+            #     return super().has_child_object_permission(request)
         return False
 
-    def has_child_object_permission(self, request, view, obj):
+    # def has_child_object_permission(self, request, view, obj):
 
-        if request.type in permissions.SAFE_METHODS:
-            get_parent_queryset(request, model_parent_id, field_parent_id, model_parent)
-            if True:
-                get_child_queryset(request, model_parent_id, field_parent_id, model_parent)
-            return False
+    #     if request.method in permissions.SAFE_METHODS:
+    #         get_parent_queryset(request, model_parent_id, field_parent_id, model_parent)
+    #         if True:
+    #             get_child_queryset(request, model_parent_id, field_parent_id, model_parent)
+    #         return False

@@ -2,9 +2,11 @@
 
 from rest_framework import serializers
 from . import auth_models
-from ..standard.st_serializers import ProductsSerializer, StatusesSerializer
-from ..reg.reg_model_serializers import UserAddressSerializer
-from ..standard import st_models
+from ..standard.st_model_serializers import ProductsSerializer, StatusesSerializer
+from ..reg import reg_models
+from ..reg.reg_model_serializers import UserAddressesSerializer
+from ..standard import st_models, st_model_serializers
+from .. import mixins, serializer_fields, serializers as custom_serializers
 
 # Shopping Cart Model Serializers
 
@@ -12,87 +14,119 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = auth_models.ShoppingCart
-        fields = ['shopping_cart_id', 'user_id', 'subtotal', 'vat', 'total']
+        fields = '__all__'
 
-class ShoppingCartItemsSerializer(serializers.ModelSerializer):
-
+class ShoppingCartItemsSerializer(custom_serializers.NestedSerializer):
+    nested_fields = {'product_config_id': st_model_serializers.ProductConfigSerializer}
     class Meta:
         model = auth_models.ShoppingCartItems
-        fields = ['shopping_cart_items_id', 'shopping_cart_id', 'product_config_id', 'quantity', 'total_price']
+        fields = '__all__'
 
 # Order Model Serializers
 
-class OrdersSerializer(serializers.ModelSerializer):
-
+class OrdersSerializer(custom_serializers.NestedSerializer):
+    nested_fields = {'shipping_address_id': UserAddressesSerializer}
+    shipping_method_id = serializer_fields.SerializerOrPkField(queryset=st_models.ShippingMethods.objects.all(), alt_field=serializers.SlugRelatedField, alt_field_params={'slug_field': 'shipping_method_value'})
+    current_status_id = serializer_fields.SerializerOrPkField(queryset=st_models.Statuses.objects.all(), alt_field=serializers.SlugRelatedField, alt_field_params={'slug_field': 'status_value'})
+    # shipping_address_id = UserAddressesSerializer(read_only=True)
+    # shipping_method_id = serializers.SlugRelatedField(read_only=True, slug_field='shipping_method_value')
+    # current_status_id = serializers.SlugRelatedField(read_only=True, slug_field='status_value')
+    
     class Meta:
         model = auth_models.Orders
-        fields = ['order_id', 'user_id', 'order_date', 'shipping_address_id', 'shipping_method_id', 'shipping_tracking_id', 'shipping_price', 'order_subtotal', 'order_tax', 'order_total', 'order_total_dim_h', 'order_total_dim_l', 'order_total_dim_w', 'order_total_weight', 'contains_exchange_unit', 'exchange_unit_img', 'is_cancelled', 'is_completed', 'current_status_id', 'current_status_date', 'current_status_comment']
+        fields = '__all__'
 
-class OrderItemsSerializer(serializers.ModelSerializer):
-
+class OrderExUnitImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = auth_models.OrderItems
-        fields = ['order_item_id', 'order_id', 'sku_no', 'order_item_price']
+        fields = ['order_ex_unit_filename']
+
+class OrderItemsSerializer(custom_serializers.NestedSerializer):
+    nested_fields = {'sku_no': st_model_serializers.ProductStocksSerializer}
+    # sku_no = serializer_fields.SerializerOrPkField(queryset=st_models.ProductStocks.objects.all(), alt_field=st_model_serializers.ProductStocksSerializer)
+    # sku_no = st_model_serializers.ProductConfigSerializer(read_only=True)
+    class Meta:
+        model = auth_models.OrderItems
+        fields = '__all__'
 
 class OrderHistorySerializer(serializers.ModelSerializer):
+    status_id = serializers.SlugRelatedField(read_only=True, slug_field='status_value')
+    # status_id = serializers.SlugRelatedField(read_only=True, slug_field='status_value')
 
     class Meta:
         model = auth_models.OrderHistory
-        fields = ['order_history_id', 'order_id', 'status_id', 'status_date', 'status_comment']
+        fields = '__all__'
 
 class OrderCommunicationHistorySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = auth_models.OrderCommunicationHistory
-        fields = ['comm_id', 'user_id', 'order_id', 'comm_method', 'comm_type', 'comm_recipient', 'comm_date', 'comm_subject', 'comm_comment']
+        fields = '__all__'
 
 # Invoice Model Serializers
 
-class InvoicesSerializer(serializers.ModelSerializer):
+class InvoicesSerializer(custom_serializers.NestedSerializer):
+    nested_fields = {'order_id': OrdersSerializer}
+    # order_id = serializer_fields.SerializerOrPkField(queryset=auth_models.Orders.objects.all(), alt_field=OrdersSerializer)
 
     class Meta:
         model = auth_models.Invoices
-        fields = ['invoice_id', 'user_id', 'order_id', 'download_link', 'is_synced', 'sage_id', 'sage_doc_no']
+        fields = '__all__'
+        depth = 1
 
-class InvoiceItemsSerializer(serializers.ModelSerializer):
-
+class InvoiceItemsSerializer(custom_serializers.NestedSerializer):
+    nested_fields = {'order_item_id': OrderItemsSerializer}
+    # order_item_id = serializer_fields.SerializerOrPkField(queryset=auth_models.OrderItems.objects.all(), alt_field=OrderItemsSerializer)
     class Meta:
         model = auth_models.InvoiceItems
-        fields = ['invoice_item_id', 'invoice_id', 'order_item_id']
+        fields = '__all__'
 
 # Repair Model Serializer
 
-class RepairsSerializer(serializers.ModelSerializer):
-
+class RepairsSerializer(custom_serializers.NestedSerializer):
+    nested_fields = {
+        'product_id': st_model_serializers.ProductsSerializer,
+        'shipping_address_id': UserAddressesSerializer
+    }
+    # product_id = serializer_fields.SerializerOrPkField(queryset=st_models.Products.objects.all(), alt_field=st_model_serializers.ProductsSerializer)
+    shipping_method_id = serializer_fields.SerializerOrPkField(queryset=st_models.ShippingMethods.objects.all(), alt_field=serializers.SlugRelatedField, alt_field_params={'slug_field': 'shipping_method_value'})
+    # shipping_address_id = serializer_fields.SerializerOrPkField(queryset=reg_models.UserAddresses.objects.all(), alt_field=UserAddressesSerializer)
+    current_status_id = serializer_fields.SerializerOrPkField(queryset=st_models.Statuses.objects.all(), alt_field=serializers.SlugRelatedField, alt_field_params={'slug_field': 'status_value'})
+    # product_id = ProductsSerializer(read_only=True)
+    # current_status_id = serializers.SlugRelatedField(read_only=True, slug_field='status_value')
     class Meta:
         model = auth_models.Repairs
-        fields = ['repair_id', 'user_id', 'repair_date', 'product_id', 'reason_repair', 'shipping_address_id', 'shipping_method_id', 'shipping_tracking_id', 'shipping_price_excl', 'shipping_price_incl', 'shipping_price_tax', 'is_cancelled', 'is_completed', 'current_status_id', 'current_status_date', 'current_status_comment']
+        fields = '__all__'
+        depth = 1
 
 class RepairHistorySerializer(serializers.ModelSerializer):
-
+    status_id = serializers.SlugRelatedField(read_only=True, slug_field='status_value')
     class Meta:
         model = auth_models.RepairHistory
-        fields = ['repair_history_id', 'repair_id', 'status_id', 'status_date', 'status_comment']
+        fields = '__all__'
 
 class RepairCommunicationHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = auth_models.RepairCommunicationHistory
-        fields = ['comm_id', 'user_id', 'repair_id', 'comm_method', 'comm_type', 'comm_recipient', 'comm_date', 'comm_subject', 'comm_comment']
+        fields = '__all__'
 
 # Return Model Serializers
 
-class ReturnsSerializer(serializers.ModelSerializer):
-
+class ReturnsSerializer(custom_serializers.NestedSerializer):
+    nested_fields = {'order_item_id': OrderItemsSerializer}
+    # order_item_id = serializer_fields.SerializerOrPkField(queryset=auth_models.OrderItems.objects.all(), alt_field=OrderItemsSerializer)
     class Meta:
         model = auth_models.Returns
-        fields = ['return_id', 'user_id', 'order_id', 'order_item_id', 'reason_return', 'product_problem', 'is_completed', 'preferred_outcome', 'current_status_id', 'current_status_date', 'current_status_comment']
+        fields = '__all__'
 
 class ReturnHistorySerializer(serializers.ModelSerializer):
-
+    status_id = serializers.SlugRelatedField(read_only=True, slug_field='status_value')
     class Meta:
         model = auth_models.ReturnHistory
-        fields = ['return_history_id', 'return_id', 'status_id', 'status_date', 'status_comment']
+        fields = '__all__'
+        depth = 1
 
 class ReturnCommunicationHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = auth_models.ReturnCommunicationHistory
-        fields = ['comm_id', 'user_id', 'return_id', 'comm_method', 'comm_type', 'comm_recipient', 'comm_date', 'comm_subject', 'comm_comment']
+        fields = '__all__'
