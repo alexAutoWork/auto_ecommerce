@@ -1,0 +1,337 @@
+/* CSS Document */
+
+@font-face {
+    font-family: Audiowide Regular;
+    src: url("Audiowide-Regular.ttf");
+    font-weight: regular;
+}
+
+@font-face {
+    font-family: Brandon Grotesque;
+    src: url("Brandon_bld.otf");
+    font-weight: bold;
+}
+
+@font-face{
+    font-family: Roboto;
+    src: url("Roboto-Light.ttf");
+    font-weight: light;
+}
+
+.my_account_header {
+	margin: 0;
+}
+
+.my_account_main_item_cont {
+	border-radius: 0px 0px 15px 15px;
+	box-shadow: 0px 10px 8px 0px rgba(204, 204, 204, 1);
+	padding: 15px 20px 15px 20px;
+	margin-bottom: 20px;
+}
+
+.my_account_main_item_status {
+	color: #BB3333;
+	margin-bottom: 0px;
+}
+
+.my_account_main_item_btn_col {
+	height: 100%;
+	max-height: 100%;
+}
+
+.my_account_main_cont {
+	margin-top: 15px;
+	margin-bottom: 70px;
+}
+
+.my_account_tabs_cont {
+	border-radius: 0px 0px 15px 15px;
+	box-shadow: 0px 10px 8px 0px rgba(204, 204, 204, 1);
+	padding: 0px;
+	margin-bottom: 30px;
+}
+
+.my_account_tabs_header_cont {
+	background-color: #BB3333;
+	color: white;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	padding-left: 30px;
+	border-radius: 15px 15px 0px 0px;
+	margin-bottom: 10px;
+}
+
+.my_account_tabs_header {
+	margin-bottom: 0px;
+	font-size: 1em;
+}
+
+.my_account_tab_links_cont {
+	padding-left: 30px;
+	padding-right: 30px;
+	padding-bottom: 10px;
+}
+
+.my_account_tab_link {
+	color: black;
+}
+
+.my_account_tab_link:hover {
+	color: #BB3333;
+}
+
+.fa-chevron-right {
+	padding-top: 3px;
+	float: right;
+}
+
+.nav-pills .nav-link.active {
+    background-color: white !important;
+	color: #BB3333 !important;
+}
+
+.my_account_main_indi_item_number_header, .my_account_main_indi_item_tracking_number {
+	margin-bottom: 0px;
+}
+
+.my_account_main_item_status_cont {
+	text-align: right;
+}
+
+.my_account_main_item_view_mobi {
+	padding: 0;
+}
+
+.fa-chevron-right {
+	padding: 0 0 2px 0;
+}
+
+.my_account_main_indi_item_status {
+	color: #BB3333;
+}
+
+.my_account_main_indi_item_details_cont {
+	max-width: 100%;
+	width: 100%;
+	margin: 0px 0px 0px 0px;
+	padding: 0px 7px 0px 7px;
+}
+
+.my_account_main_indi_item_summary_p {
+	margin-bottom: 0px;
+}
+
+.table-striped>tbody>tr:nth-child(odd)>td, 
+.table-striped>tbody>tr:nth-child(odd)>th {
+   background-color: #fce1e1;
+ }
+
+.my_account_main_indi_item_delivery_shipping_cont {
+	margin: 0px;
+	padding: 0px;
+	max-width: 50%;
+	width: 50%;
+}
+
+.my_account_main_indi_item_delivery_cont, .my_account_main_indi_item_shipping_cont {
+	max-width: 100%;
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
+}
+
+.my_account_main_indi_item_price_summary_cont {
+	max-width: 50%;
+	width: 50%;
+	align-self: flex-start;
+	margin: 0px;
+	padding: 0px;
+}
+
+.my_account_main_indi_item_product_cont, .my_account_main_indi_item_product_inner_cont {
+	max-width: 100% !important;
+	width: 100% !important;
+	margin: 0px !important;
+	padding: 0px !important;
+}
+
+.my_account_main_indi_item_product_img_cont {
+	padding-left: 0px !important;
+}
+
+.my_account_main_indi_item_product_price_cont {
+	padding-right: 0px !important;
+}
+
+.my_account_main_indi_item_product_name, .my_account_main_indi_item_product_type {
+	margin-bottom: 0px;
+}
+
+table.my_account_main_indi_item_price_summary_table > tbody > tr > th {
+	border:0px;
+	padding: 0px 0px 8px 0px;
+	margin: 0px;
+}
+
+table.my_account_main_indi_item_price_summary_table > tbody > tr > td {
+	border:0px;
+	padding: 0px 0px 8px 0px;
+	margin: 0px;
+}
+
+table.my_account_main_indi_item_price_summary_table > tbody > tr > td.my_account_main_indi_item_price_summary_table_blank {
+	border:0px;
+	padding: 0px 0px 30px 0px;
+	margin: 0px;
+}
+
+.my_account_main_indi_item_price_summary_table_data {
+	text-align: right;
+}
+
+.my_account_personal_details_edit_btn_cont {
+	width: 15%;
+	max-width: 15%;
+}
+
+.my_account_main_item_number_and_img_cont {
+	padding: 0;
+}
+
+.my_account_main_item_number_cont {
+	padding: 0;
+	margin: 0;
+}
+
+.my_account_main_item_number {
+	padding: 0;
+	margin: 0;
+}
+
+.my_account_main_indi_item_img_cont {
+	padding: 0;
+	margin: 0;
+}
+
+.my_account_main_indi_item_img_cont_inner {
+	padding: 0;
+	margin: 0;
+}
+
+.my_account_main_indi_item_img {
+	width: 100px;
+}
+
+.item_selected {
+	border: 2px solid #BB3333;
+}
+
+.my_account_invoices_download_n_view_btn_cont {
+	padding: 0;
+}
+
+.my_account_invoices_download_n_view_btn_cont_inner {
+	padding: 0;
+}
+
+.my_account_invoices_download_btn_cont, .my_account_invoices_view_btn_cont {
+	padding-right: 0 !important;
+	padding-bottom: 0 !important;
+}
+
+@media (max-width: 342px) {
+	.my_account_main_item_number_col {
+		width: 75%;
+		max-width: 75%;
+	}
+}
+
+@media (max-width: 374px) {
+	.my_account_main_indi_item_img {
+		width: 80px;
+	}
+}
+
+@media (max-width: 455px) {
+	.my_account_header {
+		font-size: 25px;
+		text-align: center;
+	}
+}
+
+@media (max-width: 767px) {
+	.my_account_header {
+		text-align: center;
+	}
+	
+	.my_account_personal_details_edit_btn_cont {
+		max-width: 100%;
+		width: 100%;
+	}
+	
+	.my_account_invoices_download_btn_cont {
+		max-width: 100%;
+		width: 100%;
+		padding: 0 !important;
+	}
+	
+	.my_account_invoices_download_btn {
+		max-width: 100%;
+		width: 100%;
+	}
+	
+	.my_account_main_indi_item_status_history_cont {
+		padding: 0;
+	}
+	
+	.my_account_status_history_table_mobi {
+		max-width: 100%;
+		width: 100%;
+	}
+	
+	.my_account_main_item_status_cont {
+		text-align: left;
+	}
+	
+	.my_account_main_indi_item_numbers_status_cont {
+		padding: 0;
+	}
+	
+	.my_account_main_indi_item_details_cont {
+		padding: 0;
+	}
+	
+	.my_account_main_indi_item_delivery_shipping_cont {
+		width: 100%;
+		max-width: 100%;
+		padding: 0 !important;
+	}
+	
+	.my_account_main_indi_item_price_summary_cont {
+		width: 100%;
+		max-width: 100%;
+		padding: 0 !important;
+	}
+	
+	.my_account_main_indi_item_cont_outer {
+		padding: 0 !important;
+	}
+	
+	.my_account_main_indi_item_product_details {
+		padding-right: 0 !important;
+	}
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+	.my_account_personal_details_edit_btn_cont {
+		width: 16%;
+		max-width: 16%;
+	}
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+	.my_account_personal_details_edit_btn_cont {
+		width: 18%;
+		max-width: 18%;
+	}
+}

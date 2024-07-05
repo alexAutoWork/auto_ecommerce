@@ -1,0 +1,244 @@
+@charset "utf-8";
+/* CSS Document */
+
+@font-face {
+    font-family: Audiowide Regular;
+    src: url("Audiowide-Regular.ttf");
+    font-weight: regular;
+}
+
+@font-face {
+    font-family: Brandon Grotesque;
+    src: url("Brandon_bld.otf");
+    font-weight: bold;
+}
+
+@font-face{
+    font-family: Roboto;
+    src: url("Roboto-Light.ttf");
+    font-weight: light;
+}
+
+.product_main_info_cont {
+	margin-bottom: 30px;
+}
+
+.product_img_cont {
+	padding: 0;
+}
+
+.product_name {
+	font-size: 35px;
+}
+
+.product_price_info_cont {
+	border-radius: 15px;
+}
+
+.product_price_info {
+	padding-top: 25px;
+	max-width: 100%;
+	width: 100%;
+}
+
+.product_price_2 {
+	font-size: 35px;
+}
+
+.product_price_qty_select {
+	margin-bottom: 16px;
+}
+
+.product_selected_type_cont {
+	max-width: 100%;
+	width: 100%;
+	padding: 0px;
+	margin: 0px;
+}
+
+.product_selected_type_p {
+	margin: 0px;
+	margin-bottom: 5px;
+}
+
+.product_selected_type_second_hand_btn {
+	margin-top: 5px;
+}
+
+.product_selected_type_btn_br::before {
+	content: "\A";
+	white-space: pre;
+}
+
+.product_repairable_cont {
+	max-width: 100%;
+	width: 100%;
+	padding: 0px;
+	margin: 0px;
+	margin-top: 10px;
+}
+
+.product_repairable_icon {
+	margin-left: 5px;
+	color: #BB3333;
+}
+
+.product_request_repair_btn {
+	margin-left: 15px;
+}
+
+.product_info_cont {
+	padding: 0;
+}
+
+.nav-tabs > li > a.product_info_tab {
+	border-left: 2px #BB3333 solid;
+	border-right: 2px #BB3333 solid;
+	border-top: 2px #BB3333 solid;
+	border-bottom: none;
+	border-radius: 12px 12px 0px 0px;
+	color: #BB3333;
+}
+
+.nav-tabs > li > a.product_info_tab.active {
+	background-color: #BB3333;
+	border-left: 2px #BB3333 solid;
+	border-right: 2px #BB3333 solid;
+	border-top: 2px #BB3333 solid;
+	border-bottom: none;
+	border-radius: 12px 12px 0px 0px;
+	color: white;
+}
+
+.nav-tabs > li > a.product_info_tab:hover {
+	background-color: #BB3333;
+	border-left: 2px #BB3333 solid;
+	border-right: 2px #BB3333 solid;
+	border-top: 2px #BB3333 solid;
+	border-bottom: none;
+	border-radius: 12px 12px 0px 0px;
+	color: white;
+}
+
+.product_info_tab_content {
+	border: 1px #BB3333 solid;
+	padding: 20px;
+	margin-bottom: 70px;
+}
+
+.product_info_table_head {
+	background-color: #BB3333;
+	color: white;
+}
+
+table.product_info_table > tbody > tr > th {
+	border:1px solid white;
+}
+
+table.product_info_table > tbody > tr > td {
+	border:1px solid #BB3333;
+}
+
+.product_info_cont_mobi {
+	padding: 0;
+}
+
+.product_info_mobi_flex {
+	max-width: 100%;
+	display: flex;
+	align-content: center;
+	vertical-align: middle!important;
+	height: 40px;;
+}
+
+.card-header {
+	vertical-align: middle !important;
+    font-family: Brandon Grotesque;
+    letter-spacing: 2px;
+    font-size: 15px;
+    background-color: #BB3333;
+    border-radius: 0px;
+}
+
+#product_info_tab_mobi {
+	border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+#product_compability_tab_mobi {
+	border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.product_info_mobi_header_col {
+	justify-content: center;
+	vertical-align: middle!important;
+	max-height: 100%;
+	align-content: center;
+	display: flex;
+	margin-top: 10px;
+}
+
+.product_info_mobi_header_text {
+    font-size: 15px;
+    color: white;
+    text-align: left;
+}
+
+.product_info_mobi_btn_col {
+	align-items: center!important;
+    justify-content: center;
+	vertical-align: middle!important;
+	max-height: 100%;
+	display: flex;
+}
+
+.product_info_mobi_btn_header {
+    color: white;
+}
+
+.product_info_mobi_btn_header:hover {
+    color: black;
+}
+
+.product_info_content_cont_mobi {
+	border-left: 1px solid #BB3333;
+	border-right: 1px solid #BB3333;
+	border-bottom: 1px solid #BB3333;
+}
+
+@media (max-width: 323px) {
+	#product_select_sale {
+		margin-top: 5px;
+	}
+}
+
+@media (max-width: 991px) {
+	#account_btn_mobi {
+		margin-top: 5px;
+		margin-bottom: 5px;
+	}
+	
+	.product_request_repair_btn {
+		margin-left: 0;
+		margin-top: 5px;
+	}
+	
+	.product_price_info {
+		padding-bottom: 30px;
+	}
+	
+	.product_price_info_cont {
+		margin-top: 10px;
+	}
+	
+	.product_info_cont_mobi {
+		margin-bottom: 50px;
+	}
+}
+
+@media (max-width: 767px) {
+	.product_img_cont {
+		margin-bottom: 15px;
+	}
+}
