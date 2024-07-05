@@ -1,0 +1,1057 @@
+/* CSS Document */
+
+@font-face {
+    font-family: Audiowide Regular;
+    src: url("../shared/fonts/Audiowide-Regular.ttf");
+    font-weight: regular;
+}
+
+@font-face {
+    font-family: Brandon Grotesque;
+    src: url("../shared/fonts/Brandon_bld.otf");
+    font-weight: bold;
+}
+
+@font-face{
+    font-family: Roboto;
+    src: url("../shared/fonts/Roboto-Light.ttf");
+    font-weight: light;
+}
+
+.global_admin_font_italic {
+	font-style: italic;
+}
+
+.global_admin_font_italic_bold {
+	font-style: italic;
+	font-weight: 700;
+}
+
+.global_admin_font_1 {
+	font-family: Audiowide Regular;
+}
+
+.global_admin_font_2 {
+	font-family: Brandon Grotesque;
+	letter-spacing: 3px;
+}
+
+.global_admin_font_3 {
+	font-family: Brandon Grotesque;
+	letter-spacing: 2px;
+	font-size: 15px;
+}
+
+.global_admin_font_4 {
+	font-family: Roboto;
+	letter-spacing: normal;
+	font-size: 15px;
+}
+
+.global_admin_header_1 {
+	font-size: 50px;
+}
+
+.global_admin_header_2 {
+	font-size: 1.4rem;
+}
+
+.global_admin_red_select_btn_2_icon {
+	margin-left: 10px;
+}
+
+.global_admin_red_select_btn_1 {
+	letter-spacing: 2px;
+	color: #BB3333;
+}
+
+.global_admin_red_select_btn_1:hover {
+	color: black;
+}
+
+.global_admin_red_select_btn_2 {
+	letter-spacing: 2px;
+	background-color: #BB3333;
+	color: white;
+}
+
+.global_admin_red_select_btn_2:hover {
+	background-color: black;
+	color: white;
+}
+
+.global_admin_white_select_btn {
+	letter-spacing: 2px;
+	color: #BB3333;
+}
+
+.global_admin_white_select_btn:hover {
+	color: black;
+}
+
+.global_admin_black_icon_btn {
+	background-color: white;
+	color: black;
+}
+
+.global_admin_black_icon_btn:hover {
+	color: #BB3333;
+}
+
+.global_admin_nav_header {
+	color: white;
+	font-size: 2em;
+	padding-top: 25px;
+	padding-left: 25px;
+	padding-bottom: 20px;
+}
+
+.global_admin_nav_icons {
+	margin-right: 20px;
+}
+
+.global_admin_dashboard_cont_inner {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	height: 220px;
+	margin-bottom: 20px;
+}
+
+table.global_admin_table > tbody > tr > td.global_admin_dashboard_text {
+	vertical-align: middle !important;
+}
+
+table.global_admin_table > tbody > tr > td.global_admin_dashboard_stock_text {
+	vertical-align: middle;
+	color: #BB3333;
+}
+
+table.global_admin_table > tbody > tr > th.global_admin_dashboard_amount_cont {
+	width: 130px;
+	max-width: 130px;
+}
+
+.global_admin_dashboard_amount {
+	text-align: center;
+	background-color: #BB3333;
+	color: white;
+	padding: 5px;
+	width: 40px;
+	max-width: 40px;
+}
+
+#global_admin_dashboard_icon {
+	
+}
+
+#global_admin_nav_orders_icon {
+	margin-left: 2px;
+	margin-right: 21px;
+}
+
+#global_admin_nav_repairs_icon {
+	margin-left: 2px;
+}
+
+#global_admin_nav_products_icon {
+	margin-left: 1px;
+	margin-right: 21px;
+}
+
+#global_admin_nav_categories_icon {
+	margin-left: 1px;
+	margin-right: 21px;
+}
+
+#global_admin_nav_invoices_icon {
+	margin-left: 3px;
+	margin-right: 22px;
+}
+
+#global_admin_nav_returns_icon {
+	margin-left: 2px;
+	margin-right: 21px;
+}
+
+#global_admin_nav_customers_icon {
+	margin-right: 19px;
+}
+
+#global_admin_nav_settings_icon {
+	margin-left: 2px;
+}
+
+.global_admin_nav_item {
+	width: 100%;
+	max-width: 100%;
+	margin-bottom: -15px;
+	padding: 0;
+}
+
+.global_admin_nav_link {
+	color: white;
+	font-size: 0.9em;
+	padding-top: 23px;
+	padding-bottom: 23px;
+	padding-left: 25px;
+	width: 100%;
+	max-width: 100%;
+	margin: 0;
+}
+
+.global_admin_nav_link.active {
+	color: black;
+	background-color: white;
+}
+
+.global_admin_nav_link:hover {
+	color: black;
+	background-color: white;
+}
+
+.global_admin_nav_line_item {
+	padding: 0;
+	margin-bottom: -12px;
+}
+
+.global_admin_nav_line_2 {
+	padding: 0;
+	margin: 0;
+	margin-left: 26px;
+}
+
+.global_admin_main_row {
+	height: 100vh;
+	min-height: 100vh;
+}
+
+.global_admin_nav {
+	background-color: #BB3333;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.global_admin_main_header {
+	margin-top: 20px;
+	margin-bottom: 10px;
+}
+
+.global_admin_main_cont {
+	margin-bottom: 30px;
+}
+
+.global_admin_table_scroll {
+	overflow-x: scroll;
+	overflow-y: scroll;
+	height: 400px;
+}
+
+.global_admin_remove_shadow:focus {
+	outline: none;
+	box-shadow: none;
+}
+
+.global_admin_table_data_sticky_icon_btns {
+	padding: 0;
+	margin: 0;
+}
+
+table.global_admin_table > thead > tr > th.global_admin_table_data_sticky_icons {
+	position: sticky;
+	right: 0;
+	z-index: 20;
+	background-color: white;
+}
+
+table.global_admin_table > tbody > tr > td.global_admin_table_data_sticky_icons {
+	position: sticky;
+	right: 0;
+	z-index: 10;
+	background-color: white;
+}
+
+table.global_admin_table > thead {
+	overflow-x: scroll;
+}
+
+table.global_admin_table > thead > tr > th {
+	position: sticky;
+	top: 0;
+	background-color: white;
+	z-index: 11;
+}
+
+.global_admin_table_header_order_date {
+	min-width: 110px;
+}
+
+.global_admin_table_header_order_no {
+	min-width: 130px;
+}
+
+.global_admin_table_header_order_status {
+	min-width: 100px;
+}
+
+.global_admin_table_header_order_status_date {
+	min-width: 140px;
+}
+
+.global_admin_table_header_order_customer {
+	min-width: 130px;
+}
+
+.global_admin_table_header_order_company {
+	min-width: 120px;
+}
+
+.global_admin_table_header_order_shipping_method {
+	min-width: 200px;
+}
+
+.global_admin_table_header_order_shipping_price {
+	min-width: 170px;
+}
+
+.global_admin_table_header_order_total_excl {
+	min-width: 130px;
+}
+
+.global_admin_table_header_order_total_incl {
+	min-width: 130px;
+}
+
+.global_admin_table_header_order_total_vat {
+	min-width: 130px;
+}
+
+.global_admin_table_header_repairs_date {
+	min-width: 110px;
+}
+
+.global_admin_table_header_repairs_no {
+	min-width: 130px;
+}
+
+.global_admin_table_header_repairs_id {
+	min-width: 140px;
+}
+
+.global_admin_table_header_repairs_name {
+	min-width: 190px;
+}
+
+.global_admin_table_header_repairs_status {
+	min-width: 100px;
+}
+
+.global_admin_table_header_repairs_status_date {
+	min-width: 140px;
+}
+
+.global_admin_table_header_repairs_customer {
+	min-width: 130px;
+}
+
+.global_admin_table_header_repairs_company {
+	min-width: 120px;
+}
+
+.global_admin_table_header_repairs_collection_method {
+	min-width: 220px;
+}
+
+.global_admin_table_header_repairs_shipping_price_excl {
+	min-width: 220px;
+}
+
+.global_admin_table_header_repairs_shipping_price_incl {
+	min-width: 220px;
+}
+
+.global_admin_table_header_repairs_shipping_price_vat {
+	min-width: 220px;
+}
+
+.global_admin_table_header_products_id {
+	min-width: 70px;
+}
+
+.global_admin_table_header_products_name {
+	min-width: 200px;
+}
+
+.global_admin_table_header_products_stock_amt {
+	min-width: 190px;
+}
+
+.global_admin_table_header_products_price {
+	min-width: 130px;
+}
+
+.global_admin_table_header_products_brand {
+	min-width: 100px;
+}
+
+.global_admin_table_header_products_category {
+	min-width: 100px;
+}
+
+.global_admin_table_header_stock_date_added {
+	min-width: 140px;
+}
+
+.global_admin_table_header_stock_product_id {
+	min-width: 140px;
+}
+
+.global_admin_table_header_stock_product_name {
+	min-width: 200px;
+}
+
+.global_admin_table_header_stock_no {
+	min-width: 170px;
+}
+
+.global_admin_table_header_stock_type {
+	min-width: 100px;
+}
+
+.global_admin_table_header_stock_status {
+	min-width: 100px;
+}
+
+.global_admin_table_header_stock_status_date {
+	min-width: 140px;
+}
+
+.global_admin_table_header_invoice_date {
+	min-width: 110px;
+}
+
+.global_admin_table_header_invoice_no {
+	min-width: 140px;
+}
+
+.global_admin_table_header_invoice_order_no {
+	min-width: 130px;
+}
+
+.global_admin_table_header_invoice_customer {
+	min-width: 130px;
+}
+
+.global_admin_table_header_invoice_company {
+	min-width: 120px;
+}
+
+.global_admin_table_header_invoice_synced {
+	min-width: 100px;
+}
+
+.global_admin_table_header_invoice_shipping_incl {
+	min-width: 160px;
+}
+
+.global_admin_table_header_invoice_total_excl {
+	min-width: 130px;
+}
+
+.global_admin_table_header_invoice_total_vat {
+	min-width: 130px;
+}
+
+.global_admin_table_header_invoice_total_incl {
+	min-width: 130px;
+}
+
+.global_admin_table_header_returns_date {
+	min-width: 110px;
+}
+
+.global_admin_table_header_returns_no {
+	min-width: 140px;
+}
+
+.global_admin_table_header_returns_item_no {
+	min-width: 120px;
+}
+
+.global_admin_table_header_returns_order_no {
+	min-width: 190px;
+}
+
+.global_admin_table_header_returns_status {
+	min-width: 100px;
+}
+
+.global_admin_table_header_returns_status_date {
+	min-width: 140px;
+}
+
+.global_admin_table_header_returns_customer {
+	min-width: 130px;
+}
+
+.global_admin_table_header_returns_company {
+	min-width: 120px;
+}
+
+.global_admin_table_header_returns_product_id {
+	min-width: 140px;
+}
+
+.global_admin_table_header_returns_product_name {
+	min-width: 200px;
+}
+
+.global_admin_table_header_returns_pref_outcome {
+	min-width: 220px;
+}
+
+.global_admin_table_header_customers_user_id {
+	min-width: 100px;
+}
+
+.global_admin_table_header_customers_created {
+	min-width: 80px;
+}
+
+.global_admin_table_header_customers_customer_name {
+	min-width: 180px;
+}
+
+.global_admin_table_header_customers_company {
+	min-width: 120px;
+}
+
+.global_admin_table_header_customers_email {
+	min-width: 220px;
+}
+
+.global_admin_table_header_customers_mobile_no {
+	min-width: 140px;
+}
+
+.global_admin_table_header_customers_reg_no {
+	min-width: 150px;
+}
+
+.global_admin_table_header_customers_vat_no {
+	min-width: 120px;
+}
+
+.global_admin_table_header_customers_synced {
+	min-width: 190px;
+}
+
+.global_admin_table_header_customers_blacklisted {
+	min-width: 150px;
+}
+
+.global_admin_nav_pill_cont {
+	background-color: black;
+}
+
+.global_admin_details_details_cont, .global_admin_details_details_cont_inner_1, .global_admin_details_details_cont_inner_2, .global_admin_details_details_cont_inner_3, .global_admin_details_items_cont {
+	padding: 0;
+	margin: 0;
+}
+
+.global_admin_details_details_cont_inner_1 {
+	width: 65%;
+}
+
+.global_admin_details_details_cont_inner_4 {
+	margin-left: 20px;
+}
+
+.global_admin_details_summary_cont {
+	margin-left: 8px;
+	padding: 0;
+}
+
+.global_admin_details_details_date {
+	margin-bottom: 7px;
+}
+
+.global_admin_details_indi_item_cont {
+	padding: 0;
+	margin-left: 0;
+	margin-right: 0;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.global_admin_details_item_cont_header {
+	margin-left: 8px;
+}
+
+.global_admin_product_thumb_img {
+	width: 150px;
+}
+
+.global_admin_product_name {
+	margin-bottom: 0;
+}
+
+.global_admin_product_type {
+	margin-bottom: 0;
+}
+
+.global_admin_product_price {
+	margin-bottom: 7px;
+}
+
+.global_admin_product_dim {
+	
+}
+
+.global_admin_product_item_no {
+	margin-bottom: 0;
+}
+
+.global_admin_details_items_divider {
+	width: 125px;
+	border-color: black;
+	background-color: black;
+	margin-left: 20px;
+}
+
+.global_admin_nav_pill_cont_margin_top {
+	margin-top: 20px;
+}
+
+ul.nav-pills > li.nav-item > a.nav-link.active {
+	background-color: #BB3333;
+	border-radius: 0;
+}
+
+ul.nav-pills > li.nav-item > a.nav-link {
+	color: white;
+	font-size: 0.9em;
+	padding: 12px 25px;
+}
+
+ul.nav-pills > li.nav-item {
+	margin-left: -2px;
+	margin-right: -2px;
+	z-index: 1;
+}
+
+.global_admin_nav_line {
+	margin-top: 7px;
+}
+
+.global_admin_popup_style1_cont {
+	max-width: 700px;
+}
+
+.global_admin_popup_cont_inner {
+	padding: 20px;
+}
+
+.global_admin_popup_scroll_cont {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	height: 400px;
+}
+
+.global_admin_status_select {
+	color: white;
+	background-color: #BB3333;
+}
+
+.global_admin_status_select:hover {
+	background-color: black;
+	color: white;
+}
+
+.global_admin_status_select_class {
+	padding-top: 7px;
+	padding-bottom: 7px;
+}
+
+.global_admin_status_select_class:hover {
+	background-color: #BB3333;
+	color: white !important;
+	border-radius: 3px;
+}
+
+.bootstrap-select button.dropdown-toggle:focus {
+	outline: none !important;
+}
+
+.dropdown-menu {
+	box-shadow: 0px 10px 8px 0px rgba(156, 156, 156, 0.75);
+	margin-right: 56px;
+	padding-top: 20px;
+	padding-bottom: 20px;
+	padding-right: 20px;
+}
+
+#bs-select-1 {
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+.inner {
+	padding: 0px 20px 20px 20px;
+	height: 100px;
+}
+
+.dropdown-menu > li.selected .active {
+	color: white;
+	background-color: #BB3333;
+	border-radius: 3px;
+}
+
+.global_admin_status_date {
+	color: #BB3333;
+	margin-top: 10px;
+	text-align: right;
+}
+
+.global_admin_details_status_cont {
+	width: 350px;
+	max-width: 350px;
+	padding-right: 0 !important;
+}
+
+.global_admin_details_total_cont {
+	background-color: #BB3333;
+	color: white;
+	border-radius: 15px;
+	padding: 30px 30px 2px 30px;
+}
+
+.global_admin_details_total_table {
+	color: white;
+}
+
+.global_admin_details_total_table_total {
+	
+}
+
+.global_admin_img_attachment_cont {
+	justify-content: space-between;
+}
+
+.global_admin_img_attachment_indi_item_cont {
+	width: 30%;
+	max-width: 30%;
+}
+
+.global_admin_img_attachment_indi_item_filename {
+	margin: 0;
+}
+
+.global_admin_img_attachment_indi_item_image {
+	width: 100%;
+	max-width: 100%;
+}
+
+/*
+.global_admin_img_attachment_indi_item_filename_cont {
+	padding: 0 !important;
+}
+*/
+
+.global_admin_img_attachment_indi_item_filename {
+	padding: 0;
+}
+
+/*
+.global_admin_img_attachment_indi_item_bin_btn_cont {
+	padding: 0 !important;
+}
+*/
+
+.global_admin_img_attachment_indi_item_bin_btn {
+	padding: 4px 0 0 0;
+}
+
+table.global_admin_table > thead > tr > th.global_admin_table_data_sticky_orders {
+	min-width: 1em;
+	right: -20px;
+}
+
+table.global_admin_table > tbody > tr > td.global_admin_table_data_sticky_orders {
+	min-width: 1em;
+	right: -20px;
+}
+
+table.global_admin_table > thead > tr > th.global_admin_table_data_sticky_repairs {
+	min-width: 1em;
+	right: -20px;
+}
+
+table.global_admin_table > tbody > tr > td.global_admin_table_data_sticky_repairs {
+	min-width: 1em;
+	right: -20px;
+}
+
+table.global_admin_table > thead > tr > th.global_admin_table_data_sticky_products {
+	min-width: 4em;
+	right: -20px;
+}
+
+table.global_admin_table > tbody > tr > td.global_admin_table_data_sticky_products {
+	min-width: 4em;
+	right: -20px;
+}
+
+table.global_admin_table > thead > tr > th.global_admin_table_data_sticky_product_stock {
+	min-width: 4em;
+	right: -20px;
+}
+
+table.global_admin_table > tbody > tr > td.global_admin_table_data_sticky_product_stock {
+	min-width: 4em;
+	right: -20px;
+}
+
+table.global_admin_table > thead > tr > th.global_admin_table_data_sticky_invoices {
+	min-width: 6em;
+	right: -20px;
+}
+
+table.global_admin_table > tbody > tr > td.global_admin_table_data_sticky_invoices {
+	min-width: 6em;
+	right: -20px;
+}
+
+table.global_admin_table > thead > tr > th.global_admin_table_data_sticky_returns {
+	min-width: 1em;
+	right: -20px;
+}
+
+table.global_admin_table > tbody > tr > td.global_admin_table_data_sticky_returns {
+	min-width: 1em;
+	right: -20px;
+}
+
+table.global_admin_table > thead > tr > th.global_admin_table_data_sticky_settings_statuses {
+	min-width: 4em;
+	right: -20px;
+}
+
+table.global_admin_table > tbody > tr > td.global_admin_table_data_sticky_settings_statuses {
+	min-width: 4em;
+	right: -20px;
+}
+
+.global_admin_table_data_sticky_icon_view_icon_btn {
+	margin-left: 2px;
+	margin-right: 4px;
+}
+
+.global_admin_indi_communication_item_cont {
+	border-radius: 15px;
+	box-shadow: 0px 10px 8px 0px rgba(204, 204, 204, 1);
+	padding: 15px 20px 15px 20px;
+	margin-bottom: 20px;
+}
+
+.global_admin_indi_communication_item_icon {
+	background-color: #BB3333;
+	padding: 5px;
+	color: white;
+}
+
+.global_admin_indi_communication_item_message_header {
+	margin-bottom: 20px;
+}
+
+.global_admin_indi_address_item_cont {
+	border-radius: 15px;
+	box-shadow: 0px 10px 8px 0px rgba(204, 204, 204, 1);
+	padding: 15px 20px 15px 20px;
+	margin-bottom: 20px;
+}
+
+.global_admin_indi_address_item_btn_cont {
+	height: 100%;
+	max-height: 100%;
+}
+
+.table-striped>tbody>tr:nth-child(odd)>td, 
+.table-striped>tbody>tr:nth-child(odd)>th {
+   background-color: #fce1e1;
+ }
+
+table.global_admin_table_2 > tbody > tr > th.global_admin_table_2_header {
+	background-color: #BB3333;
+	color: white;
+	border: 1px solid #BB3333;
+	max-width: 25%;
+	width: 25%;
+}
+
+table.global_admin_table_2 > tbody > tr > td.global_admin_table_2_data {
+	border-bottom: 1px solid #BB3333;
+	border-top: 1px solid #BB3333;
+	border-right: 1px solid #BB3333;
+}
+
+table.global_admin_table_2 {
+	border-collapse: separate;
+	border-spacing: 0px 3px;
+}
+
+table.global_admin_table_3 > tbody > tr > th.global_admin_table_3_header {
+	background-color: #BB3333;
+	color: white;
+	border: 1px solid #BB3333;
+	max-width: 50%;
+	width: 50%;
+}
+
+table.global_admin_table_3 > tbody > tr > td.global_admin_table_3_data {
+	border-bottom: 1px solid #BB3333;
+	border-top: 1px solid #BB3333;
+	border-right: 1px solid #BB3333;
+}
+
+table.global_admin_table_3 {
+	border-collapse: separate;
+	border-spacing: 0px 3px;
+}
+
+table.global_admin_table_4 > thead > tr > th.global_admin_table_4_header {
+	background-color: #BB3333;
+	color: white;
+	border: 1px solid #BB3333;
+	width: 20%;
+	max-width: 20%;
+}
+
+table.global_admin_table_4 > tbody > tr > td.global_admin_table_4_data {
+	border: 1px solid #BB3333;
+}
+
+table.global_admin_table_4 {
+	border-collapse: separate;
+	border-spacing: 3px 3px;
+}
+
+.global_admin_products_product_pricing_col_1 {
+	padding-right: 0;
+}
+
+.global_admin_products_product_pricing_col_2 {
+	padding-left: 0;
+}
+
+.global_admin_products_product_stock_amt_total {
+	text-align: right;
+	color: #BB3333;
+}
+
+.global_admin_invoice_invoices_main_invoice_cont {
+	margin-top: 30px;
+}
+
+.global_admin_invoices_invoice_1_cont {
+	margin-top: 20px;
+	margin-bottom: 80px;
+}
+
+.global_admin_invoices_invoice_1_inner_cont {
+	margin-top: 20px;
+}
+
+.global_admin_invoices_invoice_2_cont {
+	margin-top: 20px;
+	margin-bottom: 40px;
+}
+
+table.global_admin_invoices_invoice_table > thead > tr > th {
+	padding: 0px 0px 4px 0px;
+	margin: 0px;
+}
+
+table.global_admin_invoices_invoice_table > tbody > tr > td {
+	padding: 0px 0px 4px 0px;
+	margin: 0px;
+}
+
+.global_admin_invoices_invoice_table_data {
+	text-align: right;
+}
+
+.global_admin_invoices_invoice_auto_logo_text {
+	margin-top: 15px;
+	margin-bottom: 10px;
+}
+
+.global_admin_invoices_invoice_table_items_cont {
+	margin-bottom: 30%;
+}
+
+.global_admin_invoices_invoice_table_stock_code {
+	width: 13%;
+	max-width: 13%;
+}
+
+.global_admin_invoices_invoice_table_stock_unit_no {
+	width: 16%;
+	max-width: 16%;
+}
+
+.global_admin_invoices_invoice_table_item {
+	width: 16%;
+	max-width: 16%;
+}
+
+.global_admin_invoices_invoice_table_qty {
+	width: 5%;
+	max-width: 5%;
+}
+
+.global_admin_invoices_invoice_table_unit_price {
+	width: 13%;
+	max-width: 13%;
+}
+
+.global_admin_invoices_invoice_table_excl {
+	width: 11%;
+	max-width: 11%;
+}
+
+.global_admin_invoices_invoice_table_vat {
+	width: 11%;
+	max-width: 11%;
+}
+
+.global_admin_invoices_invoice_table_incl {
+	width: 11%;
+	max-width: 11%;
+}
+
+.global_admin_invoices_invoice_table_total_head, .global_admin_invoices_invoice_table_total_data {
+	font-size: 2em;
+	padding-top: 20px !important;
+}
+
+::-webkit-scrollbar {
+  	width: 5px;
+	height: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  	background: #f1f1f1;
+	border-radius: 2px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  	background: rgba(205, 205, 205, 1);
+	border-radius: 2px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  	background: rgba(129, 129, 129, 1);
+}
