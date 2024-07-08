@@ -18,6 +18,7 @@ class UserAddressesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class UserDetailsSerializer(serializers.ModelSerializer):
+    user_id = serializers.PrimaryKeyRelatedField(queryset=reg_models.UserLogin.objects.all())
     class Meta:
         model = reg_models.UserDetails
         fields = '__all__'
