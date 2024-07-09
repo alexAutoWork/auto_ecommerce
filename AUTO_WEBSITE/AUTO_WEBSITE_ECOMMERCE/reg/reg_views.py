@@ -16,9 +16,7 @@ class LogoutView(views.APIView):
     def post(self, request):
         return reg_utils.logout(request)
 
-class SensViewSet(mixins.TempMixin, mixins.CommunicationViewSetMixin, viewsets.ViewSet):
-
-    temp_name = 'temp'
+class SensViewSet(mixins.TempMixin, mixins.CommunicationViewSetMixin, viewsets.ViewSet):\
 
     def send_otp(self, request, **kwargs):
         comm_method = kwargs.get('method', None)
@@ -36,32 +34,31 @@ class SensViewSet(mixins.TempMixin, mixins.CommunicationViewSetMixin, viewsets.V
             return otp_response
 
     def verify_account(self, request):
-        temp = super().init_temp(request)
         comm_method = request.data.get('method', None)
         if comm_method is not None:
             user = request.user
-            temp.reset_type = 'verify_account'
-            super().set_temp(request, temp)
+            request.session['reset_type'] = 'verify_account'
             return Response(self.send_otp(request, method=comm_method, comment=f'To verify your account', user=user), status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'])
     def reset(self, request):
         '''
         '''
-        temp = super().init_temp(request)
         comm_method = request.data.get('method', None)
-        temp.reset_type = request.data.get('reset_type', None)
-        if ((comm_method is not None) and (temp.reset_type is not None)):
+        reset_type = request.data.get('reset_type', None)
+        if ((comm_method is not None) and (reset_type is not None)):
+            request.session['reset_type'] = reset_type
             if comm_method == 'SMS':
                 user_field = 'mobile_no'
             else:
                 user_field = comm_method
                 if user_field != 'email':
                     raise exceptions.invalid_error(obj_type='method type')
-                if temp.reset_type == 'email':
+                if reset_type == 'email':
                     raise exceptions.invalid_error(obj_type='method type')
             user_field_data = request.data.get(user_field)
             url = request.path
+            print(url)
             if 'user' in url:
                 user_field = getattr(request.user, user_field)
                 if user_field == user_field_data:
@@ -70,53 +67,52 @@ class SensViewSet(mixins.TempMixin, mixins.CommunicationViewSetMixin, viewsets.V
                     return Response({'message': 'False'}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 user = reg_models.UserLogin.objects.get(**{user_field: user_field_data})
-            request.session['user_id'] = user.user_id
-            self.send_otp(request, method=comm_method, comment=f'To reset your {temp.reset_type}', user=user)
-            super().set_temp(request, temp)
+            request.session['user_id'] = user.pk
+            self.send_otp(request, method=comm_method, comment=f'To reset your {reset_type}', user=user)
             return Response({'message': 'OTP sent'}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'])
     def verify_otp(self, request):
-        temp = super().get_temp(request)
         otp = request.session.get('otp')
         user_otp = request.data.get('user_input_otp')
+        reset_type = request.session['reset_type']
         if otp == user_otp:
-            temp.otp_valid = True
-            if temp.reset_type == 'verify_account':
+            otp_valid = True
+            request.session['otp_valid'] = otp_valid
+            if reset_type == 'verify_account':
                 user = request.user
                 if user is not None:
                     user.is_verified = True
                     user.save()
                 else:
                     return Response({'message': 'gggg'}, status=status.HTTP_400_BAD_REQUEST)
-            super().set_temp(request, temp)
-            return Response({'message': 'VALID OTP!', 'details': f'{str(temp.otp_valid)}, {str(temp.reset_type)}'}, status=status.HTTP_200_OK)
+            return Response({'message': 'VALID OTP!', 'details': f'{str(otp_valid)}, {str(reset_type)}'}, status=status.HTTP_200_OK)
         else:
-            temp.otp_valid = False
-            super().set_temp(temp)
+            otp_valid = False
+            request.session['otp_valid'] = otp_valid
             return Response({'message': 'Invalid OTP.'}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'])
     def change(self, request):
-        temp = super().get_temp(request)
-        if temp.otp_valid == True:
+        otp_valid = request.session['otp_valid']
+        reset_type = request.session['reset_type']
+        if otp_valid == True:
             user = reg_models.UserLogin.objects.get(pk=request.session.get('user_id'))
-            new = request.data.get(f'new_{temp.reset_type}')
-            conf = request.data.get(f'confirm_{temp.reset_type}')
+            new = request.data.get(f'new_{reset_type}')
+            conf = request.data.get(f'confirm_{reset_type}')
             if new == conf:
-                if temp.reset_type != 'password' or 'email':
-                    return Response({'message': 'Invalid reset type', 'details': str(temp.reset_type)}, status=status.HTTP_400_BAD_REQUEST)
+                if (reset_type != 'password') and (reset_type != 'email'):
+                    return Response({'message': 'Invalid reset type'}, status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    if temp.reset_type == 'password':
+                    if reset_type == 'password':
                         user.set_password(conf)
                     else:
                         user.email = conf
                     user.save()
-                    super().delete_temp(request, temp)
                     return reg_utils.logout(request)
             else:
-                return Response({'message': f'{temp.reset_type}s does not match!'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'message': 'fuckoff', 'details': str(temp.otp_valid)}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': f'{reset_type}s does not match!'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'fuckoff', 'details': str(otp_valid)}, status=status.HTTP_400_BAD_REQUEST)
 
 class RegisterView(views.APIView):
     def post(self, *args, **kwargs):
@@ -173,9 +169,6 @@ class VerifyViewSet(SensViewSet, viewsets.ViewSet):
         
 class UserDetailsViewSet(SensViewSet, mixins.DefaultCacheMixin, viewsets.ViewSet):
 
-    otp_valid = None
-    reset_type = None
-
     permission_classes = [BaseAuthUserPermission]
     parent_serializer = reg_model_serializers.UserDetailsSerializer
     parent_model = reg_models.UserDetails
@@ -190,15 +183,30 @@ class UserDetailsViewSet(SensViewSet, mixins.DefaultCacheMixin, viewsets.ViewSet
         serializer = self.parent_serializer(queryset)
         data = {**serializer.data, 'email': user.email, 'mobile_no': user.mobile_no}
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def partial_update(self, request, backend_req=False, detail=False, **kwargs):
+    
+    def __create__(self, request, **kwargs):
+        data = kwargs.get('data', None)
+        request.method = 'POST'
+        if data is not None:
+            data['user_id'] = request.user.user_id
+            serializer = self.parent_serializer(data=data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return True
+    
+    @action(detail=False, methods=['patch'], url_path=r'update')
+    def custom_update(self, request, backend_req=False, **kwargs):
         user_id = self.request.user
-        cache = super().list_cache(queryset=self.parent_model.objects, user_id=request.user.user_id, return_cache_name=True)
-        queryset = cache[0]
         if backend_req:
             data = kwargs.get('data')
         else:
             data = request.data
+        cache = super().list_cache(queryset=self.parent_model.objects, user_id=request.user.user_id, return_cache_name=True)
+        if cache is None:
+            self.__create__(request, data=data)
+            if True:
+                return Response({'message': 'Details Created'}, status=status.HTTP_200_OK)
+        queryset = cache[0]
         serializer = self.parent_serializer(queryset, data=data, partial=True)
         super().delete_cache(cache_name=cache[1])
         if backend_req:

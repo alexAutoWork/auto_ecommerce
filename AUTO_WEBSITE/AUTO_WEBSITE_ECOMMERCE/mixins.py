@@ -33,17 +33,18 @@ class CommunicationViewSetMixin():
     def initialize_comm_object(self, request, is_admin_req=False, **kwargs):
         if is_admin_req == True:
             self.user_id = kwargs.get('user_id', None)
-            if user_id is not None:
+            if self.user_id is not None:
                 user_details = self.get_user_details()
                 self.email = user_details['email']
                 self.mobile_no = user_details['mobile_no']
             self.parent_serializer = kwargs.get('parent_serializer', None)
             self.comm_history_serializer = kwargs.get('comm_history_serializer', None)
         else:
-            user = request.user
-            if user is None:
+            if request.user.is_authenticated:
+                user = request.user
+            else:
                 user = kwargs.get('user')
-            self.user_id = user.user_id
+            self.user_id = user.pk
             self.email = user.email
             self.mobile_no = user.mobile_no
         self.serializer_data = kwargs.get('serializer_data', None)
@@ -219,7 +220,7 @@ class CommunicationViewSetMixin():
                 'comment': kwargs.get('comment', None),
                 'serializer_data': {'otp': otp}
             }
-            self.initialize_comm_object(request, **comm_object_data)
+            self.initialize_comm_object(request, user=kwargs.get('user', None), **comm_object_data)
             # self.serializer_data = otp
             return self.check_method(comm_method)
 
@@ -256,14 +257,14 @@ class DefaultCacheMixin():
             cache_name = getattr(self, f'cache_{cache_type}_fields', None)
             if cache_name is not None:
                 model = self.convert_model_name(cache_name.pop(0))
-                if not str(model.__class__.__bases__[0]).__contains__('model'):
-                    raise Exception
+                # if not str(model.__class__.__bases__[0]).__contains__('model'):
+                #     raise Exception
                 for name in cache_name:
-                    fields.append(**{name: kwargs.get(name)})
+                    fields.update(**{name: kwargs.get(name)})
             else:
                 raise Exception
         extra_fields = kwargs.get('extra_fields', {})
-        fields.append(**extra_fields)
+        fields.update(**extra_fields)
         return fields
 
     def initialize(self, **kwargs):
