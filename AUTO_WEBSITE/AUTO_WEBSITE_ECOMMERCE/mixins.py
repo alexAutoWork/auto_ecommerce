@@ -353,7 +353,7 @@ class TempMixin():
 
     def __make_temp_name__(self, request):
         user = request.user
-        name = f'{self.temp_name}_user_id={user.user_id}'
+        name = f'__temp_{self.temp_name}_user_id={user.user_id}'
         return name
 
     def init_temp(self, request, **kwargs):
@@ -364,7 +364,7 @@ class TempMixin():
 
     def get_temp(self, request):
         name = self.__make_temp_name__(request)
-        temp = cache.get(name)
+        temp = cache.get(name, None)
         return temp
 
     def set_temp(self, request, temp):
