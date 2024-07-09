@@ -102,6 +102,8 @@ class ProductConfig(models.Model):
     is_synced = models.BooleanField()
     sage_id = models.IntegerField(unique=True, blank=True, null=True)
     sage_item_code = models.CharField(max_length=100, unique=True, blank=True, null=True)
+    stock_available = models.IntegerField()
+    has_stock = models.BooleanField()
     #synced
 
     class Meta:

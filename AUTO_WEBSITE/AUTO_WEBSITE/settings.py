@@ -94,6 +94,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         'LOCATION': os.getenv('REDIS_DB1'),
+        'TIMEOUT': None,
     }
 }
 

@@ -7,14 +7,17 @@ TYPE_2_METHODS = ('GET', 'OPTIONS', 'HEAD', 'POST', 'PATCH')
 TYPE_3_METHODS = ('GET', 'OPTIONS', 'HEAD', 'PATCH')
 TYPE_4_METHODS = ('GET', 'OPTIONS', 'HEAD', 'POST')
 
-class BaseAuthUserPermission(auth_mixins.ChildObjectAuthUserPermissionMixin, permissions.BasePermission):
+class BaseAuthUserPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.is_authenticated:
             return True
-        return False
 
         if request.user.get('is_verified') == True:
             return True
+
+        if request.method == 'POST':
+            return True
+
         return False
 
     def has_object_permission(self, request, view, obj):
@@ -25,12 +28,6 @@ class BaseAuthUserPermission(auth_mixins.ChildObjectAuthUserPermissionMixin, per
             # else:
             #     return super().has_child_object_permission(request)
             return False
-
-        # if request.method == 'POST':
-        #     return True
-            # if obj.owner == request.user:
-            #     return True
-            # return False
 
         if request.method in EDIT_METHODS or request.type == 'DELETE':
             if obj.user_id == request.user.user_id:
