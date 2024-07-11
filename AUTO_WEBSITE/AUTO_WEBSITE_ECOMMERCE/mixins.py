@@ -1,4 +1,4 @@
-import datetime, os, random, string
+import datetime, os, random, string, inspect
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.decorators import action
@@ -226,17 +226,28 @@ class CommunicationViewSetMixin():
 
 class DefaultCacheMixin():
 
-    def convert_model_name(self, model):
+    def __get_class_var(self, class_str):
+        class_var = getattr(self, class_str, None)
+        if class_var is None:
+            try:
+                class_var = self.get_private([class_str])
+                if not class_var:
+                    class_var = class_str
+            except Exception:
+                class_var = class_str
+        return class_var
+
+    def __convert_model_name(self, model):
         '''
         get model name and convert it from string or class name into lowercase
         '''
-        model_name = model.__name__
-        if model_name is None:
-            model_name = model
+        model_name = self.__get_class_var(model)
+        if type(model_name) != str:
+            model_name = getattr(model_name, '__name__', None)
         model_name = re.sub(r'([A-Z])', r'_\1', model_name).lower()
         return model_name
 
-    def create_cache_name(self, **kwargs):
+    def __create_cache_name(self, **kwargs):
         '''
         create cache name, format = 'model_field=value'
         '''
@@ -247,34 +258,36 @@ class DefaultCacheMixin():
                 model += f'_{key}={value}'
         return model
 
-    def get_fields(self, **kwargs):
+    def __get_fields(self, **kwargs):
         '''
         get fields for cache, checks if model is actually model
         '''
         cache_type = kwargs.get('cache_type', None)
+        model = None
         fields = {}
         if cache_type is not None:
             cache_name = getattr(self, f'cache_{cache_type}_fields', None)
+            print(cache_name)
             if cache_name is not None:
-                model = self.convert_model_name(cache_name.pop(0))
-                # if not str(model.__class__.__bases__[0]).__contains__('model'):
-                #     raise Exception
+                model = self.__convert_model_name(cache_name.pop(0))
                 for name in cache_name:
-                    fields.update(**{name: kwargs.get(name)})
+                    attr = self.__get_class_var(name)
+                    fields.update(**{attr: kwargs.get(attr)})
             else:
                 raise Exception
         extra_fields = kwargs.get('extra_fields', {})
         fields.update(**extra_fields)
-        return fields
+        return [model, fields]
 
-    def initialize(self, **kwargs):
+    def __initialize(self, **kwargs):
         '''
         initialize cache fields, name and model, returns fields and cache name
         '''
-        fields = self.get_fields(**kwargs)
-        model = kwargs.get('model', self.parent_model)
-        model = self.convert_model_name(model)
-        cache_name = self.create_cache_name(model=model, fields=fields)
+        model, fields = self.__get_fields(**kwargs)
+        if model is None:
+            model = kwargs.get('model', None)
+            model = self.__convert_model_name(model)
+        cache_name = self.__create_cache_name(model=model, fields=fields)
         return [fields, cache_name]
 
     def get_or_set(self, **kwargs):
@@ -285,21 +298,28 @@ class DefaultCacheMixin():
         '''
         cache_name = kwargs.get('cache_name', None)
         if cache_name is None:
-            initialize = self.initialize(**kwargs)
+            initialize = self.__initialize(**kwargs)
             cache_name = initialize[1]
             fields = initialize[0]
         else:
-            fields = self.get_fields(extra_fields=kwargs.get('fields'))
+            fields = self.__get_fields(extra_fields=kwargs.get('fields'))
         queryset = kwargs.get('queryset', None)
         data = kwargs.get('data', None)
         return_cache_name = kwargs.get('return_cache_name', False)
         if data is None:
             data = queryset.filter(**fields)
-        data = cache.get_or_set(cache_name, data)
+        cache_data = cache.get(cache_name)
+        if cache_data is None:
+            if data:
+                cache.set(cache_name, data)
+                cache_data = data
+            else:
+                cache_data = None
+        print(cache_data)
         if return_cache_name:
-            [data, cache_name]
+            return [cache_data, cache_name]
         else:
-            return data
+            return cache_data
 
     def delete_cache(self, **kwargs):
         '''
@@ -307,7 +327,7 @@ class DefaultCacheMixin():
         '''
         cache_name = kwargs.get('cache_name', None)
         if cache_name is None:
-            initialize = self.initialize(**kwargs)
+            initialize = self.__initialize(**kwargs)
             cache_name = initialize[1]
         return cache.delete(cache_name)
 
@@ -328,6 +348,22 @@ class DefaultCacheMixin():
         kwargs['cache_type'] = 'retrieve'
         return self.get_or_set(**kwargs)
 
+    def __inner_filter(self, data, **kwargs):
+        key = kwargs.get('key')
+        value = kwargs.get('value')
+        data_type = kwargs.get('data_type', 'str')
+        if data_type != 'str':
+            if data_type == 'int':
+                value = int(value)
+            if data_type == 'float':
+                value = float(value)
+            if data_type == 'decimal':
+                value = dec(value)
+        print(value)
+        output_data = [d for d in data if getattr(d, key) == value]
+        print(output_data)
+        return output_data
+
     def filter_cache(self, data, **kwargs):
         '''
         to filter cache, uses pythonic filter instead of django filtering
@@ -336,13 +372,25 @@ class DefaultCacheMixin():
         '''
         fields = kwargs.get('fields', None)
         if fields is not None:
+            print(fields)
             filtered_data = None
             for i in range(len(fields)):
-                for key, value in fields.items():
-                    if i == 0:
-                        filtered_data = [d for d in data if getattr(d, key) == value]
-                    else:
-                        filtered_data = [d for d in data if getattr(d, key) == value]
+                for field in fields:
+                    print(field)
+                    for key, value in field.items():
+                        if key == 'data_type':
+                            data_type = value
+                        else:
+                            main_key = key
+                            main_value = value
+                    main_kwargs = {
+                        'key': main_key,
+                        'value': main_value,
+                        'data_type': data_type
+                    }
+                    if i != 0:
+                        data = filtered_data
+                    filtered_data = self.__inner_filter(data=data, **main_kwargs)
             return filtered_data
 
 class Temp():

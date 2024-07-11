@@ -170,26 +170,29 @@ class VerifyViewSet(SensViewSet, viewsets.ViewSet):
 class UserDetailsViewSet(SensViewSet, mixins.DefaultCacheMixin, viewsets.ViewSet):
 
     permission_classes = [BaseAuthUserPermission]
-    parent_serializer = reg_model_serializers.UserDetailsSerializer
-    parent_model = reg_models.UserDetails
+    __parent_serializer = reg_model_serializers.UserDetailsSerializer
+    __parent_model = reg_models.UserDetails
 
     custom_actions = ['change', 'reset', 'verify_otp']
 
-    cache_list_fields = [parent_model, 'user_id']
+    cache_list_fields = ['parent_model', 'user_id']
+
+    def get_private(self, attrs):
+        return utils.get_private(self=self, attrs=attrs)
 
     def list(self, request):
         user = self.request.user
-        queryset = super().list_cache(queryset=self.parent_model.objects, user_id=request.user.user_id).first()
-        serializer = self.parent_serializer(queryset)
+        queryset = super().list_cache(queryset=self.__parent_model.objects, user_id=request.user.user_id).first()
+        serializer = self.__parent_serializer(queryset)
         data = {**serializer.data, 'email': user.email, 'mobile_no': user.mobile_no}
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-    def __create__(self, request, **kwargs):
+    def __create(self, request, **kwargs):
         data = kwargs.get('data', None)
         request.method = 'POST'
         if data is not None:
             data['user_id'] = request.user.user_id
-            serializer = self.parent_serializer(data=data)
+            serializer = self.__parent_serializer(data=data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 return True
@@ -201,13 +204,18 @@ class UserDetailsViewSet(SensViewSet, mixins.DefaultCacheMixin, viewsets.ViewSet
             data = kwargs.get('data')
         else:
             data = request.data
-        cache = super().list_cache(queryset=self.parent_model.objects, user_id=request.user.user_id, return_cache_name=True)
-        if cache is None:
-            self.__create__(request, data=data)
-            if True:
-                return Response({'message': 'Details Created'}, status=status.HTTP_200_OK)
+        cache = super().list_cache(queryset=self.__parent_model.objects, user_id=request.user.user_id, return_cache_name=True)
         queryset = cache[0]
-        serializer = self.parent_serializer(queryset, data=data, partial=True)
+        if queryset is None:
+            self.__create(request, data=data)
+            if True:
+                cache = super().list_cache(queryset=self.__parent_model.objects, user_id=request.user.user_id, return_cache_name=True)
+                if not backend_req:
+                    return Response({'message': 'Details Created'}, status=status.HTTP_200_OK)
+                return True
+        serializer = self.__parent_serializer(queryset[0], data=data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
         super().delete_cache(cache_name=cache[1])
         if backend_req:
             return True
@@ -217,27 +225,33 @@ class UserDetailsViewSet(SensViewSet, mixins.DefaultCacheMixin, viewsets.ViewSet
 class UserAddressViewSet(UserDetailsViewSet, mixins.DefaultCacheMixin, viewsets.ViewSet):
     permission_classes = [BaseAuthUserPermission]
 
-    parent_serializer = reg_model_serializers.UserAddressesSerializer
-    parent_model = reg_models.UserAddresses
+    __parent_serializer = reg_model_serializers.UserAddressesSerializer
+    __parent_model = reg_models.UserAddresses
 
     custom_actions = ['change', 'reset', 'verify_otp']
 
-    cache_list_fields = [parent_model, 'user_id']
+    cache_list_fields = ['parent_model', 'user_id']
 
+    def get_private(self, attrs):
+        return utils.get_private(self=self, attrs=attrs)
+        
     def list(self, request):
+        print(self.get_private(['parent_model']))
         user = self.request.user
-        queryset = super().list_cache(queryset=self.parent_model.objects, user_id=request.user.user_id)
-        serializer = reg_model_serializers.UserAddressesSerializer(queryset, many=True, partial=True)
+        queryset = super().list_cache(queryset=self.__parent_model.objects, user_id=request.user.user_id)
+        serializer = self.__parent_serializer(queryset, many=True, partial=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):
         user = request.user
+        data = request.data
         default = {
             'user_id': user.user_id,
             'is_active': True,
             'is_default': False
         }
-        serializer = self.parent_serializer(data=request.data, context=default)
+        data.update(**default)
+        serializer = self.__parent_serializer(data=data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             super().delete_cache(cache_type='list', user_id=user.user_id)
@@ -245,16 +259,16 @@ class UserAddressViewSet(UserDetailsViewSet, mixins.DefaultCacheMixin, viewsets.
 
     def partial_update(self, request, pk=None):
         user = self.request.user
-        queryset = super().list_cache(queryset=self.parent_model.objects, user_id=user.user_id, return_cache_name=True)
+        queryset = super().list_cache(queryset=self.__parent_model.objects, user_id=user.user_id, return_cache_name=True)
         obj = queryset[0].filter(pk=pk).first()
-        serializer = self.parent_serializer(obj, data=request.data, partial=True)
+        serializer = self.__parent_serializer(obj, data=request.data, partial=True)
         super().delete(cache_name=queryset[1])
         return Response({'message': 'Address Updated'}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'])
     def make_default(self, request, pk=None):
         user = self.request.user
-        cache = super().list_cache(queryset=self.parent_model.objects, user_id=user.user_id, return_cache_name=True)
+        cache = super().list_cache(queryset=self.__parent_model.objects, user_id=user.user_id, return_cache_name=True)
         queryset = cache[0]
         current_default = queryset.filter(is_default=True).first()
         if current_default is not None:
@@ -263,7 +277,13 @@ class UserAddressViewSet(UserDetailsViewSet, mixins.DefaultCacheMixin, viewsets.
         new_default = queryset.filter(pk=pk).first()
         new_default.is_default = True
         new_default.save()
-        super().partial_update(request, backend_req=True, data={'default_address_id': pk})
+        default = {'default_address_id': pk}
+        data = request.data
+        if data is not None:
+            default.update(**data)
+        data = default
+        print(data)
+        super().custom_update(request, backend_req=True, data=data)
         if True:
             super().delete_cache(cache_name=cache[1])
             return Response({'message': 'Address Successfully made Default!'}, status=status.HTTP_200_OK)

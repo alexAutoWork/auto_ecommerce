@@ -276,12 +276,12 @@ $('.checkout_exchange_unit_photo_file_remove').on('click', () => {
         })
         $(popup).modal('hide');
     })
-    $(`${btn}_close`).on('click', function() {
+    $(`${btn}_close`).on('click', () => {
         $(popup).modal('hide');
     })
 })
 
-$('.checkout_delivery_method_btns').on('click', function() {
+$('.checkout_delivery_method_btns').on('click', () => {
     let containers = ['checkout_delivery_address', 'checkout_pickup_address', 'checkout_courier_notice_cont']
     $('.checkout_delivery_method_btns').not(this).removeClass('active');
     $(this).addClass('active');

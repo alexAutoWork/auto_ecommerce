@@ -7,13 +7,15 @@ from django.http import Http404
 from django.conf import settings
 from ..reg.reg_model_serializers import UserAddressesSerializer
 from ..reg import reg_models
-from ..standard import st_models
+from ..standard import st_models, st_model_serializers
 from ..external_api import external_api_views
 import re, random, datetime, logging, json
 from decimal import Decimal as dec
 from django.db.models import Prefetch, F
 from django.core.cache import cache
 from django.core.files.storage import default_storage
+from django.views.decorators.cache import never_cache
+from django.utils.decorators import method_decorator
 
 sage = external_api_views.SageAccountingIntegration
 vat_perc = dec(0.15)
@@ -22,21 +24,21 @@ logger = logging.getLogger(__name__)
 class ShoppingCartViewSet(custom_mixins.TempMixin, viewsets.ViewSet):
     permission_classes = [auth_permissions.BaseAuthUserPermission]
 
-    parent_serializer = auth_model_serializers.ShoppingCartSerializer
-    child_serializer = auth_model_serializers.ShoppingCartItemsSerializer
-    child_serializer_ex = auth_serializers.ShoppingCartItemsSerializerEx
+    __parent_serializer = auth_model_serializers.ShoppingCartSerializer
+    __child_serializer = auth_model_serializers.ShoppingCartItemsSerializer
+    __child_serializer_ex = auth_serializers.ShoppingCartItemsSerializerEx
 
-    parent_model = auth_models.ShoppingCart
-    child_model = auth_models.ShoppingCartItems
+    __parent_model = auth_models.ShoppingCart
+    __child_model = auth_models.ShoppingCartItems
 
     temp_name = 'shopping_cart_obj'
 
     # shopping_cart_obj = None
     # shopping_cart_items_obj = None
 
-    def create_shopping_cart(self, request):
+    def __create_shopping_cart__(self, request):
         user = request.user
-        shopping_cart_obj = self.parent_model.objects.create(user_id=user)
+        shopping_cart_obj = self.__parent_model.objects.create(user_id=user)
         return True
 
     def serialized_response(self, request, **kwargs):
@@ -52,10 +54,10 @@ class ShoppingCartViewSet(custom_mixins.TempMixin, viewsets.ViewSet):
         if temp is not None:
             request.method = 'GET'
             if temp.shopping_cart_obj is not None:
-                serializer1 = self.parent_serializer(temp.shopping_cart_obj)
+                serializer1 = self.__parent_serializer(temp.shopping_cart_obj)
                 data.update(**{'shopping_cart': serializer1.data})
                 if temp.shopping_cart_items_obj is not None:
-                    serializer2 = self.child_serializer(temp.shopping_cart_items_obj, many=True, context={'request': request})
+                    serializer2 = self.__child_serializer(temp.shopping_cart_items_obj, many=True, context={'request': request})
                     data.update(**{'shopping_cart_items': serializer2.data})
                 if exclude is not None:
                     data.pop(exclude, '')
@@ -68,28 +70,28 @@ class ShoppingCartViewSet(custom_mixins.TempMixin, viewsets.ViewSet):
     def items_load(self, temp):
         if temp.shopping_cart_obj is not None:
             prefetch_query = Prefetch('product_config_id', queryset=st_models.ProductConfig.objects.select_related('product_id', 'variation_id').filter(product_id__is_active=True))
-            shopping_cart_items_obj = self.child_model.objects.prefetch_related(prefetch_query).filter(shopping_cart_id=temp.shopping_cart_obj.pk)
+            shopping_cart_items_obj = self.__child_model.objects.prefetch_related(prefetch_query).filter(shopping_cart_id=temp.shopping_cart_obj.pk)
             if not shopping_cart_items_obj:
                 shopping_cart_items_obj = None
             temp.shopping_cart_items_obj = shopping_cart_items_obj
             # self.shopping_cart_items_obj = shopping_cart_items_obj
 
-    def list(self, request, backend_req=False):
+    def list(self, request, backend_req=False, **kwargs):
         user = request.user
         try:
-            shopping_cart_obj = self.parent_model.objects.get(user_id=user.user_id)
+            shopping_cart_obj = self.__parent_model.objects.get(user_id=user.user_id)
             # self.check_object_permissions(request, shopping_cart_obj)
-            temp = super().init_temp(request)
+            # temp = super().init_temp(request)
+            temp = kwargs.get('temp', super().init_temp(request))
             temp.shopping_cart_obj = shopping_cart_obj
             self.items_load(temp)
-            print(temp)
             super().set_temp(request, temp)
             if not backend_req:
                 return self.serialized_response(request, temp=temp)
-        except self.parent_model.DoesNotExist:
+        except self.__parent_model.DoesNotExist:
         # if shopping_cart_obj.exists():
         # else:
-            self.create_shopping_cart(request)
+            self.__create_shopping_cart__(request)
             if True:
                 self.list(request)
 
@@ -195,7 +197,7 @@ class ShoppingCartViewSet(custom_mixins.TempMixin, viewsets.ViewSet):
             data['total_price'] = total_price
             data['shopping_cart_id'] = temp.shopping_cart_obj.pk
             data['user_id'] = request.user.user_id
-            serializer = self.child_serializer(data=data, context={'request': request})
+            serializer = self.__child_serializer(data=data, context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 data = serializer.validated_data
                 print(data)
@@ -232,31 +234,34 @@ class ShoppingCartViewSet(custom_mixins.TempMixin, viewsets.ViewSet):
 class InvoicesViewSet(custom_mixins.DefaultCacheMixin, viewsets.ViewSet):
     permission_classes = [auth_permissions.ObjectAuthUserPermission]
 
-    parent_serializer = auth_model_serializers.InvoicesSerializer
-    child_serializer = auth_model_serializers.InvoiceItemsSerializer
+    __parent_serializer = auth_model_serializers.InvoicesSerializer
+    __child_serializer = auth_model_serializers.InvoiceItemsSerializer
 
-    parent_model = auth_models.Invoices
-    parent_id_field = 'invoice_id'
-    child_model = auth_models.InvoiceItems
+    __parent_model = auth_models.Invoices
+    __parent_id_field = 'invoice_id'
+    __child_model = auth_models.InvoiceItems
     child_id_field = 'invoice_item_id'
 
-    cache_list_fields = [parent_model, 'user_id']
-    cache_retreive_fields = [parent_model, parent_id_field]
+    cache_list_fields = ['parent_model', 'user_id']
+    cache_retreive_fields = ['parent_model', 'parent_id_field']
 
     # def_prefetch_queryset = Prefetch('order_item_id__sku_no__product_config_id', queryset=st_models.ProductConfig.objects.select_related('product_id', 'variation_id'))
 
+    def get_private(self, attrs):
+        return custom_utils.get_private(self=self, attrs=attrs)
+
     def list(self, request):
-        data = self.parent_model.objects.filter(user_id=request.user.user_id)
-        serializer = self.parent_serializer(data)
+        data = self.__parent_model.objects.filter(user_id=request.user.user_id)
+        serializer = self.__parent_serializer(data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None, **kwargs):
         is_admin_req = kwargs.get('is_admin_req', False)
         invoice_serializer_dict = {}
-        invoice_queryset = self.parent_model.objects.select_related().filter(pk=pk).first()
+        invoice_queryset = self.__parent_model.objects.select_related().filter(pk=pk).first()
         if invoice_queryset is not None:
             self.check_object_permissions(request, invoice_queryset)
-            invoice_serializer = self.parent_serializer(invoice_queryset)
+            invoice_serializer = self.__parent_serializer(invoice_queryset)
             invoice_serializer_dict.update(**{'invoice_details': invoice_serializer.data})
         if is_admin_req:
             return [invoice_serializer_dict, invoice_queryset]
@@ -334,10 +339,10 @@ class InvoicesViewSet(custom_mixins.DefaultCacheMixin, viewsets.ViewSet):
                 'order_id': order_instance.pk,
                 'is_synced': False
             }
-            invoice_serializer = self.parent_serializer(data=data)
+            invoice_serializer = self.__parent_serializer(data=data)
             if invoice_serializer.is_valid(raise_exception=True):
                 invoice_instance = invoice_serializer.save()
-                invoice_instance = self.parent_models.objects.get(pk=invoice_instance['invoice_id'])
+                invoice_instance = self.__parent_models.objects.get(pk=invoice_instance['invoice_id'])
                 self.create_invoice_items(request)
                 if True:
                     super().list_cache(user_id=request.user.user_id, delete=True)
@@ -355,7 +360,7 @@ class InvoicesViewSet(custom_mixins.DefaultCacheMixin, viewsets.ViewSet):
                     'order_item_id': item.order_item_id
                 }
                 invoice_item_list_data.append(invoice_item_data)
-            invoice_item_serializer = self.child_serializer(data=invoice_item_data, many=True)
+            invoice_item_serializer = self.__child_serializer(data=invoice_item_data, many=True)
             if invoice_item_serializer.is_valid(raise_exception=True):
                 invoice_item_serializer.save()
                 return True
@@ -365,18 +370,18 @@ class OrdersViewSet(InvoicesViewSet, custom_mixins.CommunicationViewSetMixin, cu
 
     def_prefetch_queryset = Prefetch('sku_no__product_config_id', queryset=st_models.ProductConfig.objects.select_related('product_id', 'variation_id'))
 
-    parent_serializer = auth_model_serializers.OrdersSerializer
+    __parent_serializer = auth_model_serializers.OrdersSerializer
     # parent_serializer_ex = auth_serializers.OrdersSerializerEx
-    child_serializer = auth_model_serializers.OrderItemsSerializer
-    child_serializer_ex = auth_serializers.OrderItemsSerializerEx
-    file_serializer = auth_model_serializers.OrderExUnitImagesSerializer
+    __child_serializer = auth_model_serializers.OrderItemsSerializer
+    __child_serializer_ex = auth_serializers.OrderItemsSerializerEx
+    __file_serializer = auth_model_serializers.OrderExUnitImagesSerializer
 
-    parent_model = auth_models.Orders
-    parent_id_field = 'order_id'
-    child_model = auth_models.OrderItems
-    child_id_field = 'order_item_id'
-    file_model = auth_models.OrderExUnitImages
-    file_id_field = 'order_ex_unit_filename'
+    __parent_model = auth_models.Orders
+    __parent_id_field = 'order_id'
+    __child_model = auth_models.OrderItems
+    __child_id_field = 'order_item_id'
+    __file_model = auth_models.OrderExUnitImages
+    __file_id_field = 'order_ex_unit_filename'
 
     cache_field = 'user_id'
 
@@ -390,41 +395,44 @@ class OrdersViewSet(InvoicesViewSet, custom_mixins.CommunicationViewSetMixin, cu
 
     custom_actions = ['render_conf']
 
-    cache_list_fields = [parent_model, 'user_id']
-    cache_retreive_fields = [parent_model, parent_id_field]
-    cache_retreive_child_fields = [child_model, parent_id_field]
+    cache_list_fields = ['parent_model', 'user_id']
+    cache_retreive_fields = ['parent_model', 'parent_id_field']
+    cache_retreive_child_fields = ['child_model', 'parent_id_field']
 
     pending_product_stock = None
 
+    def get_private(self, attrs):
+        return custom_utils.get_private(self=self, attrs=attrs)
+
     def list(self, request):
-        queryset = super().list_cache(queryset=self.parent_model.objects, user_id=request.user.user_id, extra_fields=request.query_params)
-        serializer = self.parent_serializer(queryset, many=True)
+        queryset = super().list_cache(queryset=self.__parent_model.objects, user_id=request.user.user_id, extra_fields=request.query_params)
+        serializer = self.__parent_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
         
     # @action(detail=True)
     def render_conf(self, request):
         order_instance = kwargs.get('instance', None)
         if order_instance is not None:
-            order_instance = self.parent_serializer(order_instance)
-            cache = super().get_or_set(queryset=self.child_model.objects.prefetch_related(self.def_prefetch_queryset), order_id=order_instance.pk, return_cache_name=True)
+            order_instance = self.__parent_serializer(order_instance)
+            cache = super().get_or_set(queryset=self.__child_model.objects.prefetch_related(self.def_prefetch_queryset), order_id=order_instance.pk, return_cache_name=True)
             order_items_instance = cache[0]
-            order_items_serializer = self.child_serializer(order_items_instance, many=True)
+            order_items_serializer = self.__child_serializer(order_items_instance, many=True)
             invoice_download_link = super().create_invoice(request, order_instance=order_instance, order_items_instance=order_items_instance, order_user_details=kwargs.get('user_details'))
             data = {'order_details': order_instance.data, 'order_items': order_items_serializer.data, 'invoice_download_link': invoice_download_link}
             return data
 
     def retrieve(self, request, pk=None):
         order_serializer_dict = {}
-        order_queryset = super().retrieve_cache(queryset=self.parent_model.objects, order_id=pk)
+        order_queryset = super().retrieve_cache(queryset=self.__parent_model.objects, order_id=pk)
         if order_queryset is not None:
             self.check_object_permissions(request, order_queryset)
-            order_serializer = self.parent_serializer(order_queryset)
+            order_serializer = self.__parent_serializer(order_queryset)
             order_serializer_dict.update(**{'order_details': order_serializer.data})
             order_item_serializer = self.retrieve_items(request, pk=pk)
             order_serializer_dict.update(**{'order_items': order_item_serializer.data})
-            order_history_queryset = self.history_model.objects.filter(order_id=pk)
+            order_history_queryset = self.__history_model.objects.filter(order_id=pk)
             if order_history_queryset is not None:
-                order_history_serializer = self.history_serializer(order_history_queryset, many=True)
+                order_history_serializer = self.__history_serializer(order_history_queryset, many=True)
                 order_serializer_dict.update(**{'order_history': order_history_serializer.data})
         if is_admin_req:
             return order_serializer_dict
@@ -433,9 +441,9 @@ class OrdersViewSet(InvoicesViewSet, custom_mixins.CommunicationViewSetMixin, cu
 
     @action(detail=True, methods=['get'])
     def retrieve_items(self, request, pk=None):
-        order_items_queryset = super().get_or_set(queryset=self.child_model.objects.prefetch_related(self.def_prefetch_queryset), order_id=pk)
+        order_items_queryset = super().get_or_set(queryset=self.__child_model.objects.prefetch_related(self.def_prefetch_queryset), order_id=pk)
         if order_items_queryset is not None:
-            return self.child_serializer(order_items_queryset, many=True)
+            return self.__child_serializer(order_items_queryset, many=True)
 
     def validate_exchange_unit_images(self, files, order_id):
         paths = []
@@ -494,10 +502,10 @@ class OrdersViewSet(InvoicesViewSet, custom_mixins.CommunicationViewSetMixin, cu
                 ex_unit_files = request.data.get('ex_unit_images', None)
                 if ex_unit_files is not None:
                     ex_unit_files = self.validate_exchange_unit_images(ex_unit_files)
-            serializer = self.parent_serializer(data=data)
+            serializer = self.__parent_serializer(data=data)
             if serializer.is_valid(raise_exception=True):
                 order_instance = serializer.save()
-                order_instance = auth_models.Orders.objects.select_related('shipping_method_id', 'shipping_address_id').filter(pk=order_instance['order_id']).first()
+                order_instance = self.__parent_model.objects.select_related('shipping_method_id', 'shipping_address_id').filter(pk=order_instance['order_id']).first()
                 if order_instance is not None:
                     return order_instance
                 else:
@@ -519,7 +527,7 @@ class OrdersViewSet(InvoicesViewSet, custom_mixins.CommunicationViewSetMixin, cu
                         file = self.file_model.objects.get(pk=path)
                         if file is not None:
                             file.delete()
-            serializer = self.file_serializer(data=data, many=True)
+            serializer = self.__file_serializer(data=data, many=True)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
 
@@ -578,7 +586,7 @@ class OrdersViewSet(InvoicesViewSet, custom_mixins.CommunicationViewSetMixin, cu
                 'order_item_incl': item_excl + item_vat
             }
             order_item_list_data.append(order_item_data)
-        serializer = self.child_serializer(data=order_item_list_data, many=True)
+        serializer = self.__child_serializer(data=order_item_list_data, many=True)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             super().list_cache(user_id=request.user.user_id, delete=True)
@@ -587,7 +595,7 @@ class OrdersViewSet(InvoicesViewSet, custom_mixins.CommunicationViewSetMixin, cu
     def update_order_items(self, request, **kwargs):
         fields = kwargs.get('fields', None)
         order_instance = kwargs.get('order_instance')
-        cache = super().get_or_set(queryset=self.child_model.objects.prefetch_related(self.def_prefetch_queryset), order_id=order_instance.pk, return_cache_name=True)
+        cache = super().get_or_set(queryset=self.__child_model.objects.prefetch_related(self.def_prefetch_queryset), order_id=order_instance.pk, return_cache_name=True)
         items = cache[0]
         cache_name = cache[1]
         product_configs = []
@@ -609,42 +617,45 @@ class OrdersViewSet(InvoicesViewSet, custom_mixins.CommunicationViewSetMixin, cu
         return True
 
     def destroy(self, request, pk=None):
-        order_instance = self.parent_model.objects.get(pk=pk)
+        order_instance = self.__parent_model.objects.get(pk=pk)
         order_instance.delete()
         return Response({'message': 'deleted order on cancellation'}, status=status.HTTP_202_ACCEPTED)
 
 class RepairsViewSet(custom_mixins.CommunicationViewSetMixin, custom_mixins.DefaultCacheMixin, viewsets.ViewSet):
     
-    parent_serializer = auth_model_serializers.RepairsSerializer
-    parent_model = auth_models.Repairs
-    parent_id_field = 'repair_id'
+    __parent_serializer = auth_model_serializers.RepairsSerializer
+    __parent_model = auth_models.Repairs
+    __parent_id_field = 'repair_id'
 
-    history_serializer = auth_model_serializers.RepairHistorySerializer
-    history_model = auth_models.RepairHistory
+    __history_serializer = auth_model_serializers.RepairHistorySerializer
+    __history_model = auth_models.RepairHistory
 
-    comm_history_serializer = auth_model_serializers.RepairCommunicationHistorySerializer
-    comm_history_model = auth_models.RepairCommunicationHistory
+    __comm_history_serializer = auth_model_serializers.RepairCommunicationHistorySerializer
+    __comm_history_model = auth_models.RepairCommunicationHistory
 
     custom_actions = ['render_conf']
 
-    cache_list_fields = [parent_model, 'user_id']
-    cache_retreive_fields = [parent_model, parent_id_field]
+    cache_list_fields = ['parent_model', 'user_id']
+    cache_retreive_fields = ['parent_model', 'parent_id_field']
+
+    def get_private(self, attrs):
+        return custom_utils.get_private(self=self, attrs=attrs)
 
     def list(self, request):
-        queryset = super().list_cache(queryset=self.parent_model.objects, user_id=request.user.user_id)
-        serializer = self.parent_serializer(queryset, many=True)
+        queryset = super().list_cache(queryset=self.__parent_model.objects, user_id=request.user.user_id)
+        serializer = self.__parent_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
         repair_serializer_dict = {}
-        repair_queryset = super().retrieve_cache(queryset=self.parent_model.objects, repair_id=pk)
+        repair_queryset = super().retrieve_cache(queryset=self.__parent_model.objects, repair_id=pk)
         if repair_queryset is not None:
             self.check_object_permissions(request, repair_queryset)
-            repair_serializer = self.parent_serializer(repair_queryset)
+            repair_serializer = self.__parent_serializer(repair_queryset)
             repair_serializer_dict.update(**{'repair_details': repair_serializer.data})
-        repair_history_queryset = self.history_model.filter(repair_id=pk)
+        repair_history_queryset = self.__history_model.filter(repair_id=pk)
         if repair_history_queryset is not None:
-            repair_history_serializer = self.history_serializer(repair_history_queryset, many=True)
+            repair_history_serializer = self.__history_serializer(repair_history_queryset, many=True)
             repair_serializer_dict.update(**{'repair_history': repair_history_serializer.data})
         if is_admin_req:
             return repair_serializer_dict
@@ -655,7 +666,7 @@ class RepairsViewSet(custom_mixins.CommunicationViewSetMixin, custom_mixins.Defa
     def render_conf(self, request):
         repair_instance = kwargs.get('instance', None)
         if repair_instance is not None:
-            repair_instance = self.parent_serializer(repair_instance)
+            repair_instance = self.__parent_serializer(repair_instance)
             data = repair_instance.data
             return {'repair_details': data}
 
@@ -685,11 +696,11 @@ class RepairsViewSet(custom_mixins.CommunicationViewSetMixin, custom_mixins.Defa
                 'current_status_id': 1,
                 'current_status_date': datetime.date.today()
             }
-            serializer = self.parent_serializer(data=data)
+            serializer = self.__parent_serializer(data=data)
             if serializer.is_valid(raise_exception=True):
                 repair_instance = serializer.save()
                 request.session['repair_instance'] = repair_instance
-                repair_instance = self.parent_model.objects.select_related('product_id').filter(pk=repair_instance['repair_id']).first()
+                repair_instance = self.__parent_model.objects.select_related('product_id').filter(pk=repair_instance['repair_id']).first()
                 if repair_instance is not None:
                     super().list_cache(user_id=request.user.user_id, delete=True)
                     return repair_instance
@@ -714,36 +725,36 @@ class RepairsViewSet(custom_mixins.CommunicationViewSetMixin, custom_mixins.Defa
             repair_instance.reload_from_db()
             return repair_instance
 
+@method_decorator(never_cache, name='dispatch')
 class Checkout(OrdersViewSet, RepairsViewSet, ShoppingCartViewSet, external_api_views.PayfastIntegration, external_api_views.BobGoIntegration, custom_mixins.DefaultCacheMixin, custom_mixins.TempMixin, viewsets.ViewSet):
     lookup_field = 'instance_type'
     lookup_url_kwargs = 'instance_type'
-    temp_name = 'checkout'
 
     permission_classes = [permissions.IsAuthenticated]
-    checkout_instance_type = None
-    checkout_instance_super = None
-    checkout_instance_model = None
-    checkout_instance_serializer = None
+    # checkout_instance_type = None
+    # checkout_instance_super = None
+    # checkout_instance_model = None
+    # checkout_instance_serializer = None
     # checkout_instance_id_field = None
-    checkout_instance_id = None
-    checkout_instance = None
+    # checkout_instance_id = None
+    # checkout_instance = None
     checkout_backend_load = False
     checkout_on_load = False
-    checkout_instance_user_details = None
-    checkout_user_address = None
-    checkout_items = None
-    checkout_saved_instance = False
-    # ex_api_instance_type = checkout_instance_type
-    # ex_api_instance_model = checkout_instance_model
-    # ex_api_instance_serializer = checkout_instance_serializer
-    # ex_api_instance_id_field = checkout_instance_id_field
-    # ex_api_instance_id = checkout_instance_id
-    # ex_api_instance = checkout_instance
-    # ex_api_instance_user_details = checkout_instance_user_details
-    # ex_api_user_address = checkout_user_address
-    # ex_api_user_address_instance = None
+    # checkout_instance_user_details = None
+    # checkout_user_address = None
+    # checkout_items = None
+    # checkout_saved_instance = False
+    checkout_instance_super = None
 
-    # @action(detail=False, methods=['post'])
+    def __initialize_super(self, instance_type=None):
+        if instance_type == 'repair':
+            instance_super = [OrdersViewSet, self]
+        if instance_type == 'order':
+            instance_super = []
+        self.checkout_instance_super = instance_super
+        instance_class = globals()[f'{instance_type.capitalize()}sViewSet']
+        return instance_class
+
     def initialize_new(self, request, instance_type=None, **kwargs):
         '''
         get checkout type from client, get checkout items, initalize model, serializer and ID field associated
@@ -751,100 +762,108 @@ class Checkout(OrdersViewSet, RepairsViewSet, ShoppingCartViewSet, external_api_
         checkout_type = instance_type
         temp = kwargs.get('temp', None)
         if checkout_type is not None:
-            self.initialize(checkout_type)
+            self.initialize(checkout_type, temp=temp)
             if checkout_type == 'repair':
                 product_id = request.query_params.get('product_id', None)
                 if product_id is not None:
-                    product_instance = st_models.Products.get(pk=product_id)
+                    product_instance = st_models.Products.objects.get(pk=product_id)
                     if product_instance.is_active == False:
                         raise custom_exceptions.item_non_active_error('product')
                     else:
-                        self.checkout_items = product_instance
+                        temp.checkout_items = [product_instance]
                 else:
                     raise custom_exceptions.invalid_or_none_error('product_id')
-            if checkout_type == 'order':
+            elif checkout_type == 'order':
                 super(RepairsViewSet, self).list(request, backend_req=True)
-                self.checkout_items = self.shopping_cart_items_obj
+                if temp.shopping_cart_items_obj is not None:
+                    temp.checkout_items = temp.shopping_cart_items_obj
             else:
                 raise custom_exceptions.invalid_type_error('checkout')
         else:
             raise custom_exceptions.none_not_allowed_error('checkout type')
 
-    def initialize(self, instance_type):
-        self.checkout_instance_type = instance_type
-        if instance_type == 'repair':
-            self.checkout_instance_super = super(OrdersViewSet, self)
-        if instance_type == 'order':
-            self.checkout_instance_super = super()
-        else:
-            raise custom_exceptions.invalid_type_error('checkout')
-        self.checkout_instance_model = getattr(self.checkout_instance_super, 'parent_model')
-        self.checkout_instance_serializer = getattr(self.checkout_instance_super, 'parent_serializer')
-        self.checkout_id_field = getattr(self.checkout_instance_super, 'parent_id_field')
-        return True
+    def initialize(self, instance_type, **kwargs):
+        temp = kwargs.get('temp', None)
+        if temp is not None:
+            temp.checkout_instance_type = instance_type
+            temp_view = self.__initialize_super(instance_type=temp.checkout_instance_type)()
+            temp.checkout_instance_model, temp.checkout_instance_serializer, temp.checkout_id_field = temp_view.get_private(['parent_model', 'parent_serializer', 'parent_id_field'])
+            return True
 
-    def initialize_saved(self, instance):
-        self.checkout_instance = instance
-        self.checkout_instance_id = instance.pk
+    def initialize_saved(self, instance, **kwargs):
+        temp = kwargs.get('temp', None)
+        if temp is not None:
+            temp.checkout_instance = instance
+            temp.checkout_instance_id = instance.pk
+
+    def __get_user_address(self, request, **kwargs):
+        temp = kwargs.get('temp', None)
+        if temp is not None:
+            checkout_instance = getattr(temp, 'checkout_instance', None)
+            shipping_address_id = request.data.get('shipping_address_id', getattr(checkout_instance, 'shipping_address_id', None))
+            if shipping_address_id is None:
+                default_address_id = getattr(temp.checkout_instance_user_details, 'default_address_id', None)
+                shipping_address_id = default_address_id
+            if shipping_address_id is not None:
+                try:
+                    fields = {'user_id': request.user.user_id}
+                    queryset = super().get_or_set(model='_user_addresses', extra_fields=fields, queryset=reg_models.UserAddresses.objects)
+                    print(queryset)
+                    user_address_obj = super().filter_cache(queryset, fields=[{'pk': shipping_address_id, 'data_type': 'int'}])[0]
+                except Exception:
+                    user_address_obj = None
+                # if user_address_obj is not None:
+                #     serializer = UserAddressesSerializer(user_address_obj)
+                #     user_address_obj = serializer.data
+                #     shipping_address_id = user_address_obj
+                temp.checkout_user_address = user_address_obj
+            data = {'shipping_address_id': getattr(temp.checkout_user_address, 'address_id', None)}
+            return data
 
     @action(detail=False, methods=['post'])
     def get_shipping_method(self, request, **kwargs):
-        shipping_method_id = request.data.get('shipping_method_id', self.checkout_instance.shipping_method_id)
-        shipping_address_id = request.data.get('shipping_address_id', self.checkout_instance.shipping_address_id)
+        temp = kwargs.get('temp', super().get_temp(request))
+        checkout_instance = getattr(temp, 'checkout_instance', None)
+        shipping_method_id = request.data.get('shipping_method_id', getattr(checkout_instance, 'shipping_method_id', None))
+        print(shipping_method_id)
         request.session['shipping_method_id'] = shipping_method_id
-        if shipping_method_id == 1:
-            if self.checkout_user_address is None:
-                if shipping_address_id is None:
-                    default_address_id = self.checkout_instance_user_details.default_address_id
-                    if default_address_id is None:
-                        shipping_address_id = None
-                    else:
-                        shipping_address_id = default_address_id
-                if shipping_address_id is not None:
-                    try:
-                        fields = {'user_id': request.user.user_id}
-                        queryset = super().get_or_set(model='user_addresses', extra_fields=fields, queryset=reg_models.UserAddresses.objects)
-                        user_address_obj = super().filter_cache(queryset, fields={'address_id': shipping_address_id})
-                    except SomeModel.DoesNotExist:
-                        user_address_obj = None
-                    if user_address_obj is not None:
-                        serializer = reg_model_serializers.UserAddressSerializer(user_address_obj)
-                        self.checkout_user_address = serializer.data
-                        data = super().get_checkout_rate(request)
-                else:
-                    data = 0
+        if temp is not None:
+            data = {}
+            if shipping_method_id is None:
+                shipping_rate = 0
             else:
-                data = super().get_checkout_rate(request)
-        else:
-            data = 0
-        if self.checkout_backend_load:
-            data = {
-                'checkout_shipping_rate': data, 
+                if int(shipping_method_id) == 1:
+                    shipping_address_id = self.__get_user_address(request, temp=temp)
+                    data.update(**shipping_address_id)
+                    shipping_rate = super().get_checkout_rate(request, temp=temp)
+                else:
+                    shipping_rate = 0
+            data.update({
+                'checkout_shipping_rate': dec(shipping_rate), 
                 'shipping_method_id': shipping_method_id
-            }
-            if self.checkout_user_address is not None:
-                data.append(**{'shipping_address_id': self.checkout_user_address['address_id']})
-            return data
-        if data > 0:
-            if self.checkout_on_load:
-                return {'checkout_shipping_rate': data}
-            self.calculate_total(request, checkout_shipping_rate=data)
+            })
+            if self.checkout_on_load or self.checkout_backend_load:
+                if self.checkout_on_load:
+                    data.pop('shipping_method_id', None)
+                return data
+            return self.calculate_total(request, checkout_shipping_rate=data.get('checkout_shipping_rate', 0), temp=temp)
 
-    def calculate_product_vat(self):
-        if self.checkout_items is not None:
-            for item in self.checkout_items:
-                price = item.sku_no.product_config_id.price
-                vat = round((price * vat_perc), 2)
-                data = {
-                    'order_item_excl': price,
-                    'order_item_vat': vat,
-                    'order_item_incl': price + vat
-                }
-                item.update(data)
-                item.reload_from_db()
-        return True
+    def calculate_product_vat(self, **kwargs):
+        temp = kwargs.get('temp', None)
+        if temp is not None:
+            if temp.checkout_items is not None:
+                for item in temp.checkout_items:
+                    price = item.sku_no.product_config_id.price
+                    vat = round((price * vat_perc), 2)
+                    data = {
+                        'order_item_excl': price,
+                        'order_item_vat': vat,
+                        'order_item_incl': price + vat
+                    }
+                    item.update(data)
+                    item.reload_from_db()
+            return True
 
-    @action(detail=False)
     def calculate_total(self, request, **kwargs):
         '''
         calculate total incl shipping
@@ -854,143 +873,148 @@ class Checkout(OrdersViewSet, RepairsViewSet, ShoppingCartViewSet, external_api_
         - else:
         product calculations are redone to match the product config price
         '''
-        checkout_shipping_rate = kwargs.get('checkout_shipping_rate', 0)
-        if self.checkout_saved_instance:
-            total_quantity = self.checkout_items.count()
-            subtotal_excl = 0
-            if self.checkout_instance == 'order':
-                for item in self.checkout_items:
-                    subtotal_excl += item.order_item_excl
-        else:
-            if self.checkout_items is not None:
-                if self.checkout_instance_type == 'order':
-                    shopping_cart_items_obj = super().shopping_cart_items_obj
-                    subtotal_excl = shopping_cart_items_obj.subtotal
-                    total_quantity = shopping_cart_items_obj.total_quantity
-                if self.checkout_instance_type == 'repair':
-                    subtotal_excl = 0
-                    total_quantity = 0
-        shipping_vat = round((checkout_shipping_rate * vat_perc), 2)
-        shipping = checkout_shipping_rate + shipping_vat
-        subtotal_incl = subtotal_excl + shipping
-        vat = round((subtotal_incl * vat_perc), 2)
-        total = vat + subtotal_incl
-        data = {
-            'total_quantity': total_quantity,
-            'subtotal_excl': subtotal_excl,
-            'shipping': shipping,
-            'subtotal_incl': subtotal_incl,
-            'vat': vat,
-            'total': total
-        }
-        if self.checkout_on_load or self.checkout_backend_load:
-            return data
-        else:
-            return Response(data, status=status.HTTP_200_OK)
-
-    @action(detail=False)
-    def contains_exchange_unit(self, request, **kwargs):
-        '''
-        check if checkout items contains exchange unit
-        '''
-        if self.checkout_items is not None:
-            contains_ex = False
-            for item in self.checkout_items:
-                if self.checkout_saved_instance:
-                    product_config = item.sku_no.product_config_id
-                else:
-                    product_config = item.product_config_id
-                if product_config.variation_id == 2:
-                    contains_ex = True
-                    break
-            return contains_ex
+        temp = kwargs.get('temp', None)
+        if temp is not None:
+            checkout_shipping_rate = kwargs.get('checkout_shipping_rate', 0)
+            if temp.checkout_saved_instance:
+                total_quantity = temp.checkout_items.count()
+                subtotal_excl = 0
+                if temp.checkout_instance == 'order':
+                    for item in temp.checkout_items:
+                        subtotal_excl += item.order_item_excl
+            else:
+                if temp.checkout_items is not None:
+                    if temp.checkout_instance_type == 'order':
+                        subtotal_excl = temp.shopping_cart_obj.subtotal
+                        total_quantity = temp.shopping_cart_obj.total_quantity
+                    if temp.checkout_instance_type == 'repair':
+                        subtotal_excl = 0
+                        total_quantity = 0
+            shipping = checkout_shipping_rate
+            subtotal_incl = subtotal_excl + shipping
+            vat = round((subtotal_incl * vat_perc), 2)
+            total = vat + subtotal_incl
+            data = {
+                'total_quantity': total_quantity,
+                'subtotal_excl': subtotal_excl,
+                'shipping': shipping,
+                'subtotal_incl': subtotal_incl,
+                'vat': vat,
+                'total': total
+            }
+            if self.checkout_on_load or self.checkout_backend_load:
+                return data
+            else:
+                super().set_temp(request, temp=temp)
+                return Response(data, status=status.HTTP_200_OK)
 
     def initialize_user_addresses(self, request):
         fields = {'user_id': request.user.user_id}
-        queryset = super().get_or_set(model='user_addresses', extra_fields=fields, queryset=reg_models.UserAddresses.objects)
+        queryset = super().get_or_set(model='_user_addresses', extra_fields=fields, queryset=reg_models.UserAddresses.objects)
         serializer = UserAddressesSerializer(queryset, many=True)
         return serializer.data
 
-    def initialize_user(self, request):
+    def initialize_user(self, request, **kwargs):
         '''
         initializes user details, from queryset or cache
         '''
-        fields = {'user_id': request.user.user_id}
-        queryset = super().get_or_set(model='user_details', extra_fields=fields, queryset=reg_models.UserDetails.objects)
-        self.checkout_instance_user_details = queryset
+        temp = kwargs.get('temp', None)
+        if temp is not None:
+            fields = {'user_id': request.user.user_id}
+            queryset = super().get_or_set(model='_user_details', extra_fields=fields, queryset=reg_models.UserDetails.objects)
+            temp.checkout_instance_user_details = queryset[0]
 
-    def serialized_checkout_items(self):
+    def serialized_checkout_items(self, request, **kwargs):
         '''
         returns serialized versions of products
         '''
-        if self.checkout_instance_type == 'order':
-            if self.checkout_saved_instance:
-                super().retrieve_items(request, pk=self.checkout_instance_id)
-            else:
-                data = super().serialized_response(backend_req=True, exclude='shopping_cart')
-        if self.checkout_instance_type == 'repair':
-            serializer = st_model_serializers.ProductsSerializer(self.checkout_items)
-            data = serializer.data
-        return data
+        temp = kwargs.get('temp', None)
+        if temp is not None:
+            if temp.checkout_instance_type == 'order':
+                if temp.checkout_saved_instance:
+                    super().retrieve_items(request, pk=temp.checkout_instance_id)
+                else:
+                    data = super().serialized_response(request, backend_req=True, exclude='shopping_cart', temp=temp)
+                    # data = super().serialized_response(request, backend_req=True, temp=temp)
+            if temp.checkout_instance_type == 'repair':
+                serializer = st_model_serializers.ProductsSerializer(temp.checkout_items, context={'request': request}, many=True)
+                data = serializer.data
+            return data
 
     def check_active(self, **kwargs):
-        if self.checkout_instance_type == 'repair':
-            items = [self.checkout_items]
-        else:
-            items = self.checkout_items
-        for item in items:
-            if self.checkout_instance_type == 'order':
-                if self.checkout_saved_instance:
-                    product_config_id = item.sku_no.product_config_id
-                    product_id = product_config_id.product_id
-                else:
-                    product_config_id = item.product_config_id
-                    product_id = item.product_config_id.products_id
-                quantity = [i for i in items if i.product_config_id == product_config_id].count()
-                if (product_config_id.stock_available - 2) > quantity:
-                    return Exception
+        temp = kwargs.get('temp', None)
+        if temp is not None:
+            if temp.checkout_instance_type == 'repair':
+                items = [temp.checkout_items]
             else:
-                product_id = item
-            if product_id.is_active == False:
-                return custom_exceptions.item_non_active_error('product')
-        return True
+                items = temp.checkout_items
+                temp.checked_ex_unit = False
+                temp.contains_ex = False
+            for item in items:
+                if temp.checkout_instance_type == 'order':
+                    if temp.checkout_saved_instance:
+                        product_config_id = item.sku_no.product_config_id
+                        product_id = product_config_id.product_id
+                    else:
+                        product_config_id = item.product_config_id
+                        product_id = item.product_config_id.product_id
+                    quantity = [i for i in items if i.product_config_id == product_config_id]
+                    quantity = quantity.count(len(quantity))
+                    if temp.checked_ex_unit == False:
+                        if product_config_id.variation_id == 2:
+                            temp.contains_ex = True
+                            temp.checked_ex_unit = True
+                    if (product_config_id.stock_available - 2) > quantity:
+                        return Exception
+                else:
+                    product_id = item[0]
+                if product_id.is_active == False:
+                    return custom_exceptions.item_non_active_error('product')
+            return True
 
-    def run_checks(self, request, instance_type=None, pk=None):
+    def run_checks(self, request, instance_type=None, pk=None, **kwargs):
         '''
         used for the retrieve() and payment_initialize_data() methods
         '''
-        self.initialize_user(request)
-        temp = super().init_temp(request)
-        if self.checkout_saved_instance:
-            if self.checkout_backend_load():
-                self.continue_saved_checkout(request, pk=pk, instance_type=instance_type)
-        else:
-            self.initialize_new(request, instance_type=instance_type)
-        shipping_rate = self.get_shipping_method(request)
-        checkout_total = self.calculate_total(request, **shipping_rate)
-        data = {
-            'checkout_total': checkout_total
-        }
-        self.check_active()
-        if self.checkout_instance_type == 'order':
-            data['checkout_contains_ex'] = self.contains_exchange_unit()
-        if self.checkout_on_load:
-            data['checkout_items'] = self.serialized_checkout_items()
-            data['user_addresses'] = self.initialize_user_addresses(request)
-            data['active_address'] = self.checkout_user_address
-        if self.checkout_backend_load:
-            shipping_rate.pop('checkout_shipping_rate', '')
-            data.append(**shipping_rate)
-            if self.checkout_instance_type == 'repair':
-                data['checkout_item_id'] = self.checkout_items.pk
-        return data
+        temp = kwargs.get('temp', None)
+        self.initialize_user(request, temp=temp)
+        if temp is not None:
+            checkout_saved_instance = getattr(temp, 'checkout_saved_instance', False)
+            temp.checkout_saved_instance = checkout_saved_instance
+            if temp.checkout_saved_instance:
+                if self.checkout_backend_load:
+                    self.continue_saved_checkout(request, pk=pk, instance_type=instance_type, temp=temp)
+            else:
+                self.initialize_new(request, instance_type=instance_type, temp=temp)
+            shipping_rate = self.get_shipping_method(request, temp=temp)
+            checkout_total = self.calculate_total(request, temp=temp, checkout_shipping_rate=shipping_rate.get('checkout_shipping_rate', 0))
+            data = {
+                'checkout_total': checkout_total
+            }
+            self.check_active(temp=temp)
+            if temp.checkout_instance_type == 'order':
+                data['checkout_contains_ex'] = temp.contains_ex
+            if self.checkout_on_load:
+                data['checkout_items'] = self.serialized_checkout_items(request, temp=temp)
+                data['user_addresses'] = self.initialize_user_addresses(request)
+                data['active_address'] = getattr(temp, 'checkout_user_address', None)
+            if self.checkout_backend_load:
+                shipping_rate.pop('checkout_shipping_rate', '')
+                data.append(**shipping_rate)
+                if temp.checkout_instance_type == 'repair':
+                    data['checkout_item_id'] = temp.checkout_items.pk
+            super().set_temp(request, temp=temp)
+            # temp2 = super().get_temp(request)
+            print(temp.__dict__)
+            return data
 
     def retrieve(self, request, instance_type=None, **kwargs):
         '''
         return initial values on page load
         '''
         self.checkout_on_load = True
-        data = self.run_checks(request, instance_type=instance_type)
+        temp = kwargs.get('temp', super().get_temp(request))
+        data = self.run_checks(request, instance_type=instance_type, temp=temp)
         extra_vals = kwargs.get('extra_vals', None)
         if extra_vals is not None:
             data.append(**extra_vals)
@@ -1003,38 +1027,45 @@ class Checkout(OrdersViewSet, RepairsViewSet, ShoppingCartViewSet, external_api_
         initialize data process for payfast, including running checks and creating instance
         '''
         self.checkout_backend_load = True
-        data = self.run_checks(request, instance_type=instance_type, pk=pk)
+        temp = super().get_temp(request)
+        data = self.run_checks(request, instance_type=instance_type, pk=pk, temp=temp)
         initial = {'initial': data}
-        if self.checkout_saved_instance:
-            initial.append(**{f'{self.checkout_instance_type}': self.checkout_instance})
+        if temp.checkout_saved_instance:
+            initial.append(**{f'{temp.checkout_instance_type}': temp.checkout_instance})
             action = 'update'
         else:
             action = 'create'
-        instance = getattr(self.checkout_instance_super, action)
+        instance = getattr(temp.checkout_instance_super, action)
         self.initialize_saved(instance(request, **initial))
-        if self.checkout_instance_type == 'order':
+        if temp.checkout_instance_type == 'order':
             if action == 'create':
-                self.create_order_items(request, initial_data_items=self.checkout_items, order_instance=self.checkout_instance)
-            else:
-                self.update_order_items(request, fields={'is_pending': True}, order_instance=self.checkout_instance)
-            if order_instance.contains_ex == True:
-                update_or_delete_ex_images(request, order_instance=order_instance)
+                self.create_order_items(request, initial_data_items=temp.checkout_items, order_instance=temp.checkout_instance)
+            if action == 'update':
+                self.update_order_items(request, fields={'is_pending': True}, order_instance=temp.checkout_instance)
+            if instance.contains_ex == True:
+                update_or_delete_ex_images(request, order_instance=temp.checkout_instance)
         self.checkout_backend_load = False
-        return super().initialize_form(request)
+        return super().initialize_form(request, temp=temp)
 
     @action(detail=True, methods=['get'], url_path=r'(?P<pk>\d+)')
-    def continue_saved_checkout(self, request, pk=None, instance_type=None):
+    def continue_saved_checkout(self, request, pk=None, instance_type=None, **kwargs):
         if pk is not None:
-            self.checkout_saved_instance = True
-            self.initialize(instance_type=instance_type)
-            self.initialize_saved(self.checkout_instance_model.objects.get(pk=pk))
+            temp = kwargs.get('temp', None)
+            if temp is None:
+                temp = super().get_temp(request)
+            temp.checkout_saved_instance = True
+            self.initialize(instance_type=instance_type, temp=temp)
+            self.initialize_saved(self.checkout_instance_model.objects.get(pk=pk), temp=temp)
             if instance_type == 'order':
-                child_model = getattr(self.checkout_instance_super, 'child_model')
-                prefetch_qs = getattr(self.checkout_instance_super, 'def_prefetch_queryset')
-                self.checkout_items = child_model.objects.prefetch_related(prefetch_qs).filter(order_id=pk)
+                # child_model = getattr(temp.checkout_instance_super, 'child_model')
+                get_private = getattr(temp.checkout_instance_super, 'get_private')
+                child_model = get_private(['child_model'])
+                prefetch_qs = getattr(temp.checkout_instance_super, 'def_prefetch_queryset')
+                temp.checkout_items = child_model.objects.prefetch_related(prefetch_qs).filter(order_id=pk)
             if instance_type == 'repair':
-                self.checkout_items = self.checkout_instance.product_id
-                extra_vals = {'saved_reason_repair': self.checkout_instance.reason_repair, 'saved_error_codes': self.checkout_instance.error_codes}
+                temp.checkout_items = temp.checkout_instance.product_id
+                extra_vals = {'saved_reason_repair': temp.checkout_instance.reason_repair, 'saved_error_codes': temp.checkout_instance.error_codes}
+            super().set_temp(request, temp=temp)
             return self.retrieve(request, instance_type=instance_type, extra_vals=extra_vals)
 
     @action(detail=False, methods=['get'], url_path=r'(?P<pk>\d+)/cancel')
@@ -1042,7 +1073,8 @@ class Checkout(OrdersViewSet, RepairsViewSet, ShoppingCartViewSet, external_api_
         '''
         if pk matches, sets instance (and items) to 'saved'
         '''
-        if self.checkout_instance_id == pk:
+        temp = kwargs.get('temp', super().get_temp(request))
+        if temp.checkout_instance_id == int(pk):
             current_status_id = {'current_status_id': 3,}
             fields = {
                 **current_status_id,
@@ -1050,23 +1082,23 @@ class Checkout(OrdersViewSet, RepairsViewSet, ShoppingCartViewSet, external_api_
             }
             status_data = {
                 **current_status_id,
-                'subject': f'Your {self.checkout_instance_type} {self.checkout_instance_id} has been saved for future payment',
+                'subject': f'Your {temp.checkout_instance_type} {temp.checkout_instance_id} has been saved for future payment',
                 'comment': '',
                 'instance': self.checkout_instance,
                 'comm_method': ''
             }
-            update_status = getattr(self.checkout_instance_super, 'update_status')
+            update_status = getattr(temp.checkout_instance_super, 'update_status')
             update_status(request, **status_data)
-            if self.checkout_instance_type == 'order':
-                self.update_order_items(request, pk=self.checkout_instance_id, fields=fields)
-            return Response({'message': f'successfully saved {self.checkout_instance_type}'}, status=status.HTTP_200_OK)
+            if temp.checkout_instance_type == 'order':
+                self.update_order_items(request, pk=temp.checkout_instance_id, fields=fields)
+            return Response({'message': f'successfully saved {temp.checkout_instance_type}'}, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['delete'], url_path=r'(?P<pk>\d+)/recieve')
     def payment_recieve_data(self, request, pk=None):
         '''
         if pk matches, recieve data
         '''
-        if self.checkout_instance_id == pk:
+        if temp.checkout_instance_id == int(pk):
             return super().recieve_data(request)
 
     @action(detail=False, url_path=r'(?P<pk>\d+)/render-conf')
@@ -1082,15 +1114,16 @@ class Checkout(OrdersViewSet, RepairsViewSet, ShoppingCartViewSet, external_api_
         will send a response to the client in the instance the security checks weren't successful for the admin/technical department to investigate
 
         '''
-        if self.checkout_instance_id == pk:
+        temp = super().get_temp()
+        if temp.checkout_instance_id == pk:
             super().conduct_security_checks(request)
             if True:
-                html_conf = getattr(self.checkout_instance_super, 'render_conf')
-                data = html_conf(request, instance=self.checkout_instance, user_details=self.checkout_instance_user_details)
-                if self.checkout_instance.shipping_method_id == 1:
+                html_conf = getattr(temp.checkout_instance_super, 'render_conf')
+                data = html_conf(request, instance=temp.checkout_instance, user_details=temp.checkout_instance_user_details)
+                if temp.checkout_instance.shipping_method_id == 1:
                     super().create_shipment(request)
-                    self.checkout_instance.refresh_from_db()
-                subject = f'Your {self.checkout_instance_type} {self.checkout_instance_id} is confirmed'
+                    temp.checkout_instance.refresh_from_db()
+                subject = f'Your {temp.checkout_instance_type} {temp.checkout_instance_id} is confirmed'
                 comment = subject
                 status_data = {
                     'subject': subject,
@@ -1101,17 +1134,18 @@ class Checkout(OrdersViewSet, RepairsViewSet, ShoppingCartViewSet, external_api_
                 conf_data = status_data
                 conf_data.pop('comm_method')
                 conf_data.append(**{'serializer_data': data})
-                send_conf = getattr(self.checkout_instance_super, 'send_conf')
-                update_status = getattr(self.checkout_instance_super, 'update_status')
-                if self.checkout_instance_type == 'order':
+                send_conf = getattr(temp.checkout_instance_super, 'send_conf')
+                update_status = getattr(temp.checkout_instance_super, 'update_status')
+                if temp.checkout_instance_type == 'order':
                     status_data['current_status_id'] = 1
-                if self.checkout_instance_type == 'repair':
+                if temp.checkout_instance_type == 'repair':
                     status_data['current_status_id'] = 2
                 send_conf(request, **conf_data)
                 update_status(request, **status_data)
-                return Response(data, status=status.HTTP_201_CREATED)
+                return Response(data, status=status.HTTP_201_CREATED)  
             else:
-                return Response({'message': 'Payment Failed'}, status=status.HTTP_400_BAD_REQUEST)
+                return self.payment_cancel(request, pk=temp.checkout_instance_id, temp=temp)
+                # return Response({'message': 'Payment Failed'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'message': 'Invalid Checkout Instance ID'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1120,35 +1154,38 @@ class ReturnsViewSet(custom_mixins.CommunicationViewSetMixin, custom_mixins.Defa
     
     def_prefetch_queryset = Prefetch('order_item_id__sku_no__product_config_id', queryset=st_models.ProductConfig.objects.select_related('product_id', 'variation_id'))
 
-    parent_serializer = auth_model_serializers.ReturnsSerializer
-    parent_serializer_ex = auth_serializers.ReturnsSerializerEx
-    parent_model = auth_models.Returns
-    parent_id_field = 'return_id'
+    __parent_serializer = auth_model_serializers.ReturnsSerializer
+    __parent_serializer_ex = auth_serializers.ReturnsSerializerEx
+    __parent_model = auth_models.Returns
+    __parent_id_field = 'return_id'
 
-    history_serializer = auth_model_serializers.ReturnHistorySerializer
-    history_model = auth_models.ReturnHistory
+    __history_serializer = auth_model_serializers.ReturnHistorySerializer
+    __history_model = auth_models.ReturnHistory
     
-    comm_history_serializer = auth_model_serializers.ReturnCommunicationHistorySerializer
-    comm_history_model = auth_models.ReturnCommunicationHistory
+    __comm_history_serializer = auth_model_serializers.ReturnCommunicationHistorySerializer
+    __comm_history_model = auth_models.ReturnCommunicationHistory
 
-    cache_list_fields = [parent_model, 'user_id']
-    cache_retrieve_fields = [parent_model, parent_id_field]
+    cache_list_fields = ['parent_model', 'user_id']
+    cache_retrieve_fields = ['parent_model', 'parent_id_field']
+
+    def get_private(self, attrs):
+        return custom_utils.get_private(self=self, attrs=attrs)
 
     def list(self, request):
-        queryset = super().list_cache(queryset=self.parent_model.objects, user_id=request.user.user_id)
-        serializer = self.parent_serializer(queryset, many=True)
+        queryset = super().list_cache(queryset=self.__parent_model.objects, user_id=request.user.user_id)
+        serializer = self.__parent_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
         return_serializer_dict = {}
-        return_queryset = order_queryset = super().retrieve_cache(queryset=self.parent_model.objects, return_id=pk)
+        return_queryset = order_queryset = super().retrieve_cache(queryset=self.__parent_model.objects, return_id=pk)
         if return_queryset is not None:
             self.check_object_permissions(request, return_queryset)
-            return_serializer = self.parent_serializer(return_queryset)
+            return_serializer = self.__parent_serializer(return_queryset)
             return_serializer_dict.update(**{'return_details': return_serializer.data})
-        return_history_queryset = self.history_model.objects.filter(return_id=pk)
+        return_history_queryset = self.__history_model.objects.filter(return_id=pk)
         if return_history_queryset is not None:
-            return_history_serializer = self.history_serializer(return_history_queryset, many=True)
+            return_history_serializer = self.__history_serializer(return_history_queryset, many=True)
             return_serializer_dict.update(**{'return_history': return_history_serializer.data})
         if is_admin_req:
             return return_serializer_dict
@@ -1158,7 +1195,7 @@ class ReturnsViewSet(custom_mixins.CommunicationViewSetMixin, custom_mixins.Defa
     def send_conf(self, request, **kwargs):
         return_instance = kwargs.get('return_instance', None)
         if return_instance is not None:
-            return_serializer = self.parent_serializer(return_instance)
+            return_serializer = self.__parent_serializer(return_instance)
             serializer_data = {'return_details': return_serializer.data}
             comm_object_data = {
                 'type_id': return_instance.return_id,
@@ -1179,10 +1216,12 @@ class ReturnsViewSet(custom_mixins.CommunicationViewSetMixin, custom_mixins.Defa
             'current_status_id': 2,
             'current_status_date': custom_utils.return_date_and_time()
         }
-        serializer = auth_model_serializers.ReturnsSerializer(data=request.data, context=default)
+        data = request.data
+        data.update(**default)
+        serializer = self.__parent_serializer(data=request.data, context={'request': request})
         if serializer.is_valid(raise_exception=True):
             return_instance = serializer.save()
             request.session['return_instance'] = return_instance
-            return_instance = auth_models.Returns.objects.prefetch_related(self.def_prefetch_queryset).select_related('order_id').filter(pk=return_instance['repair_id']).first()
+            return_instance = __parent_model.objects.prefetch_related(self.def_prefetch_queryset).select_related('order_id').filter(pk=return_instance['repair_id']).first()
             super().list_cache(user_id=request.user.user_id, delete=True)
             return self.send_return_conf(request, return_instance=return_instance)

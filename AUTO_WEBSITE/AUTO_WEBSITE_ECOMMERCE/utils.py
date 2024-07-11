@@ -98,3 +98,16 @@ def get_or_query_cache(**kwargs):
         qs = kwargs.get('qs')
         queryset = cache.get_or_set(cache_name, qs)
         return queryset
+
+def get_private(**kwargs):
+    self = kwargs.get('self')
+    attrs = kwargs.get('attrs', None)
+    attr_values = []
+    if attrs is not None:
+        for attr in attrs:
+            value = getattr(self, f'_{self.__class__.__name__}' + f'__{attr}', None)
+            if value is not None:
+                attr_values.append(value)
+    if len(attr_values) == 1:
+        attr_values = attr_values[0]
+    return attr_values

@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'localhost:8080', 'host.docker.internal', 'host.docker.internal:3000']
+ALLOWED_HOSTS = ['localhost', 'localhost:8080', 'host.docker.internal', 'host.docker.internal:3000', 'c09d-102-68-28-61.ngrok-free.app']
 
 # Application definition
 
@@ -275,8 +275,8 @@ BOBGO_DEFAULT_COLLECTION_ADDRESS = {
     'code': '3610'
 }
 BOBGO_DEFAULT_HEADERS = {
-    'Content-Type': 'application/json',
-    'Authorization': BOBGO_API_KEY
+    'Authorization': f'Bearer {os.getenv("BOBGO_API_KEY")}',
+    'Content-Type': 'application/json'
 }
 
 # PAYFAST INTEGRATION SETTINGS

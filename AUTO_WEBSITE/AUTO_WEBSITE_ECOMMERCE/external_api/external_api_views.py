@@ -4,13 +4,14 @@ from django.conf import settings
 from . import external_api_serializers
 import hashlib, urllib.parse, base64, requests
 from socket import gethostbyname_ex
-from ..reg import reg_models
+from ..reg import reg_models, reg_model_serializers
 from ..auth.auth_models import Invoices, InvoiceItems
 from ..auth.auth_model_serializers import InvoicesSerializer, InvoiceItemsSerializer
 from ..standard import st_models, st_model_serializers
 from .. import utils, exceptions
 from django.db.models import Prefetch
 from celery import shared_task
+import json
 
 payfast_exc = exceptions.ServerPayFastError
 
@@ -33,7 +34,7 @@ class PayfastIntegration(viewsets.ViewSet):
             payload += f'&passphrase={pass_phrase}'
         return hashlib.md5(payload.encode()).hexdigest()
 
-    def initialize_form(self, request):
+    def initialize_form(self, request, **kwargs):
         '''
         initialize html form for payment on frontend
         SEE BELOW FOR NOTES vvvv
@@ -45,33 +46,35 @@ class PayfastIntegration(viewsets.ViewSet):
         and yes, while this does violate some REST API principles, I'd rather that than risk someone's credit card information being exposed
         ~ sincerely, the original backend dev
         '''
-        user = request.user
-        user_details = self.checkout_instance_user_details
-        if self.checkout_instance_type == 'repair':
-            amount = self.checkout_instance.shipping_price_incl
-        if self.checkout_instance_type == 'order':
-            amount = self.checkout_instance.order_total
-        else:
-            raise exceptions.invalid_error('checkout type')
-        data = {
-            'merchant_id': settings.PAYFAST_ID,
-            'merchant_key': settings.PAYFAST_KEY,
-            'return_url': f'http://localhost:8080/conf/{self.checkout_instance_type}/{self.checkout_instance_id}/',
-            'cancel_url': f'http://localhost:8080/cancel/{self.checkout_instance_type}/{self.checkout_instance_id}/',
-            'notify_url': f'http://localhost:3000/auth/checkout/{self.checkout_instance_id}/recieve',
-            'name_first': user_details.name,
-            'name_last': user_details.surname,
-            'email_address': user.email,
-            'cell_number': user.mobile_no,
-            'amount': amount,
-            'item_name': self.checkout_instance_id
-        }
-        pass_phrase = settings.PAYFAST_PASS_PHRASE
-        data['security_signature'] = self.generate_signature(data, pass_phrase)
-        request.session['initialized_data'] = data
-        serializer = external_api_serializers.PayFastSerializer(data=data)
-        if serializer.is_valid(raise_exception=True):
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        temp = kwargs.get('temp', None)
+        if temp is not None:
+            user = request.user
+            user_details = temp.checkout_instance_user_details
+            if temp.checkout_instance_type == 'repair':
+                amount = temp.checkout_instance.shipping_price_incl
+            if temp.checkout_instance_type == 'order':
+                amount = temp.checkout_instance.order_total
+            else:
+                raise exceptions.invalid_error('checkout type')
+            data = {
+                'merchant_id': settings.PAYFAST_ID,
+                'merchant_key': settings.PAYFAST_KEY,
+                'return_url': f'http://localhost:8080/conf/{temp.checkout_instance_type}/{temp.checkout_instance_id}/',
+                'cancel_url': f'http://localhost:8080/cancel/{temp.checkout_instance_type}/{temp.checkout_instance_id}/',
+                'notify_url': f'http://localhost:3000/auth/checkout/{temp.checkout_instance_id}/recieve',
+                'name_first': user_details.name,
+                'name_last': user_details.surname,
+                'email_address': user.email,
+                'cell_number': user.mobile_no,
+                'amount': amount,
+                'item_name': temp.checkout_instance_id
+            }
+            pass_phrase = settings.PAYFAST_PASS_PHRASE
+            data['security_signature'] = self.generate_signature(data, pass_phrase)
+            request.session['initialized_data'] = data
+            serializer = external_api_serializers.PayFastSerializer(data=data)
+            if serializer.is_valid(raise_exception=True):
+                return Response(serializer.data, status=status.HTTP_200_OK)
 
     def recieve_data(self, request):
         data = request.data
@@ -297,93 +300,100 @@ class SageAccountingIntegration(views.APIView):
 
 class BobGoIntegration(viewsets.ViewSet):
     ex_api_bobgo_parcels = None
-    # ex_api_instance_type = None
-    # ex_api_instance_model = None
-    # ex_api_instance_serializer = None
-    # ex_api_instance_id_field = None
-    # ex_api_instance_id = None
-    # ex_api_instance = None
-    # ex_api_instance_user_details = None
-    # ex_api_user_address = None
 
-    def configure_user_address(self):
+    def configure_user_address(self, **kwargs):
         '''
         configure user address to BobGo API Format
         '''
-        user_address_obj = self.checkout_user_address
-        if user_address_obj.unit_number != None or 'null':
-            street_address = f'{user_address_obj.unit_number}, {user_address_obj.address_line_1}'
-        else:
-            street_address = f'{user_address_obj.address_line_1}'
-        user_address_data = {
-            'name': user_address_obj.name,
-            'mobile_no': user_address_obj.contact_number,
-            'street_address': street_address,
-            'local_area': user_address_obj.area,
-            'city': user_address_obj.city,
-            'zone': user_address_obj.province,
-            'code': user_address_obj.postal_code
-        }
-        if user_address_obj.company_name != None or 'null':
-            user_address_data['company'] = user_address_obj.company
-        if user_address_obj.email_address != None or 'null':
-            user_address_data['email'] = user_address_obj.email_address
-        return user_address_data
+        temp = kwargs.get('temp', None)
+        if temp is not None:
+            user_address_obj = temp.checkout_user_address
+            if user_address_obj.unit_number != None or 'null':
+                street_address = f'{user_address_obj.unit_number} {user_address_obj.address_line_1}'
+            else:
+                street_address = f'{user_address_obj.address_line_1}'
+            user_address_data = {
+                'name': user_address_obj.name,
+                'mobile_no': user_address_obj.contact_number,
+                'street_address': street_address,
+                'local_area': user_address_obj.area,
+                'city': user_address_obj.city,
+                'zone': user_address_obj.province,
+                'code': user_address_obj.postal_code
+            }
+            if user_address_obj.company != None or 'null':
+                user_address_data['company'] = user_address_obj.company
+            if user_address_obj.email_address != None or 'null':
+                user_address_data['email'] = user_address_obj.email_address
+            return user_address_data
 
     def address_order(self, user_address_data, **kwargs):
         '''
         configure address order of user address + autolectronix address, based on if the checkout type is repair or order
         '''
         is_shipment = kwargs.get('is_shipment', False)
-        if ex_api_instance_type == 'repair':
-            collection_address = user_address_data
-            delivery_address = settings.BOBGO_DEFAULT_COLLECTION_ADDRESS
-        else:
-            collection_address = settings.BOBGO_DEFAULT_COLLECTION_ADDRESS
-            delivery_address = user_address_data
-        addresses = [collection_address, delivery_address]
-        contact_vals = ['name', 'mobile_no', 'email', 'company']
-        if is_shipment == False:
-            for item in contact_vals:
-                for address in addresses:
-                    try:
-                        del address[item]
-                    except KeyError:
-                        continue
-        return addresses
+        temp = kwargs.get('temp', None)
+        if temp is not None:
+            if temp.checkout_instance_type == 'repair':
+                collection_address = user_address_data
+                delivery_address = settings.BOBGO_DEFAULT_COLLECTION_ADDRESS
+            else:
+                collection_address = settings.BOBGO_DEFAULT_COLLECTION_ADDRESS
+                delivery_address = user_address_data
+            addresses = [collection_address, delivery_address]
+            contact_vals = ['name', 'mobile_no', 'email', 'company']
+            if is_shipment == False:
+                for item in contact_vals:
+                    for address in addresses:
+                        try:
+                            del address[item]
+                        except KeyError:
+                            continue
+            return addresses
 
     def initialize_parcels(self, **kwargs):
         '''
         interate through checkout items -> append with necessary data based on quantity
         '''
-        checkout_items = self.checkout_items
-        items = {}
-        is_shipment = kwargs.get('is_shipment', False)
-        for item in checkout_items:
-            if self.checkout_instance_type == 'order':
-                quantity = item.quantity
-                product_id = item.product_config_id.product_id
-            if self.checkout_instance_type == 'repair':
-                quantity = 1
-                product_id = item
-            # quantity = item['quantity']
-            product_id = product_id.pk
-            weight = product_id.weight
-            weight_type = product_id.weight_type
-            if weight_type.lower() != 'kg':
+        temp = kwargs.get('temp', None)
+        if temp is not None:
+            checkout_items = temp.checkout_items
+            # checkout_items = json.dumps(list(checkout_items))
+            items = {}
+            is_shipment = kwargs.get('is_shipment', False)
+            for item in checkout_items:
+                if temp.checkout_instance_type == 'order':
+                    quantity = item.quantity
+                    product_id = item.product_config_id.product_id
+                if temp.checkout_instance_type == 'repair':
+                    quantity = 1
+                    product_id = item
+                # quantity = item['quantity']
+                # product_id = product_id.pk
+                weight = product_id.weight
+                weight_type = getattr(product_id, 'weight_type', None)
+                # weight_type = product_id.weight_type
                 if weight_type is not None:
-                    weight = weight / 1000
-            for i in range(quantity):
-                data = {
-                    'description': '',
-                    'submitted_length_cm': product_id.dimension_l,
-                    'submitted_width_cm': product_id.dimension_w,
-                    'submitted_height_cm': product_id.dimension_h,
-                    'submitted_weight_kg': weight,
-                    'custom_parcel_reference': ''
-                }
-                items.append(**data)
-        return data
+                    if weight_type.lower() != 'kg':
+                        weight = weight / 1000
+                for i in range(quantity):
+                    data = {
+                        'description': '',
+                        'submitted_length_cm': round(product_id.dimension_l),
+                        'submitted_width_cm': round(product_id.dimension_w),
+                        'submitted_height_cm': round(product_id.dimension_h),
+                        'submitted_weight_kg': round(weight),
+                        # 'custom_parcel_reference': ''
+                    }
+                    # data = {
+                    #     'submitted_length_cm': 2.00,
+                    #     'submitted_width_cm': 2.00,
+                    #     'submitted_height_cm': 2.00,
+                    #     'submitted_weight_kg': 2.00
+                    # }
+                    items.update(**data)
+            print(items)
+            return items
 
     def get_courier_rates_for_products(self):
         '''
@@ -423,6 +433,7 @@ class BobGoIntegration(viewsets.ViewSet):
                 'providers': ['RAM'],
                 'service_levels': ['ECO']
               }
+              print(data)
               serializer = external_api_serializers.BobGoCourierRateSerializer(data=data)
               if serializer.is_valid(raise_exception=True):
                 courier_rate_request = requests.post(url=url, data=serializer.data, headers=settings.BOBGO_DEFAULT_HEADERS)
@@ -448,78 +459,97 @@ class BobGoIntegration(viewsets.ViewSet):
         '''
         get rate of shipping at checkout (order/repair)
         '''
-        url = f'${settings.BOBGO_URL}/rates'
-        user_address_data = self.configure_user_address()
-        address = self.address_order(user_address_data)
-        parcels = self.initialize_parcels()
-        self.ex_api_bobgo_parcels = parcels
-        data = {
-            'collection_address': address[0],
-            'delivery_address': address[1],
-            'parcels': [
-                parcels
-            ],
-            'declared_value': '',
-            'timeout': 10000,
-            'providers': ['RAM'],
-            'service_levels': ['ECO']
-        }
-        serializer = external_api_serializers.BobGoCourierRateSerializer(data=data)
-        if serializer.is_valid(raise_exception=True):
-            courier_rate_request = requests.post(url=url, data=serializer.data, headers=settings.BOBGO_DEFAULT_HEADERS)
-            if courier_rate_request.status_code == '201':
+        temp = kwargs.get('temp', None)
+        if temp is not None:
+            url = f'{settings.BOBGO_URL}/rates'
+            user_address_data = self.configure_user_address(temp=temp)
+            print(user_address_data)
+            address = self.address_order(user_address_data, temp=temp)
+            parcels = self.initialize_parcels(temp=temp)
+            temp.ex_api_bobgo_parcels = parcels
+            data = {
+                'collection_address': address[0],
+                'delivery_address': address[1],
+                'parcels': [
+                    parcels
+                ],
+                'timeout': 10000,
+                'providers': ['demo'],
+                'service_levels': ['ECO']
+            }
+            print(data)
+            data = json.dumps(data)
+            print(data)
+            courier_rate_request = requests.post(url=url, data=data, headers=settings.BOBGO_DEFAULT_HEADERS)
+            print(courier_rate_request.status_code)
+            print(courier_rate_request.text)
+            if courier_rate_request.status_code == '201' or '200':
                 courier_rate_request_data = courier_rate_request.json()
                 if courier_rate_request_data['provider_rate_requests'][0]['status'] == 'success':
-                    data2 = {
-                        'shipping_price': courier_rate_request_data['provider_rate_requests'][0]['responses'][0]['rate_amount_excl_vat']
-                    }
-                    return data
+                    data2 = courier_rate_request_data['provider_rate_requests'][0]['responses'][0]['rate_amount_excl_vat']
+                    return data2
+            # serializer = external_api_serializers.BobGoCourierRateSerializer(data=data)
+            # if serializer.is_valid(raise_exception=True):
+            #     print(serializer.data)
+            #     print(settings.BOBGO_DEFAULT_HEADERS)
+            #     courier_rate_request = requests.post(url=url, data=serializer.data, headers=settings.BOBGO_DEFAULT_HEADERS)
+            #     print(courier_rate_request.status_code)
+            #     print(courier_rate_request.text)
+            #     if courier_rate_request.status_code == '201' | '200':
+            #         courier_rate_request_data = courier_rate_request.json()
+            #         if courier_rate_request_data['provider_rate_requests'][0]['status'] == 'success':
+            #             data2 = {
+            #                 'shipping_price': courier_rate_request_data['provider_rate_requests'][0]['responses'][0]['rate_amount_excl_vat']
+            #             }
+            #             return data
 
     def create_shipment(self, request, **kwargs):
         '''
         create shipment at checkout (order/repair) after successful payment
         '''
-        url = f'${settings.BOBGO_URL}/shipments'
-        parcels = self.ex_api_bobgo_parcels
-        if self.checkout_instance is not None:
-            if self.checkout_user_address is not None:
-                user_address_data = self.configure_user_address()
-                address = self.address_order(user_address_data, is_shipment=True)
-                addresses = {'collection_address': address[0], 'delivery_address': address[1]}
-                for parcel in parcels:
-                    parcel.pop('description', '')
-                    parcel.pop('custom_parcel_reference', '')
-                address_vals = ['name', 'mobile_no', 'email', 'company']
-                address_data = {}
-                for item in address_vals:
-                    for key, value in addresses.items():
-                        val = value.pop(item, '')
-                        address_data[f'{key}_{item}'] = val
-                instance_id_field = f'{self.ex_api_instance_type}_id'
-                instance_date_field = f'{self.ex_api_instance_type}_date'
-                instance_id = instance[instance_id_field]
-                instance_date = instance[instance_date]
-                data = {
-                    **addresses,
-                    **address_data,
-                    'timeout': 10000,
-                    'parcels': [
-                        parcels
-                    ],
-                    'delcared_value': 0,
-                    'custom_order_number': instance_id,
-                    'service_level_code': 'ECO',
-                    'provider_slug': 'RAM',
-                    'collection_min_date': instance_date,
-                    'collection_after': '08:00',
-                    'collection_before': '16:00',
-                }
-                serializer = external_api_serializers.BobGoCheckoutSerializer(data=data)
-                if serializer.is_valid(raise_exception=True):
-                    courier_shipment_request = requests.post(url=url, data=serializer.data, headers=settings.BOBGO_DEFAULT_HEADERS)
-                    if courier_shipment_request.status_code == '201':
-                        courier_shipment_request_data = courier_rate_request.json()
-                        if courier_shipment_request_data['submission_status'] == 'success':
-                            shipping_tracking_id = courier_shipment_request_data['provider_tracking_reference']
-                            self.checkout_instance.shipping_tracking_id = shipping_tracking_id
-                            self.checkout_instance.save()
+        temp = kwargs.get('temp', None)
+        if temp is not None:
+            url = f'${settings.BOBGO_URL}/shipments'
+            parcels = temp.ex_api_bobgo_parcels
+            if temp.checkout_instance is not None:
+                if self.checkout_user_address is not None:
+                    user_address_data = self.configure_user_address()
+                    address = self.address_order(user_address_data, is_shipment=True)
+                    addresses = {'collection_address': address[0], 'delivery_address': address[1]}
+                    for parcel in parcels:
+                        parcel.pop('description', '')
+                        parcel.pop('custom_parcel_reference', '')
+                    address_vals = ['name', 'mobile_no', 'email', 'company']
+                    address_data = {}
+                    for item in address_vals:
+                        for key, value in addresses.items():
+                            val = value.pop(item, '')
+                            address_data[f'{key}_{item}'] = val
+                    instance_id_field = f'{temp.checkout_instance_type}_id'
+                    instance_date_field = f'{temp.checkout_instance_type}_date'
+                    instance_id = instance[instance_id_field]
+                    instance_date = instance[instance_date]
+                    data = {
+                        **addresses,
+                        **address_data,
+                        'timeout': 10000,
+                        'parcels': [
+                            parcels
+                        ],
+                        'delcared_value': 0,
+                        'custom_order_number': instance_id,
+                        'service_level_code': 'ECO',
+                        'provider_slug': 'RAM',
+                        'collection_min_date': instance_date,
+                        'collection_after': '08:00',
+                        'collection_before': '16:00',
+                    }
+                    serializer = external_api_serializers.BobGoCheckoutSerializer(data=data)
+                    if serializer.is_valid(raise_exception=True):
+                        courier_shipment_request = requests.post(url=url, data=serializer.data, headers=settings.BOBGO_DEFAULT_HEADERS)
+                        if courier_shipment_request.status_code == '201':
+                            courier_shipment_request_data = courier_rate_request.json()
+                            if courier_shipment_request_data['submission_status'] == 'success':
+                                shipping_tracking_id = courier_shipment_request_data['provider_tracking_reference']
+                                temp.checkout_instance.shipping_tracking_id = shipping_tracking_id
+                                temp.checkout_instance.save()

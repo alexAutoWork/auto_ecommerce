@@ -94,18 +94,18 @@ class BobGoAddressSerializer1(serializers.Serializer):
 #     weight_kg = serializers.DecimalField(max_digits=12, decimal_places=2)
 
 class BobGoItemSerializer1(serializers.Serializer):
-   description = serializers.CharField(allow_blank=True)
+#    description = serializers.CharField(allow_blank=True)
    submitted_length_cm = serializers.DecimalField(max_digits=12, decimal_places=2)
    submitted_width_cm = serializers.DecimalField(max_digits=12, decimal_places=2)
    submitted_height_cm = serializers.DecimalField(max_digits=12, decimal_places=2)
    submitted_weight_kg = serializers.DecimalField(max_digits=12, decimal_places=2)
-   custom_parcel_reference = serializers.CharField(allow_blank=True)
+#    custom_parcel_reference = serializers.CharField(allow_blank=True)
 
 class BobGoCourierRateSerializer(serializers.Serializer):
     collection_address = BobGoAddressSerializer1()
     delivery_address = BobGoAddressSerializer1()
     parcels = BobGoItemSerializer1(many=True)
-    declared_value =  serializers.DecimalField(max_digits=12, decimal_places=2, required=False)
+    declared_value = serializers.DecimalField(max_digits=12, decimal_places=2, required=False)
     timeout = serializers.IntegerField()
     providers = serializers.ListField(
         child=serializers.CharField(allow_blank=True)
@@ -127,7 +127,7 @@ class BobGoCheckoutSerializer(serializers.Serializer):
     delivery_contact_mobile_no = serializers.CharField()
     delivery_contact_email = serializers.EmailField()
     parcels = BobGoItemSerializer1(many=True)
-    declared_value =  serializers.DecimalField(max_digits=12, decimal_places=2, required=False)
+    declared_value =  serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True)
     custom_tracking_reference = serializers.CharField(allow_blank=True)
     custom_order_number = serializers.CharField()
     instructions_collection = serializers.CharField(allow_blank=True)
