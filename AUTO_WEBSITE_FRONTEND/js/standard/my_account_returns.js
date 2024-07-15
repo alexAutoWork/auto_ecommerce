@@ -2,8 +2,8 @@ const $ = require('jquery');
 const axios = require('axios');
 const {check_user} = require('./sens');
 const {load_bulk, page_main_load} = require('./my_account_global_items.js');
-const {return_auth_page} = require('../shared/shared_gen_func');
-const {toggle_element_slide} = require('../shared/shared_even_func');
+const {return_auth_page} = import('../shared/shared_gen_func.mjs');
+const {toggle_element_slide} = import('../shared/shared_event_func.mjs');
 
 let is_logged_in = false;
 let withCredentials = false;

@@ -1,18 +1,13 @@
 const axios = require('axios');
 const $ = require('jquery');
-const { return_page } = require('../shared/shared_functions.js');
+// const { return_page } = import('../shared/shared_gen_func.mjs');
+const {return_page} = require('../standard/test.js');
 const { check_user } = require('../standard/sens.js');
 
-let is_logged_in = false;
-let withCredentials = false;
-
-$(() => {
-    [is_logged_in, withCredentials] = check_user();
-    return_page();
-});
-
 function get_products(sort=null, brands=null, categories=null, city_id=null) {
-    let url = `http://host.docker.internal:3000/products/`
+    // let url = `http://localhost:3000/products`;
+    // let url = `http://host.docker.internal:3000/products`;
+    let url = `https://1f9f-102-68-28-61.ngrok-free.app/products/`;
     let query_param_list = []
     if (sort !== null) {
         let sort = `sort=${sort}`;
@@ -36,19 +31,24 @@ function get_products(sort=null, brands=null, categories=null, city_id=null) {
         let query_params = query_param_list.join('&');
         url = `${url}?${query_params}`;
     }
-    axios.get(url)
+    axios.get(url, {
+        headers: {
+            'ngrok-skip-browser-warning': 'true'
+        }
+    })
     .then((response) => {
         const products = response.data;
+        console.log(products);
         let product_html_array = [];
         for (let product of products) {
-            let product_details = product[0].product;
+            let product_details = product.product;
             let product_id = product_details.product_id;
             let name = product_details.name;
             let brand = product_details.brand_id;
             let category = product_details.category_id;
             let img = product_details.product_img_thumb;
             let img_location = `/public/${img}`
-            let shipping_rate_details = product[1].shipping_rate;
+            let shipping_rate_details = product.shipping_rate;
             let shipping_rate;
             if (shipping_rate_details !== undefined) {
                 shipping_rate = shipping_rate_details.base_charge;
@@ -88,7 +88,7 @@ function product_config_switch(variation_id) {
 };
 
 function get_products_page(product_id) {
-    const product_url = `http://host.docker.internal:3000/products/${product_id}/`;
+    const product_url = `https://1f9f-102-68-28-61.ngrok-free.app/products/${product_id}/`;
     axios.get(product_url)
     .then((response) => {
         const product_details_list = response.data;
@@ -157,6 +157,14 @@ $('.product_select_type').on('click', () => {
 $('.product_price_qty_select').on('change', () => {
     let product_price = $('.product_price_2').text();
     detect_amount_for_config_price(product_price);
+});
+
+let is_logged_in = false;
+let withCredentials = false;
+
+$(() => {
+    [is_logged_in, withCredentials] = check_user();
+    return_page(get_products_page, get_products);
 });
 
 exports.get_products = get_products

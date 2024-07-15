@@ -3,6 +3,7 @@ import datetime
 import re
 import os
 import io
+
 from rest_framework.parsers import JSONParser
 from decimal import Decimal as dec
 from django.conf import settings
@@ -69,13 +70,22 @@ def calculate_vat(price):
 #     else:
 #         return True
 
-def return_file(filename, filedir, **kwargs):
+def return_file(**kwargs):
     return_file = kwargs.get('return_file', False)
-    file = os.path.join(settings.MEDIA_ROOT, filedir, filename)
+    filedir = kwargs.get('filedir', None)
+    filename = kwargs.get('filename', None)
+    if filename is not None:
+        filedir = filedir + filename
+    current = os.path.dirname(__file__)
+    current = os.path.dirname(current)
+    # file = current + '/media' + filedir
+    file = filedir
+    # file = os.path.join(current, settings.MEDIA_ROOT, filedir)
+    print(file)
     if os.path.isfile(file):
-        return True
         if return_file:
-            open(file)
+            return file
+        return True
     else:
         return False
 
@@ -106,8 +116,7 @@ def get_private(**kwargs):
     if attrs is not None:
         for attr in attrs:
             value = getattr(self, f'_{self.__class__.__name__}' + f'__{attr}', None)
-            if value is not None:
-                attr_values.append(value)
+            attr_values.append(value)
     if len(attr_values) == 1:
         attr_values = attr_values[0]
     return attr_values

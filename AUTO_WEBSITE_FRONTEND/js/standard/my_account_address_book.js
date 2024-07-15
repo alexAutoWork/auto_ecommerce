@@ -1,6 +1,6 @@
 const $ = require('jquery');
 const axios = require('axios');
-const {load_shipping_details} = require('../shared/shared_render_func');
+const {load_shipping_details} = import('../shared/shared_render_func.mjs');
 const {check_user} = require('./sens');
 
 let is_logged_in = false;

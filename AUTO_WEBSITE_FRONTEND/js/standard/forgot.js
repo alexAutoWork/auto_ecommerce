@@ -1,6 +1,6 @@
 const $ = require('jquery');
 const {reset} = require('./reset');
-const {toggle_element_slide} = require('../shared/shared_event_func');
+const {toggle_element_slide} = import('../shared/shared_event_func.mjs');
 
 let is_logged_in = false;
 

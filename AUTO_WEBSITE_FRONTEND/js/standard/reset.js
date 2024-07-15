@@ -1,6 +1,6 @@
 const $ = require('jquery');
 const axios = require('axios');
-const {toggle_element_slide} = require('../shared/shared_event_func');
+const {toggle_element_slide} = import('../shared/shared_event_func.mjs');
 
 function reset(reset_type, url, withCredentials) {
     // $('.reset_next_btn').on('click', () => {

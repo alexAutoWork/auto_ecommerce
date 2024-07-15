@@ -1,7 +1,7 @@
 const axios = require('axios');
 const $ = require('jquery');
-const {url_id_check, get_prop_by_string} = require('../shared/shared_gen_func.js');
-const {load_shipping_details} = require('../shared/shared_render_func.js');
+const {url_id_check, get_prop_by_string} = import('../shared/shared_gen_func.mjs');
+const {load_shipping_details} = import('../shared/shared_render_func.mjs');
 const {check_user} = require('./sens');
 
 let is_logged_in = false;
@@ -108,10 +108,10 @@ function load_details(data, type, type_id) {
     let total = get_prop_by_string(details, `${prefix}_total`);
     $('.conf_summary_tax').text(`R${tax}`);
     $('.conf_summary_total').text(`R${total}`);
-    load_shipping_details(details);
+    load_shipping_details_ov(details);
 }
 
-function load_shipping_details(data) {
+function load_shipping_details_ov(data) {
     let shipping_method_id = data.shipping_method_value;
     $('.conf_delivery_method').text(`${shipping_method_id}`);
     if (shipping_method_id === 1) {

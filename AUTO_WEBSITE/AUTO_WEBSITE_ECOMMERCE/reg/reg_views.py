@@ -16,7 +16,7 @@ class LogoutView(views.APIView):
     def post(self, request):
         return reg_utils.logout(request)
 
-class SensViewSet(mixins.TempMixin, mixins.CommunicationViewSetMixin, viewsets.ViewSet):\
+class SensViewSet(mixins.TempMixin, mixins.CommunicationViewSetMixin, viewsets.ViewSet):
 
     def send_otp(self, request, **kwargs):
         comm_method = kwargs.get('method', None)

@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
+from corsheaders.defaults import default_headers
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -32,7 +33,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'localhost:8080', 'host.docker.internal', 'host.docker.internal:3000', 'c09d-102-68-28-61.ngrok-free.app']
+ALLOWED_HOSTS = ['localhost', 'localhost:8080', 'host.docker.internal', 'host.docker.internal:3000', '1f9f-102-68-28-61.ngrok-free.app']
 
 # Application definition
 
@@ -77,9 +78,14 @@ ROOT_URLCONF = 'AUTO_WEBSITE.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'APP_DIRS': False,
         'OPTIONS': {
+            'loaders': [
+                (
+                    'django.template.loaders.filesystem.Loader',
+                    [BASE_DIR / 'media' / 'tmp' / 'html' / 'otp']
+                ),
+            ],
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -98,15 +104,15 @@ CACHES = {
     }
 }
 
-STORAGES = {
-    'default': {
-        'BACKEND': 'django.core.files.storage.FileSystemStorage',
-        'OPTIONS': {
-            'location': os.path.join(os.path.dirname(BASE_DIR), 'media'),
-            'base_url': '/media/',
-        }
-    }
-}
+# STORAGES = {
+#     'default': {
+#         'BACKEND': 'django.core.files.storage.FileSystemStorage',
+#         'OPTIONS': {
+#             'location': os.path.join(os.path.dirname(BASE_DIR), 'media'),
+#             'base_url': '/media/',
+#         }
+#     }
+# }
 
 WSGI_APPLICATION = 'AUTO_WEBSITE.wsgi.application'
 
@@ -215,6 +221,9 @@ SESSION_COOKIE_AGE = 86400
 # ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'ngrok-skip-browser-warning'
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -257,7 +266,7 @@ EMAIL_HOST = os.getenv('EMAIL_HOST')
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = os.getenv('EMAIL_PORT')
-EMAIL_USE_TLS =  True
+EMAIL_USE_SSL = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # BOBGO INTEGRATION SETTINGS

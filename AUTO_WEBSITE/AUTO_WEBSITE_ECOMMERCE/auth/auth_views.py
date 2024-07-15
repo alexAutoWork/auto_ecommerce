@@ -391,6 +391,8 @@ class OrdersViewSet(InvoicesViewSet, custom_mixins.CommunicationViewSetMixin, cu
     comm_history_serializer = auth_model_serializers.OrderCommunicationHistorySerializer
     comm_history_model = auth_models.OrderCommunicationHistory
 
+    __obj_type = 'order'
+
     is_admin_req = False
 
     custom_actions = ['render_conf']
@@ -632,6 +634,8 @@ class RepairsViewSet(custom_mixins.CommunicationViewSetMixin, custom_mixins.Defa
 
     __comm_history_serializer = auth_model_serializers.RepairCommunicationHistorySerializer
     __comm_history_model = auth_models.RepairCommunicationHistory
+
+    __obj_type = 'repair'
 
     custom_actions = ['render_conf']
 
@@ -1164,6 +1168,8 @@ class ReturnsViewSet(custom_mixins.CommunicationViewSetMixin, custom_mixins.Defa
     
     __comm_history_serializer = auth_model_serializers.ReturnCommunicationHistorySerializer
     __comm_history_model = auth_models.ReturnCommunicationHistory
+
+    __obj_type = 'return'
 
     cache_list_fields = ['parent_model', 'user_id']
     cache_retrieve_fields = ['parent_model', 'parent_id_field']

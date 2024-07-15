@@ -1,6 +1,6 @@
 const axios = require('axios');
 const $ = require('jquery');
-const {get_prop_by_string, url_id_check} = require('../shared/shared_gen_func');
+const {get_prop_by_string, url_id_check} = import('../shared/shared_gen_func.mjs');
 const {check_user} = require('./sens');
 
 let is_saved = false;

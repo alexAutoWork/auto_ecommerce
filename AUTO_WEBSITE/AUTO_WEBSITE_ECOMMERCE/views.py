@@ -2,9 +2,11 @@ from rest_framework import viewsets, status, views, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.core.mail import EmailMessage, EmailMultiAlternatives, send_mail
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from . import utils, serializers
+from django.conf import settings
 
 class UploadView(views.APIView):
 
@@ -56,3 +58,17 @@ class UploadView(views.APIView):
                     default_storage.delete(path)
                     request.session[filename] = {'path': path, 'is_active': False}
                     return Response({'message': 'File Deleted Successfully!'}, status=status.HTTP_200_OK)
+
+class Test(views.APIView):
+    def post(self, request):
+        try:
+            print(settings.EMAIL_HOST_USER)
+            print(settings.EMAIL_HOST_PASSWORD)
+            subject = 'subject'
+            message = 'test message'
+            from_email = 'noreply@autolectronix.co.za'
+            recipient_list = [request.data.get('email', None)]
+            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            return Response({'message': 'success!!'}, status=status.HTTP_200_OK)
+        except Exception:
+            return Exception

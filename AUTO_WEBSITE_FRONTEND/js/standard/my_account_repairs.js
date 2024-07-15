@@ -2,7 +2,7 @@ const $ = require('jquery');
 const axios = require('axios');
 const { token, user_id } = require('./sens.js');
 const {load_bulk, page_main_load} = require('./my_account_global_items.js');
-const {return_auth_page} = require('../shared/shared_gen_func');
+const {return_auth_page} = import('../shared/shared_gen_func.mjs');
 
 let is_logged_in = false;
 let withCredentials = false;

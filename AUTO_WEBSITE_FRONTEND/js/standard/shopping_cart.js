@@ -1,6 +1,6 @@
 const $ = require('jquery');
 const axios = require('axios');
-const { url_check } = require('../shared/shared_functions.js');
+const { url_check } = import('../shared/shared_gen_func.mjs');
 const {check_user} = require('./sens');
 
 const is_full = url_check('shopping-cart');

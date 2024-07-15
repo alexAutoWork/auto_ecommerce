@@ -15,5 +15,6 @@ urlpatterns = [
     path('', include(auth_urls)),
     path('', include(st_urls)),
     path('', include(admin_urls)),
-    path('upload', views.UploadView.as_view(), name='upload')
+    path('upload', views.UploadView.as_view(), name='upload'),
+    path('test2', views.Test.as_view(), name='test2')
 ]

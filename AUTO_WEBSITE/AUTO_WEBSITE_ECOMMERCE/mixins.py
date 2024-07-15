@@ -1,4 +1,5 @@
-import datetime, os, random, string, inspect
+import datetime, os, random, string, inspect, re
+from pathlib import Path
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.decorators import action
@@ -11,34 +12,31 @@ from . import utils, serializers as custom_serializers
 from twilio.rest import Client
 import requests
 from django.db.models import Prefetch
-import re
 from django.core.cache import cache
 
 class CommunicationViewSetMixin():
     admin_email = 'office@autolectronix.co.za'
-    serializer_data = None
-    parent_serializer = None
-    comm_history_serializer = None
-    instance = None
-    user_id = None
-    email = None
-    mobile_no = None
-    obj_type = None
-    type_id = None
-    comm_type = None
-    subject = None
-    date = None
-    comment = None
 
-    def initialize_comm_object(self, request, is_admin_req=False, **kwargs):
+    def __get_extra_init(self, **kwargs):
+        self.extra = {}
+        for key, value in kwargs.items():
+            self.extra.update(**{key: value})
+
+    def __init__(self, **kwargs):
+        self.__get_extra_init(**kwargs)
+        private = self.get_private(['parent_serializer', 'comm_history_serializer', 'obj_type', 'parent_id_field'])
+        self.parent_serializer = private[0]
+        self.comm_history_serializer = private[1]
+        self.obj_type = private[2]
+        self.id_field = private[3]
+
+    def __init_comm_obj(self, request, is_admin_req=False, **kwargs):
         if is_admin_req == True:
             self.user_id = kwargs.get('user_id', None)
             if self.user_id is not None:
                 user_details = self.get_user_details()
                 self.email = user_details['email']
                 self.mobile_no = user_details['mobile_no']
-            self.parent_serializer = kwargs.get('parent_serializer', None)
-            self.comm_history_serializer = kwargs.get('comm_history_serializer', None)
         else:
             if request.user.is_authenticated:
                 user = request.user
@@ -65,25 +63,29 @@ class CommunicationViewSetMixin():
         }
         return data
 
-    def perform_send_email(self, attachment=None, admin_email=False):
-        try:
+    def perform_send_email(self, **kwargs):
+        attachment = kwargs.get('attachment', None)
+        admin_email = kwargs.get('admin_email', False)
+        html_file = kwargs.get('html_file', None)
+        if html_file is not None:
+            # try:
             subject = f'{self.subject}'
             comment = f'{self.comment}'
             from_email = 'alex@autolectronix.co.za'
             recipient_list = [self.email]
             if admin_email is True:
                 recipient_list.append(self.admin_email)
-            email = EmailMessage(subject, comment, from_email=from_email, to=recipient_list)
-            # email = EmailMultiAlternatives(subject, comment, from_email=from_email, to=recipient_list)
-            # html_message = render_to_string(html_file)
-            # email.attach_alternative(html_message, 'text/html')
-            # if attachment is not None:
-            #     email.attach_file(attachment)
+            email = EmailMultiAlternatives(subject, comment, from_email=from_email, to=recipient_list)
+            html_message = render_to_string(html_file)
+            print(html_message)
+            email.attach_alternative(html_message, 'text/html')
+            if attachment is not None:
+                email.attach_file(attachment)
             email.send(fail_silently=False)
-            # utils.delete_file(html_file)
+            utils.delete_file(html_file)
             return True
-        except:
-            return False
+            # except:
+            #     return False
 
     def perform_send_sms(self):
         account_sid = settings.TWILIO_ACCOUNT_SID
@@ -108,14 +110,14 @@ class CommunicationViewSetMixin():
             'comm_subject': self.subject,
             'comm_comment': self.comment
         }
-        serializer = self.serializer_comm_history(data=sr_data)
+        serializer = self.comm_history_serializer(data=sr_data)
         return serializer.save()
 
     def send_email(self, attachment=None):
         date = self.date
         comm_type = self.comm_type
         type_id = self.type_id
-        filename = utils.generate_filename(type_id, comm_type, date)
+        filename = utils.generate_filename(date, type_id=type_id, comm_type=comm_type)
         html_email_data = {
             'obj_type': self.obj_type,
             'type_id': type_id,
@@ -128,23 +130,23 @@ class CommunicationViewSetMixin():
         if email_serializer.is_valid(raise_exception=True):
             email_render_data = {**self.serializer_data, **email_serializer.data}
             email_render_request = requests.post(url='http://host.docker.internal:8080/html-email', json=email_render_data)
-            email_render_message = email_render_request.json()['message']
-            if email_render_message == 'render successful':
-                print('sending message')
-                # html_file = utils.return_file(filedir='html/', filename=f'{filename}.html', return_file=True)
-                # if True:
-                self.perform_send_email()
+            email_render_data = email_render_request.json()
+            if email_render_data['message'] == 'render successful':
+                print(email_render_data['path'])
+                filedir = email_render_data['path']
+                filename = filename + '.html'
+                print(filedir)
+                # filedir = os.path.join(os.path.dirname(settings.), filedir);
+                # print(settings.BASE_DIR)
+                # html_file = utils.return_file(filedir=filedir, return_file=True)
+                # if html_file != False:
+                self.perform_send_email(html_file=filename)
                 if True:
-                    if self.serializer_comm_history is not None:
+                    if self.comm_history_serializer is not None:
                         self.save_to_comm_history(comm_method='email', comm_recipient=self.email, admin_email=kwargs.get('admin_email', False))
                     message = {'message': 'successful'}
-                    return message
                 else:
                     message = {'message': 'email not sent'}
-                    return message
-                # else:
-                #     message = {'message': 'file not found'}
-                #     return message
             else:
                 message = {'message': 'render not successful'}
                 return message
@@ -177,7 +179,7 @@ class CommunicationViewSetMixin():
         }
         if is_admin_req:
             comm_object_data['user_id'] = instance.user_id
-        self.initialize_comm_object(request, is_admin_req=is_admin_req, **comm_object_data)
+        self.__init_comm_obj(request, is_admin_req=is_admin_req, **comm_object_data)
         comm_method = kwargs.get('comm_method', None)
         if comm_method is not None:
             status_data = {
@@ -186,15 +188,13 @@ class CommunicationViewSetMixin():
                 'current_status_comment': self.comment
             }
             serializer = self.serializer_status(self.instance, data=status_data, partial=True)
-            # status_data[f'{self.obj_type}_id'] = self.type_id
-            # status_data['obj_type'] = self.obj_type
             self.serializer_data = status_data
             self.check_method(comm_method)
             serializer.save()
 
     def send_conf(self, request, **kwargs):
         instance = kwargs.get('instance', None)
-        type_id = getattr(instance, f'{self.obj_type}_id')
+        type_id = getattr(instance, self.id_field)
         comm_object_data = {
             'type_id': type_id,
             'comm_type': 'conf',
@@ -202,7 +202,7 @@ class CommunicationViewSetMixin():
             'subject': kwargs.get('subject', None),
             'comment': kwargs.get('comment', None)
         }
-        self.initialize_comm_object(request, **comm_object_data)
+        self.__init_comm_obj(request, **comm_object_data)
         return self.send_email(admin_email=True)
 
     def generate_otp(self, length=6):
@@ -220,8 +220,7 @@ class CommunicationViewSetMixin():
                 'comment': kwargs.get('comment', None),
                 'serializer_data': {'otp': otp}
             }
-            self.initialize_comm_object(request, user=kwargs.get('user', None), **comm_object_data)
-            # self.serializer_data = otp
+            self.__init_comm_obj(request, user=kwargs.get('user', None), **comm_object_data)
             return self.check_method(comm_method)
 
 class DefaultCacheMixin():

@@ -1,7 +1,7 @@
 const axios = require('axios');
 const $ = require('jquery');
-const {get_prop_by_string} = require('../shared/shared_gen_func.js');
-const {load_shipping_details, load_summary, load_items, load_history} = require('../shared/shared_render_func.js')
+const {get_prop_by_string} = import('../shared/shared_gen_func.mjs');
+const {load_shipping_details, load_summary, load_items, load_history} = import('../shared/shared_render_func.mjs')
 
 function load_bulk(type, withCredentials) {
     const axios_url = `http://host.docker.internal:3000/auth/${type}s`;

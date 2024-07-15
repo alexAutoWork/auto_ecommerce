@@ -1,8 +1,27 @@
 (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __esm = (fn, res) => function __init() {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  };
   var __commonJS = (cb, mod) => function __require() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
   // node_modules/axios/dist/browser/axios.cjs
   var require_axios = __commonJS({
@@ -62,6 +81,7 @@
         kind === "object" && isFunction(thing.toString) && thing.toString() === "[object FormData]"));
       };
       var isURLSearchParams = kindOfTest("URLSearchParams");
+      var [isReadableStream, isRequest, isResponse, isHeaders] = ["ReadableStream", "Request", "Response", "Headers"].map(kindOfTest);
       var trim = (str) => str.trim ? str.trim() : str.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, "");
       function forEach(obj, fn, { allOwnKeys = false } = {}) {
         if (obj === null || typeof obj === "undefined") {
@@ -271,8 +291,7 @@
       var noop = () => {
       };
       var toFiniteNumber = (value, defaultValue) => {
-        value = +value;
-        return Number.isFinite(value) ? value : defaultValue;
+        return value != null && Number.isFinite(value = +value) ? value : defaultValue;
       };
       var ALPHA = "abcdefghijklmnopqrstuvwxyz";
       var DIGIT = "0123456789";
@@ -327,6 +346,10 @@
         isBoolean,
         isObject,
         isPlainObject,
+        isReadableStream,
+        isRequest,
+        isResponse,
+        isHeaders,
         isUndefined,
         isDate,
         isFile,
@@ -503,10 +526,10 @@
               value = JSON.stringify(value);
             } else if (utils$1.isArray(value) && isFlatArray(value) || (utils$1.isFileList(value) || utils$1.endsWith(key, "[]")) && (arr = utils$1.toArray(value))) {
               key = removeBrackets(key);
-              arr.forEach(function each(el, index) {
+              arr.forEach(function each(el, index2) {
                 !(utils$1.isUndefined(el) || el === null) && formData.append(
                   // eslint-disable-next-line no-nested-ternary
-                  indexes === true ? renderKey([key], index, dots) : indexes === null ? key : key + "[]",
+                  indexes === true ? renderKey([key], index2, dots) : indexes === null ? key : key + "[]",
                   convertValue(el)
                 );
               });
@@ -693,11 +716,13 @@
         return typeof WorkerGlobalScope !== "undefined" && // eslint-disable-next-line no-undef
         self instanceof WorkerGlobalScope && typeof self.importScripts === "function";
       })();
+      var origin = hasBrowserEnv && window.location.href || "http://localhost";
       var utils = /* @__PURE__ */ Object.freeze({
         __proto__: null,
         hasBrowserEnv,
         hasStandardBrowserWebWorkerEnv,
-        hasStandardBrowserEnv
+        hasStandardBrowserEnv,
+        origin
       });
       var platform = {
         ...utils,
@@ -732,12 +757,12 @@
         return obj;
       }
       function formDataToJSON(formData) {
-        function buildPath(path, value, target, index) {
-          let name = path[index++];
+        function buildPath(path, value, target, index2) {
+          let name = path[index2++];
           if (name === "__proto__")
             return true;
           const isNumericKey = Number.isFinite(+name);
-          const isLast = index >= path.length;
+          const isLast = index2 >= path.length;
           name = !name && utils$1.isArray(target) ? target.length : name;
           if (isLast) {
             if (utils$1.hasOwnProp(target, name)) {
@@ -750,7 +775,7 @@
           if (!target[name] || !utils$1.isObject(target[name])) {
             target[name] = [];
           }
-          const result = buildPath(path, value, target[name], index);
+          const result = buildPath(path, value, target[name], index2);
           if (result && utils$1.isArray(target[name])) {
             target[name] = arrayToObject(target[name]);
           }
@@ -780,7 +805,7 @@
       }
       var defaults = {
         transitional: transitionalDefaults,
-        adapter: ["xhr", "http"],
+        adapter: ["xhr", "http", "fetch"],
         transformRequest: [function transformRequest(data, headers) {
           const contentType = headers.getContentType() || "";
           const hasJSONContentType = contentType.indexOf("application/json") > -1;
@@ -792,7 +817,7 @@
           if (isFormData2) {
             return hasJSONContentType ? JSON.stringify(formDataToJSON(data)) : data;
           }
-          if (utils$1.isArrayBuffer(data) || utils$1.isBuffer(data) || utils$1.isStream(data) || utils$1.isFile(data) || utils$1.isBlob(data)) {
+          if (utils$1.isArrayBuffer(data) || utils$1.isBuffer(data) || utils$1.isStream(data) || utils$1.isFile(data) || utils$1.isBlob(data) || utils$1.isReadableStream(data)) {
             return data;
           }
           if (utils$1.isArrayBufferView(data)) {
@@ -826,6 +851,9 @@
           const transitional = this.transitional || defaults.transitional;
           const forcedJSONParsing = transitional && transitional.forcedJSONParsing;
           const JSONRequested = this.responseType === "json";
+          if (utils$1.isResponse(data) || utils$1.isReadableStream(data)) {
+            return data;
+          }
           if (data && utils$1.isString(data) && (forcedJSONParsing && !this.responseType || JSONRequested)) {
             const silentJSONParsing = transitional && transitional.silentJSONParsing;
             const strictJSONParsing = !silentJSONParsing && JSONRequested;
@@ -985,6 +1013,10 @@
             setHeaders(header, valueOrRewrite);
           } else if (utils$1.isString(header) && (header = header.trim()) && !isValidHeaderName(header)) {
             setHeaders(parseHeaders(header), valueOrRewrite);
+          } else if (utils$1.isHeaders(header)) {
+            for (const [key, value] of header.entries()) {
+              setHeader(value, key, rewrite);
+            }
           } else {
             header != null && setHeader(valueOrRewrite, header, rewrite);
           }
@@ -1163,6 +1195,130 @@
           ));
         }
       }
+      function parseProtocol(url) {
+        const match = /^([-+\w]{1,25})(:?\/\/|:)/.exec(url);
+        return match && match[1] || "";
+      }
+      function speedometer(samplesCount, min) {
+        samplesCount = samplesCount || 10;
+        const bytes = new Array(samplesCount);
+        const timestamps = new Array(samplesCount);
+        let head = 0;
+        let tail = 0;
+        let firstSampleTS;
+        min = min !== void 0 ? min : 1e3;
+        return function push(chunkLength) {
+          const now = Date.now();
+          const startedAt = timestamps[tail];
+          if (!firstSampleTS) {
+            firstSampleTS = now;
+          }
+          bytes[head] = chunkLength;
+          timestamps[head] = now;
+          let i = tail;
+          let bytesCount = 0;
+          while (i !== head) {
+            bytesCount += bytes[i++];
+            i = i % samplesCount;
+          }
+          head = (head + 1) % samplesCount;
+          if (head === tail) {
+            tail = (tail + 1) % samplesCount;
+          }
+          if (now - firstSampleTS < min) {
+            return;
+          }
+          const passed = startedAt && now - startedAt;
+          return passed ? Math.round(bytesCount * 1e3 / passed) : void 0;
+        };
+      }
+      function throttle(fn, freq) {
+        let timestamp = 0;
+        const threshold = 1e3 / freq;
+        let timer = null;
+        return function throttled() {
+          const force = this === true;
+          const now = Date.now();
+          if (force || now - timestamp > threshold) {
+            if (timer) {
+              clearTimeout(timer);
+              timer = null;
+            }
+            timestamp = now;
+            return fn.apply(null, arguments);
+          }
+          if (!timer) {
+            timer = setTimeout(() => {
+              timer = null;
+              timestamp = Date.now();
+              return fn.apply(null, arguments);
+            }, threshold - (now - timestamp));
+          }
+        };
+      }
+      var progressEventReducer = (listener, isDownloadStream, freq = 3) => {
+        let bytesNotified = 0;
+        const _speedometer = speedometer(50, 250);
+        return throttle((e) => {
+          const loaded = e.loaded;
+          const total = e.lengthComputable ? e.total : void 0;
+          const progressBytes = loaded - bytesNotified;
+          const rate = _speedometer(progressBytes);
+          const inRange = loaded <= total;
+          bytesNotified = loaded;
+          const data = {
+            loaded,
+            total,
+            progress: total ? loaded / total : void 0,
+            bytes: progressBytes,
+            rate: rate ? rate : void 0,
+            estimated: rate && total && inRange ? (total - loaded) / rate : void 0,
+            event: e,
+            lengthComputable: total != null
+          };
+          data[isDownloadStream ? "download" : "upload"] = true;
+          listener(data);
+        }, freq);
+      };
+      var isURLSameOrigin = platform.hasStandardBrowserEnv ? (
+        // Standard browser envs have full support of the APIs needed to test
+        // whether the request URL is of the same origin as current location.
+        function standardBrowserEnv() {
+          const msie = /(msie|trident)/i.test(navigator.userAgent);
+          const urlParsingNode = document.createElement("a");
+          let originURL;
+          function resolveURL(url) {
+            let href = url;
+            if (msie) {
+              urlParsingNode.setAttribute("href", href);
+              href = urlParsingNode.href;
+            }
+            urlParsingNode.setAttribute("href", href);
+            return {
+              href: urlParsingNode.href,
+              protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, "") : "",
+              host: urlParsingNode.host,
+              search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, "") : "",
+              hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, "") : "",
+              hostname: urlParsingNode.hostname,
+              port: urlParsingNode.port,
+              pathname: urlParsingNode.pathname.charAt(0) === "/" ? urlParsingNode.pathname : "/" + urlParsingNode.pathname
+            };
+          }
+          originURL = resolveURL(window.location.href);
+          return function isURLSameOrigin2(requestURL) {
+            const parsed = utils$1.isString(requestURL) ? resolveURL(requestURL) : requestURL;
+            return parsed.protocol === originURL.protocol && parsed.host === originURL.host;
+          };
+        }()
+      ) : (
+        // Non standard browser envs (web workers, react-native) lack needed support.
+        /* @__PURE__ */ function nonStandardBrowserEnv() {
+          return function isURLSameOrigin2() {
+            return true;
+          };
+        }()
+      );
       var cookies = platform.hasStandardBrowserEnv ? (
         // Standard browser envs support document.cookie
         {
@@ -1206,138 +1362,134 @@
         }
         return requestedURL;
       }
-      var isURLSameOrigin = platform.hasStandardBrowserEnv ? (
-        // Standard browser envs have full support of the APIs needed to test
-        // whether the request URL is of the same origin as current location.
-        function standardBrowserEnv() {
-          const msie = /(msie|trident)/i.test(navigator.userAgent);
-          const urlParsingNode = document.createElement("a");
-          let originURL;
-          function resolveURL(url) {
-            let href = url;
-            if (msie) {
-              urlParsingNode.setAttribute("href", href);
-              href = urlParsingNode.href;
+      var headersToObject = (thing) => thing instanceof AxiosHeaders$1 ? { ...thing } : thing;
+      function mergeConfig(config1, config2) {
+        config2 = config2 || {};
+        const config = {};
+        function getMergedValue(target, source, caseless) {
+          if (utils$1.isPlainObject(target) && utils$1.isPlainObject(source)) {
+            return utils$1.merge.call({ caseless }, target, source);
+          } else if (utils$1.isPlainObject(source)) {
+            return utils$1.merge({}, source);
+          } else if (utils$1.isArray(source)) {
+            return source.slice();
+          }
+          return source;
+        }
+        function mergeDeepProperties(a, b, caseless) {
+          if (!utils$1.isUndefined(b)) {
+            return getMergedValue(a, b, caseless);
+          } else if (!utils$1.isUndefined(a)) {
+            return getMergedValue(void 0, a, caseless);
+          }
+        }
+        function valueFromConfig2(a, b) {
+          if (!utils$1.isUndefined(b)) {
+            return getMergedValue(void 0, b);
+          }
+        }
+        function defaultToConfig2(a, b) {
+          if (!utils$1.isUndefined(b)) {
+            return getMergedValue(void 0, b);
+          } else if (!utils$1.isUndefined(a)) {
+            return getMergedValue(void 0, a);
+          }
+        }
+        function mergeDirectKeys(a, b, prop) {
+          if (prop in config2) {
+            return getMergedValue(a, b);
+          } else if (prop in config1) {
+            return getMergedValue(void 0, a);
+          }
+        }
+        const mergeMap = {
+          url: valueFromConfig2,
+          method: valueFromConfig2,
+          data: valueFromConfig2,
+          baseURL: defaultToConfig2,
+          transformRequest: defaultToConfig2,
+          transformResponse: defaultToConfig2,
+          paramsSerializer: defaultToConfig2,
+          timeout: defaultToConfig2,
+          timeoutMessage: defaultToConfig2,
+          withCredentials: defaultToConfig2,
+          withXSRFToken: defaultToConfig2,
+          adapter: defaultToConfig2,
+          responseType: defaultToConfig2,
+          xsrfCookieName: defaultToConfig2,
+          xsrfHeaderName: defaultToConfig2,
+          onUploadProgress: defaultToConfig2,
+          onDownloadProgress: defaultToConfig2,
+          decompress: defaultToConfig2,
+          maxContentLength: defaultToConfig2,
+          maxBodyLength: defaultToConfig2,
+          beforeRedirect: defaultToConfig2,
+          transport: defaultToConfig2,
+          httpAgent: defaultToConfig2,
+          httpsAgent: defaultToConfig2,
+          cancelToken: defaultToConfig2,
+          socketPath: defaultToConfig2,
+          responseEncoding: defaultToConfig2,
+          validateStatus: mergeDirectKeys,
+          headers: (a, b) => mergeDeepProperties(headersToObject(a), headersToObject(b), true)
+        };
+        utils$1.forEach(Object.keys(Object.assign({}, config1, config2)), function computeConfigValue(prop) {
+          const merge2 = mergeMap[prop] || mergeDeepProperties;
+          const configValue = merge2(config1[prop], config2[prop], prop);
+          utils$1.isUndefined(configValue) && merge2 !== mergeDirectKeys || (config[prop] = configValue);
+        });
+        return config;
+      }
+      var resolveConfig = (config) => {
+        const newConfig = mergeConfig({}, config);
+        let { data, withXSRFToken, xsrfHeaderName, xsrfCookieName, headers, auth } = newConfig;
+        newConfig.headers = headers = AxiosHeaders$1.from(headers);
+        newConfig.url = buildURL(buildFullPath(newConfig.baseURL, newConfig.url), config.params, config.paramsSerializer);
+        if (auth) {
+          headers.set(
+            "Authorization",
+            "Basic " + btoa((auth.username || "") + ":" + (auth.password ? unescape(encodeURIComponent(auth.password)) : ""))
+          );
+        }
+        let contentType;
+        if (utils$1.isFormData(data)) {
+          if (platform.hasStandardBrowserEnv || platform.hasStandardBrowserWebWorkerEnv) {
+            headers.setContentType(void 0);
+          } else if ((contentType = headers.getContentType()) !== false) {
+            const [type, ...tokens] = contentType ? contentType.split(";").map((token) => token.trim()).filter(Boolean) : [];
+            headers.setContentType([type || "multipart/form-data", ...tokens].join("; "));
+          }
+        }
+        if (platform.hasStandardBrowserEnv) {
+          withXSRFToken && utils$1.isFunction(withXSRFToken) && (withXSRFToken = withXSRFToken(newConfig));
+          if (withXSRFToken || withXSRFToken !== false && isURLSameOrigin(newConfig.url)) {
+            const xsrfValue = xsrfHeaderName && xsrfCookieName && cookies.read(xsrfCookieName);
+            if (xsrfValue) {
+              headers.set(xsrfHeaderName, xsrfValue);
             }
-            urlParsingNode.setAttribute("href", href);
-            return {
-              href: urlParsingNode.href,
-              protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, "") : "",
-              host: urlParsingNode.host,
-              search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, "") : "",
-              hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, "") : "",
-              hostname: urlParsingNode.hostname,
-              port: urlParsingNode.port,
-              pathname: urlParsingNode.pathname.charAt(0) === "/" ? urlParsingNode.pathname : "/" + urlParsingNode.pathname
-            };
           }
-          originURL = resolveURL(window.location.href);
-          return function isURLSameOrigin2(requestURL) {
-            const parsed = utils$1.isString(requestURL) ? resolveURL(requestURL) : requestURL;
-            return parsed.protocol === originURL.protocol && parsed.host === originURL.host;
-          };
-        }()
-      ) : (
-        // Non standard browser envs (web workers, react-native) lack needed support.
-        /* @__PURE__ */ function nonStandardBrowserEnv() {
-          return function isURLSameOrigin2() {
-            return true;
-          };
-        }()
-      );
-      function parseProtocol(url) {
-        const match = /^([-+\w]{1,25})(:?\/\/|:)/.exec(url);
-        return match && match[1] || "";
-      }
-      function speedometer(samplesCount, min) {
-        samplesCount = samplesCount || 10;
-        const bytes = new Array(samplesCount);
-        const timestamps = new Array(samplesCount);
-        let head = 0;
-        let tail = 0;
-        let firstSampleTS;
-        min = min !== void 0 ? min : 1e3;
-        return function push(chunkLength) {
-          const now = Date.now();
-          const startedAt = timestamps[tail];
-          if (!firstSampleTS) {
-            firstSampleTS = now;
-          }
-          bytes[head] = chunkLength;
-          timestamps[head] = now;
-          let i = tail;
-          let bytesCount = 0;
-          while (i !== head) {
-            bytesCount += bytes[i++];
-            i = i % samplesCount;
-          }
-          head = (head + 1) % samplesCount;
-          if (head === tail) {
-            tail = (tail + 1) % samplesCount;
-          }
-          if (now - firstSampleTS < min) {
-            return;
-          }
-          const passed = startedAt && now - startedAt;
-          return passed ? Math.round(bytesCount * 1e3 / passed) : void 0;
-        };
-      }
-      function progressEventReducer(listener, isDownloadStream) {
-        let bytesNotified = 0;
-        const _speedometer = speedometer(50, 250);
-        return (e) => {
-          const loaded = e.loaded;
-          const total = e.lengthComputable ? e.total : void 0;
-          const progressBytes = loaded - bytesNotified;
-          const rate = _speedometer(progressBytes);
-          const inRange = loaded <= total;
-          bytesNotified = loaded;
-          const data = {
-            loaded,
-            total,
-            progress: total ? loaded / total : void 0,
-            bytes: progressBytes,
-            rate: rate ? rate : void 0,
-            estimated: rate && total && inRange ? (total - loaded) / rate : void 0,
-            event: e
-          };
-          data[isDownloadStream ? "download" : "upload"] = true;
-          listener(data);
-        };
-      }
+        }
+        return newConfig;
+      };
       var isXHRAdapterSupported = typeof XMLHttpRequest !== "undefined";
       var xhrAdapter = isXHRAdapterSupported && function(config) {
         return new Promise(function dispatchXhrRequest(resolve, reject) {
-          let requestData = config.data;
-          const requestHeaders = AxiosHeaders$1.from(config.headers).normalize();
-          let { responseType, withXSRFToken } = config;
+          const _config = resolveConfig(config);
+          let requestData = _config.data;
+          const requestHeaders = AxiosHeaders$1.from(_config.headers).normalize();
+          let { responseType } = _config;
           let onCanceled;
           function done() {
-            if (config.cancelToken) {
-              config.cancelToken.unsubscribe(onCanceled);
+            if (_config.cancelToken) {
+              _config.cancelToken.unsubscribe(onCanceled);
             }
-            if (config.signal) {
-              config.signal.removeEventListener("abort", onCanceled);
-            }
-          }
-          let contentType;
-          if (utils$1.isFormData(requestData)) {
-            if (platform.hasStandardBrowserEnv || platform.hasStandardBrowserWebWorkerEnv) {
-              requestHeaders.setContentType(false);
-            } else if ((contentType = requestHeaders.getContentType()) !== false) {
-              const [type, ...tokens] = contentType ? contentType.split(";").map((token) => token.trim()).filter(Boolean) : [];
-              requestHeaders.setContentType([type || "multipart/form-data", ...tokens].join("; "));
+            if (_config.signal) {
+              _config.signal.removeEventListener("abort", onCanceled);
             }
           }
           let request = new XMLHttpRequest();
-          if (config.auth) {
-            const username = config.auth.username || "";
-            const password = config.auth.password ? unescape(encodeURIComponent(config.auth.password)) : "";
-            requestHeaders.set("Authorization", "Basic " + btoa(username + ":" + password));
-          }
-          const fullPath = buildFullPath(config.baseURL, config.url);
-          request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
-          request.timeout = config.timeout;
+          request.open(_config.method.toUpperCase(), _config.url, true);
+          request.timeout = _config.timeout;
           function onloadend() {
             if (!request) {
               return;
@@ -1380,55 +1532,46 @@
             if (!request) {
               return;
             }
-            reject(new AxiosError("Request aborted", AxiosError.ECONNABORTED, config, request));
+            reject(new AxiosError("Request aborted", AxiosError.ECONNABORTED, _config, request));
             request = null;
           };
           request.onerror = function handleError() {
-            reject(new AxiosError("Network Error", AxiosError.ERR_NETWORK, config, request));
+            reject(new AxiosError("Network Error", AxiosError.ERR_NETWORK, _config, request));
             request = null;
           };
           request.ontimeout = function handleTimeout() {
-            let timeoutErrorMessage = config.timeout ? "timeout of " + config.timeout + "ms exceeded" : "timeout exceeded";
-            const transitional = config.transitional || transitionalDefaults;
-            if (config.timeoutErrorMessage) {
-              timeoutErrorMessage = config.timeoutErrorMessage;
+            let timeoutErrorMessage = _config.timeout ? "timeout of " + _config.timeout + "ms exceeded" : "timeout exceeded";
+            const transitional = _config.transitional || transitionalDefaults;
+            if (_config.timeoutErrorMessage) {
+              timeoutErrorMessage = _config.timeoutErrorMessage;
             }
             reject(new AxiosError(
               timeoutErrorMessage,
               transitional.clarifyTimeoutError ? AxiosError.ETIMEDOUT : AxiosError.ECONNABORTED,
-              config,
+              _config,
               request
             ));
             request = null;
           };
-          if (platform.hasStandardBrowserEnv) {
-            withXSRFToken && utils$1.isFunction(withXSRFToken) && (withXSRFToken = withXSRFToken(config));
-            if (withXSRFToken || withXSRFToken !== false && isURLSameOrigin(fullPath)) {
-              const xsrfValue = config.xsrfHeaderName && config.xsrfCookieName && cookies.read(config.xsrfCookieName);
-              if (xsrfValue) {
-                requestHeaders.set(config.xsrfHeaderName, xsrfValue);
-              }
-            }
-          }
           requestData === void 0 && requestHeaders.setContentType(null);
           if ("setRequestHeader" in request) {
             utils$1.forEach(requestHeaders.toJSON(), function setRequestHeader(val, key) {
               request.setRequestHeader(key, val);
             });
           }
-          if (!utils$1.isUndefined(config.withCredentials)) {
-            request.withCredentials = !!config.withCredentials;
+          if (!utils$1.isUndefined(_config.withCredentials)) {
+            request.withCredentials = !!_config.withCredentials;
           }
           if (responseType && responseType !== "json") {
-            request.responseType = config.responseType;
+            request.responseType = _config.responseType;
           }
-          if (typeof config.onDownloadProgress === "function") {
-            request.addEventListener("progress", progressEventReducer(config.onDownloadProgress, true));
+          if (typeof _config.onDownloadProgress === "function") {
+            request.addEventListener("progress", progressEventReducer(_config.onDownloadProgress, true));
           }
-          if (typeof config.onUploadProgress === "function" && request.upload) {
-            request.upload.addEventListener("progress", progressEventReducer(config.onUploadProgress));
+          if (typeof _config.onUploadProgress === "function" && request.upload) {
+            request.upload.addEventListener("progress", progressEventReducer(_config.onUploadProgress));
           }
-          if (config.cancelToken || config.signal) {
+          if (_config.cancelToken || _config.signal) {
             onCanceled = (cancel) => {
               if (!request) {
                 return;
@@ -1437,12 +1580,12 @@
               request.abort();
               request = null;
             };
-            config.cancelToken && config.cancelToken.subscribe(onCanceled);
-            if (config.signal) {
-              config.signal.aborted ? onCanceled() : config.signal.addEventListener("abort", onCanceled);
+            _config.cancelToken && _config.cancelToken.subscribe(onCanceled);
+            if (_config.signal) {
+              _config.signal.aborted ? onCanceled() : _config.signal.addEventListener("abort", onCanceled);
             }
           }
-          const protocol = parseProtocol(fullPath);
+          const protocol = parseProtocol(_config.url);
           if (protocol && platform.protocols.indexOf(protocol) === -1) {
             reject(new AxiosError("Unsupported protocol " + protocol + ":", AxiosError.ERR_BAD_REQUEST, config));
             return;
@@ -1450,9 +1593,248 @@
           request.send(requestData || null);
         });
       };
+      var composeSignals = (signals, timeout) => {
+        let controller = new AbortController();
+        let aborted;
+        const onabort = function(cancel) {
+          if (!aborted) {
+            aborted = true;
+            unsubscribe();
+            const err = cancel instanceof Error ? cancel : this.reason;
+            controller.abort(err instanceof AxiosError ? err : new CanceledError(err instanceof Error ? err.message : err));
+          }
+        };
+        let timer = timeout && setTimeout(() => {
+          onabort(new AxiosError(`timeout ${timeout} of ms exceeded`, AxiosError.ETIMEDOUT));
+        }, timeout);
+        const unsubscribe = () => {
+          if (signals) {
+            timer && clearTimeout(timer);
+            timer = null;
+            signals.forEach((signal2) => {
+              signal2 && (signal2.removeEventListener ? signal2.removeEventListener("abort", onabort) : signal2.unsubscribe(onabort));
+            });
+            signals = null;
+          }
+        };
+        signals.forEach((signal2) => signal2 && signal2.addEventListener && signal2.addEventListener("abort", onabort));
+        const { signal } = controller;
+        signal.unsubscribe = unsubscribe;
+        return [signal, () => {
+          timer && clearTimeout(timer);
+          timer = null;
+        }];
+      };
+      var composeSignals$1 = composeSignals;
+      var streamChunk = function* (chunk, chunkSize) {
+        let len = chunk.byteLength;
+        if (!chunkSize || len < chunkSize) {
+          yield chunk;
+          return;
+        }
+        let pos = 0;
+        let end;
+        while (pos < len) {
+          end = pos + chunkSize;
+          yield chunk.slice(pos, end);
+          pos = end;
+        }
+      };
+      var readBytes = async function* (iterable, chunkSize, encode2) {
+        for await (const chunk of iterable) {
+          yield* streamChunk(ArrayBuffer.isView(chunk) ? chunk : await encode2(String(chunk)), chunkSize);
+        }
+      };
+      var trackStream = (stream, chunkSize, onProgress, onFinish, encode2) => {
+        const iterator = readBytes(stream, chunkSize, encode2);
+        let bytes = 0;
+        return new ReadableStream({
+          type: "bytes",
+          async pull(controller) {
+            const { done, value } = await iterator.next();
+            if (done) {
+              controller.close();
+              onFinish();
+              return;
+            }
+            let len = value.byteLength;
+            onProgress && onProgress(bytes += len);
+            controller.enqueue(new Uint8Array(value));
+          },
+          cancel(reason) {
+            onFinish(reason);
+            return iterator.return();
+          }
+        }, {
+          highWaterMark: 2
+        });
+      };
+      var fetchProgressDecorator = (total, fn) => {
+        const lengthComputable = total != null;
+        return (loaded) => setTimeout(() => fn({
+          lengthComputable,
+          total,
+          loaded
+        }));
+      };
+      var isFetchSupported = typeof fetch === "function" && typeof Request === "function" && typeof Response === "function";
+      var isReadableStreamSupported = isFetchSupported && typeof ReadableStream === "function";
+      var encodeText = isFetchSupported && (typeof TextEncoder === "function" ? /* @__PURE__ */ ((encoder) => (str) => encoder.encode(str))(new TextEncoder()) : async (str) => new Uint8Array(await new Response(str).arrayBuffer()));
+      var supportsRequestStream = isReadableStreamSupported && (() => {
+        let duplexAccessed = false;
+        const hasContentType = new Request(platform.origin, {
+          body: new ReadableStream(),
+          method: "POST",
+          get duplex() {
+            duplexAccessed = true;
+            return "half";
+          }
+        }).headers.has("Content-Type");
+        return duplexAccessed && !hasContentType;
+      })();
+      var DEFAULT_CHUNK_SIZE = 64 * 1024;
+      var supportsResponseStream = isReadableStreamSupported && !!(() => {
+        try {
+          return utils$1.isReadableStream(new Response("").body);
+        } catch (err) {
+        }
+      })();
+      var resolvers = {
+        stream: supportsResponseStream && ((res) => res.body)
+      };
+      isFetchSupported && ((res) => {
+        ["text", "arrayBuffer", "blob", "formData", "stream"].forEach((type) => {
+          !resolvers[type] && (resolvers[type] = utils$1.isFunction(res[type]) ? (res2) => res2[type]() : (_, config) => {
+            throw new AxiosError(`Response type '${type}' is not supported`, AxiosError.ERR_NOT_SUPPORT, config);
+          });
+        });
+      })(new Response());
+      var getBodyLength = async (body) => {
+        if (body == null) {
+          return 0;
+        }
+        if (utils$1.isBlob(body)) {
+          return body.size;
+        }
+        if (utils$1.isSpecCompliantForm(body)) {
+          return (await new Request(body).arrayBuffer()).byteLength;
+        }
+        if (utils$1.isArrayBufferView(body)) {
+          return body.byteLength;
+        }
+        if (utils$1.isURLSearchParams(body)) {
+          body = body + "";
+        }
+        if (utils$1.isString(body)) {
+          return (await encodeText(body)).byteLength;
+        }
+      };
+      var resolveBodyLength = async (headers, body) => {
+        const length = utils$1.toFiniteNumber(headers.getContentLength());
+        return length == null ? getBodyLength(body) : length;
+      };
+      var fetchAdapter = isFetchSupported && (async (config) => {
+        let {
+          url,
+          method,
+          data,
+          signal,
+          cancelToken,
+          timeout,
+          onDownloadProgress,
+          onUploadProgress,
+          responseType,
+          headers,
+          withCredentials = "same-origin",
+          fetchOptions
+        } = resolveConfig(config);
+        responseType = responseType ? (responseType + "").toLowerCase() : "text";
+        let [composedSignal, stopTimeout] = signal || cancelToken || timeout ? composeSignals$1([signal, cancelToken], timeout) : [];
+        let finished, request;
+        const onFinish = () => {
+          !finished && setTimeout(() => {
+            composedSignal && composedSignal.unsubscribe();
+          });
+          finished = true;
+        };
+        let requestContentLength;
+        try {
+          if (onUploadProgress && supportsRequestStream && method !== "get" && method !== "head" && (requestContentLength = await resolveBodyLength(headers, data)) !== 0) {
+            let _request = new Request(url, {
+              method: "POST",
+              body: data,
+              duplex: "half"
+            });
+            let contentTypeHeader;
+            if (utils$1.isFormData(data) && (contentTypeHeader = _request.headers.get("content-type"))) {
+              headers.setContentType(contentTypeHeader);
+            }
+            if (_request.body) {
+              data = trackStream(_request.body, DEFAULT_CHUNK_SIZE, fetchProgressDecorator(
+                requestContentLength,
+                progressEventReducer(onUploadProgress)
+              ), null, encodeText);
+            }
+          }
+          if (!utils$1.isString(withCredentials)) {
+            withCredentials = withCredentials ? "cors" : "omit";
+          }
+          request = new Request(url, {
+            ...fetchOptions,
+            signal: composedSignal,
+            method: method.toUpperCase(),
+            headers: headers.normalize().toJSON(),
+            body: data,
+            duplex: "half",
+            withCredentials
+          });
+          let response = await fetch(request);
+          const isStreamResponse = supportsResponseStream && (responseType === "stream" || responseType === "response");
+          if (supportsResponseStream && (onDownloadProgress || isStreamResponse)) {
+            const options = {};
+            ["status", "statusText", "headers"].forEach((prop) => {
+              options[prop] = response[prop];
+            });
+            const responseContentLength = utils$1.toFiniteNumber(response.headers.get("content-length"));
+            response = new Response(
+              trackStream(response.body, DEFAULT_CHUNK_SIZE, onDownloadProgress && fetchProgressDecorator(
+                responseContentLength,
+                progressEventReducer(onDownloadProgress, true)
+              ), isStreamResponse && onFinish, encodeText),
+              options
+            );
+          }
+          responseType = responseType || "text";
+          let responseData = await resolvers[utils$1.findKey(resolvers, responseType) || "text"](response, config);
+          !isStreamResponse && onFinish();
+          stopTimeout && stopTimeout();
+          return await new Promise((resolve, reject) => {
+            settle(resolve, reject, {
+              data: responseData,
+              headers: AxiosHeaders$1.from(response.headers),
+              status: response.status,
+              statusText: response.statusText,
+              config,
+              request
+            });
+          });
+        } catch (err) {
+          onFinish();
+          if (err && err.name === "TypeError" && /fetch/i.test(err.message)) {
+            throw Object.assign(
+              new AxiosError("Network Error", AxiosError.ERR_NETWORK, config, request),
+              {
+                cause: err.cause || err
+              }
+            );
+          }
+          throw AxiosError.from(err, err && err.code, config, request);
+        }
+      });
       var knownAdapters = {
         http: httpAdapter,
-        xhr: xhrAdapter
+        xhr: xhrAdapter,
+        fetch: fetchAdapter
       };
       utils$1.forEach(knownAdapters, (fn, value) => {
         if (fn) {
@@ -1544,85 +1926,7 @@
           return Promise.reject(reason);
         });
       }
-      var headersToObject = (thing) => thing instanceof AxiosHeaders$1 ? thing.toJSON() : thing;
-      function mergeConfig(config1, config2) {
-        config2 = config2 || {};
-        const config = {};
-        function getMergedValue(target, source, caseless) {
-          if (utils$1.isPlainObject(target) && utils$1.isPlainObject(source)) {
-            return utils$1.merge.call({ caseless }, target, source);
-          } else if (utils$1.isPlainObject(source)) {
-            return utils$1.merge({}, source);
-          } else if (utils$1.isArray(source)) {
-            return source.slice();
-          }
-          return source;
-        }
-        function mergeDeepProperties(a, b, caseless) {
-          if (!utils$1.isUndefined(b)) {
-            return getMergedValue(a, b, caseless);
-          } else if (!utils$1.isUndefined(a)) {
-            return getMergedValue(void 0, a, caseless);
-          }
-        }
-        function valueFromConfig2(a, b) {
-          if (!utils$1.isUndefined(b)) {
-            return getMergedValue(void 0, b);
-          }
-        }
-        function defaultToConfig2(a, b) {
-          if (!utils$1.isUndefined(b)) {
-            return getMergedValue(void 0, b);
-          } else if (!utils$1.isUndefined(a)) {
-            return getMergedValue(void 0, a);
-          }
-        }
-        function mergeDirectKeys(a, b, prop) {
-          if (prop in config2) {
-            return getMergedValue(a, b);
-          } else if (prop in config1) {
-            return getMergedValue(void 0, a);
-          }
-        }
-        const mergeMap = {
-          url: valueFromConfig2,
-          method: valueFromConfig2,
-          data: valueFromConfig2,
-          baseURL: defaultToConfig2,
-          transformRequest: defaultToConfig2,
-          transformResponse: defaultToConfig2,
-          paramsSerializer: defaultToConfig2,
-          timeout: defaultToConfig2,
-          timeoutMessage: defaultToConfig2,
-          withCredentials: defaultToConfig2,
-          withXSRFToken: defaultToConfig2,
-          adapter: defaultToConfig2,
-          responseType: defaultToConfig2,
-          xsrfCookieName: defaultToConfig2,
-          xsrfHeaderName: defaultToConfig2,
-          onUploadProgress: defaultToConfig2,
-          onDownloadProgress: defaultToConfig2,
-          decompress: defaultToConfig2,
-          maxContentLength: defaultToConfig2,
-          maxBodyLength: defaultToConfig2,
-          beforeRedirect: defaultToConfig2,
-          transport: defaultToConfig2,
-          httpAgent: defaultToConfig2,
-          httpsAgent: defaultToConfig2,
-          cancelToken: defaultToConfig2,
-          socketPath: defaultToConfig2,
-          responseEncoding: defaultToConfig2,
-          validateStatus: mergeDirectKeys,
-          headers: (a, b) => mergeDeepProperties(headersToObject(a), headersToObject(b), true)
-        };
-        utils$1.forEach(Object.keys(Object.assign({}, config1, config2)), function computeConfigValue(prop) {
-          const merge2 = mergeMap[prop] || mergeDeepProperties;
-          const configValue = merge2(config1[prop], config2[prop], prop);
-          utils$1.isUndefined(configValue) && merge2 !== mergeDirectKeys || (config[prop] = configValue);
-        });
-        return config;
-      }
-      var VERSION = "1.6.7";
+      var VERSION = "1.7.2";
       var validators$1 = {};
       ["object", "boolean", "number", "function", "string", "symbol"].forEach((type, i) => {
         validators$1[type] = function validator2(thing) {
@@ -1704,10 +2008,13 @@
               let dummy;
               Error.captureStackTrace ? Error.captureStackTrace(dummy = {}) : dummy = new Error();
               const stack = dummy.stack ? dummy.stack.replace(/^.+\n/, "") : "";
-              if (!err.stack) {
-                err.stack = stack;
-              } else if (stack && !String(err.stack).endsWith(stack.replace(/^.+\n.+\n/, ""))) {
-                err.stack += "\n" + stack;
+              try {
+                if (!err.stack) {
+                  err.stack = stack;
+                } else if (stack && !String(err.stack).endsWith(stack.replace(/^.+\n.+\n/, ""))) {
+                  err.stack += "\n" + stack;
+                }
+              } catch (e) {
               }
             }
             throw err;
@@ -1904,9 +2211,9 @@
           if (!this._listeners) {
             return;
           }
-          const index = this._listeners.indexOf(listener);
-          if (index !== -1) {
-            this._listeners.splice(index, 1);
+          const index2 = this._listeners.indexOf(listener);
+          if (index2 !== -1) {
+            this._listeners.splice(index2, 1);
           }
         }
         /**
@@ -2012,27 +2319,27 @@
         };
         return instance;
       }
-      var axios2 = createInstance(defaults$1);
-      axios2.Axios = Axios$1;
-      axios2.CanceledError = CanceledError;
-      axios2.CancelToken = CancelToken$1;
-      axios2.isCancel = isCancel;
-      axios2.VERSION = VERSION;
-      axios2.toFormData = toFormData;
-      axios2.AxiosError = AxiosError;
-      axios2.Cancel = axios2.CanceledError;
-      axios2.all = function all(promises) {
+      var axios = createInstance(defaults$1);
+      axios.Axios = Axios$1;
+      axios.CanceledError = CanceledError;
+      axios.CancelToken = CancelToken$1;
+      axios.isCancel = isCancel;
+      axios.VERSION = VERSION;
+      axios.toFormData = toFormData;
+      axios.AxiosError = AxiosError;
+      axios.Cancel = axios.CanceledError;
+      axios.all = function all(promises) {
         return Promise.all(promises);
       };
-      axios2.spread = spread;
-      axios2.isAxiosError = isAxiosError;
-      axios2.mergeConfig = mergeConfig;
-      axios2.AxiosHeaders = AxiosHeaders$1;
-      axios2.formToJSON = (thing) => formDataToJSON(utils$1.isHTMLForm(thing) ? new FormData(thing) : thing);
-      axios2.getAdapter = adapters.getAdapter;
-      axios2.HttpStatusCode = HttpStatusCode$1;
-      axios2.default = axios2;
-      module.exports = axios2;
+      axios.spread = spread;
+      axios.isAxiosError = isAxiosError;
+      axios.mergeConfig = mergeConfig;
+      axios.AxiosHeaders = AxiosHeaders$1;
+      axios.formToJSON = (thing) => formDataToJSON(utils$1.isHTMLForm(thing) ? new FormData(thing) : thing);
+      axios.getAdapter = adapters.getAdapter;
+      axios.HttpStatusCode = HttpStatusCode$1;
+      axios.default = axios;
+      module.exports = axios;
     }
   });
 
@@ -3881,10 +4188,10 @@
             // Remove a callback from the list
             remove: function() {
               jQuery.each(arguments, function(_, arg) {
-                var index;
-                while ((index = jQuery.inArray(arg, list, index)) > -1) {
-                  list.splice(index, 1);
-                  if (index <= firingIndex) {
+                var index2;
+                while ((index2 = jQuery.inArray(arg, list, index2)) > -1) {
+                  list.splice(index2, 1);
+                  if (index2 <= firingIndex) {
                     firingIndex--;
                   }
                 }
@@ -4651,33 +4958,33 @@
           return display;
         }
         function showHide(elements, show) {
-          var display, elem, values = [], index = 0, length = elements.length;
-          for (; index < length; index++) {
-            elem = elements[index];
+          var display, elem, values = [], index2 = 0, length = elements.length;
+          for (; index2 < length; index2++) {
+            elem = elements[index2];
             if (!elem.style) {
               continue;
             }
             display = elem.style.display;
             if (show) {
               if (display === "none") {
-                values[index] = dataPriv.get(elem, "display") || null;
-                if (!values[index]) {
+                values[index2] = dataPriv.get(elem, "display") || null;
+                if (!values[index2]) {
                   elem.style.display = "";
                 }
               }
               if (elem.style.display === "" && isHiddenWithinTree(elem)) {
-                values[index] = getDefaultDisplay(elem);
+                values[index2] = getDefaultDisplay(elem);
               }
             } else {
               if (display !== "none") {
-                values[index] = "none";
+                values[index2] = "none";
                 dataPriv.set(elem, "display", display);
               }
             }
           }
-          for (index = 0; index < length; index++) {
-            if (values[index] != null) {
-              elements[index].style.display = values[index];
+          for (index2 = 0; index2 < length; index2++) {
+            if (values[index2] != null) {
+              elements[index2].style.display = values[index2];
             }
           }
           return elements;
@@ -5427,10 +5734,10 @@
           args = flat(args);
           var fragment, first, scripts, hasScripts, node, doc, i = 0, l = collection.length, iNoClone = l - 1, value = args[0], valueIsFunction = isFunction(value);
           if (valueIsFunction || l > 1 && typeof value === "string" && !support.checkClone && rchecked.test(value)) {
-            return collection.each(function(index) {
-              var self2 = collection.eq(index);
+            return collection.each(function(index2) {
+              var self2 = collection.eq(index2);
               if (valueIsFunction) {
-                args[0] = value.call(this, index, self2.html());
+                args[0] = value.call(this, index2, self2.html());
               }
               domManip(self2, args, callback, ignored);
             });
@@ -6204,9 +6511,9 @@
           return attrs;
         }
         function createTween(value, prop, animation) {
-          var tween, collection = (Animation.tweeners[prop] || []).concat(Animation.tweeners["*"]), index = 0, length = collection.length;
-          for (; index < length; index++) {
-            if (tween = collection[index].call(animation, prop, value)) {
+          var tween, collection = (Animation.tweeners[prop] || []).concat(Animation.tweeners["*"]), index2 = 0, length = collection.length;
+          for (; index2 < length; index2++) {
+            if (tween = collection[index2].call(animation, prop, value)) {
               return tween;
             }
           }
@@ -6330,27 +6637,27 @@
           }
         }
         function propFilter(props, specialEasing) {
-          var index, name, easing, value, hooks;
-          for (index in props) {
-            name = camelCase(index);
+          var index2, name, easing, value, hooks;
+          for (index2 in props) {
+            name = camelCase(index2);
             easing = specialEasing[name];
-            value = props[index];
+            value = props[index2];
             if (Array.isArray(value)) {
               easing = value[1];
-              value = props[index] = value[0];
+              value = props[index2] = value[0];
             }
-            if (index !== name) {
+            if (index2 !== name) {
               props[name] = value;
-              delete props[index];
+              delete props[index2];
             }
             hooks = jQuery.cssHooks[name];
             if (hooks && "expand" in hooks) {
               value = hooks.expand(value);
               delete props[name];
-              for (index in value) {
-                if (!(index in props)) {
-                  props[index] = value[index];
-                  specialEasing[index] = easing;
+              for (index2 in value) {
+                if (!(index2 in props)) {
+                  props[index2] = value[index2];
+                  specialEasing[index2] = easing;
                 }
               }
             } else {
@@ -6359,15 +6666,15 @@
           }
         }
         function Animation(elem, properties, options) {
-          var result, stopped, index = 0, length = Animation.prefilters.length, deferred = jQuery.Deferred().always(function() {
+          var result, stopped, index2 = 0, length = Animation.prefilters.length, deferred = jQuery.Deferred().always(function() {
             delete tick.elem;
           }), tick = function() {
             if (stopped) {
               return false;
             }
-            var currentTime = fxNow || createFxNow(), remaining = Math.max(0, animation.startTime + animation.duration - currentTime), temp = remaining / animation.duration || 0, percent = 1 - temp, index2 = 0, length2 = animation.tweens.length;
-            for (; index2 < length2; index2++) {
-              animation.tweens[index2].run(percent);
+            var currentTime = fxNow || createFxNow(), remaining = Math.max(0, animation.startTime + animation.duration - currentTime), temp = remaining / animation.duration || 0, percent = 1 - temp, index3 = 0, length2 = animation.tweens.length;
+            for (; index3 < length2; index3++) {
+              animation.tweens[index3].run(percent);
             }
             deferred.notifyWith(elem, [animation, percent, remaining]);
             if (percent < 1 && length2) {
@@ -6402,13 +6709,13 @@
               return tween;
             },
             stop: function(gotoEnd) {
-              var index2 = 0, length2 = gotoEnd ? animation.tweens.length : 0;
+              var index3 = 0, length2 = gotoEnd ? animation.tweens.length : 0;
               if (stopped) {
                 return this;
               }
               stopped = true;
-              for (; index2 < length2; index2++) {
-                animation.tweens[index2].run(1);
+              for (; index3 < length2; index3++) {
+                animation.tweens[index3].run(1);
               }
               if (gotoEnd) {
                 deferred.notifyWith(elem, [animation, 1, 0]);
@@ -6420,8 +6727,8 @@
             }
           }), props = animation.props;
           propFilter(props, animation.opts.specialEasing);
-          for (; index < length; index++) {
-            result = Animation.prefilters[index].call(animation, elem, props, animation.opts);
+          for (; index2 < length; index2++) {
+            result = Animation.prefilters[index2].call(animation, elem, props, animation.opts);
             if (result) {
               if (isFunction(result.stop)) {
                 jQuery._queueHooks(animation.elem, animation.opts.queue).stop = result.stop.bind(result);
@@ -6458,9 +6765,9 @@
             } else {
               props = props.match(rnothtmlwhite);
             }
-            var prop, index = 0, length = props.length;
-            for (; index < length; index++) {
-              prop = props[index];
+            var prop, index2 = 0, length = props.length;
+            for (; index2 < length; index2++) {
+              prop = props[index2];
               Animation.tweeners[prop] = Animation.tweeners[prop] || [];
               Animation.tweeners[prop].unshift(callback);
             }
@@ -6534,23 +6841,23 @@
               this.queue(type || "fx", []);
             }
             return this.each(function() {
-              var dequeue = true, index = type != null && type + "queueHooks", timers = jQuery.timers, data = dataPriv.get(this);
-              if (index) {
-                if (data[index] && data[index].stop) {
-                  stopQueue(data[index]);
+              var dequeue = true, index2 = type != null && type + "queueHooks", timers = jQuery.timers, data = dataPriv.get(this);
+              if (index2) {
+                if (data[index2] && data[index2].stop) {
+                  stopQueue(data[index2]);
                 }
               } else {
-                for (index in data) {
-                  if (data[index] && data[index].stop && rrun.test(index)) {
-                    stopQueue(data[index]);
+                for (index2 in data) {
+                  if (data[index2] && data[index2].stop && rrun.test(index2)) {
+                    stopQueue(data[index2]);
                   }
                 }
               }
-              for (index = timers.length; index--; ) {
-                if (timers[index].elem === this && (type == null || timers[index].queue === type)) {
-                  timers[index].anim.stop(gotoEnd);
+              for (index2 = timers.length; index2--; ) {
+                if (timers[index2].elem === this && (type == null || timers[index2].queue === type)) {
+                  timers[index2].anim.stop(gotoEnd);
                   dequeue = false;
-                  timers.splice(index, 1);
+                  timers.splice(index2, 1);
                 }
               }
               if (dequeue || !gotoEnd) {
@@ -6563,21 +6870,21 @@
               type = type || "fx";
             }
             return this.each(function() {
-              var index, data = dataPriv.get(this), queue = data[type + "queue"], hooks = data[type + "queueHooks"], timers = jQuery.timers, length = queue ? queue.length : 0;
+              var index2, data = dataPriv.get(this), queue = data[type + "queue"], hooks = data[type + "queueHooks"], timers = jQuery.timers, length = queue ? queue.length : 0;
               data.finish = true;
               jQuery.queue(this, type, []);
               if (hooks && hooks.stop) {
                 hooks.stop.call(this, true);
               }
-              for (index = timers.length; index--; ) {
-                if (timers[index].elem === this && timers[index].queue === type) {
-                  timers[index].anim.stop(true);
-                  timers.splice(index, 1);
+              for (index2 = timers.length; index2--; ) {
+                if (timers[index2].elem === this && timers[index2].queue === type) {
+                  timers[index2].anim.stop(true);
+                  timers.splice(index2, 1);
                 }
               }
-              for (index = 0; index < length; index++) {
-                if (queue[index] && queue[index].finish) {
-                  queue[index].finish.call(this);
+              for (index2 = 0; index2 < length; index2++) {
+                if (queue[index2] && queue[index2].finish) {
+                  queue[index2].finish.call(this);
                 }
               }
               delete data.finish;
@@ -7016,15 +7323,15 @@
             },
             select: {
               get: function(elem) {
-                var value, option, i, options = elem.options, index = elem.selectedIndex, one = elem.type === "select-one", values = one ? null : [], max = one ? index + 1 : options.length;
-                if (index < 0) {
+                var value, option, i, options = elem.options, index2 = elem.selectedIndex, one = elem.type === "select-one", values = one ? null : [], max = one ? index2 + 1 : options.length;
+                if (index2 < 0) {
                   i = max;
                 } else {
-                  i = one ? index : 0;
+                  i = one ? index2 : 0;
                 }
                 for (; i < max; i++) {
                   option = options[i];
-                  if ((option.selected || i === index) && // Don't return options that are disabled or in a disabled optgroup
+                  if ((option.selected || i === index2) && // Don't return options that are disabled or in a disabled optgroup
                   !option.disabled && (!option.parentNode.disabled || !nodeName(option.parentNode, "optgroup"))) {
                     value = jQuery(option).val();
                     if (one) {
@@ -8386,15 +8693,270 @@
     }
   });
 
-  // js/filter_sort_methods.js
-  var axios = require_axios();
-  var $ = require_jquery();
-  function place_filter_options(type, type_id, type_value) {
-    let ul_cont = `.shop_options_filter_submenu_${type}`;
-    let nav_line_class = `shop_options_filter_submenu_${type}_line`;
-    let input_id = `shop_options_filter_${type}_${type_value}`;
-    let universal_class = `shop_options_filter_${type}`;
-    let html = `<div class="row shop_options_filter_sub">
+  // js/shared/shared_gen_func.js
+  var require_shared_gen_func = __commonJS({
+    "js/shared/shared_gen_func.js"(exports, module) {
+      var $ = require_jquery();
+      var axios = require_axios();
+      function url_check(url_substring) {
+        let is_full = false;
+        const url = window.location.toString();
+        if (url.includes(url_substring)) {
+          is_full = true;
+        }
+        return is_full;
+      }
+      function url_id(extract_param = False) {
+        const url = window.location.pathname;
+        const id = url.substring(url.lastIndexOf("/") + 1);
+        let vals = [url, id];
+        if (extract_param) {
+          const param = id.split("?")[1];
+          vals.push(param);
+        }
+        return vals;
+      }
+      function url_id_check(extract_param = False) {
+        const url = url_id(extract_param);
+        const params = url[0].split("/");
+        const id = url[1];
+        let vals;
+        let is_id;
+        let module2;
+        if (/\d/.test(id)) {
+          is_id = true;
+          module2 = params[params.length - 2];
+          module2 = module2.slice(0, -1);
+          vals = [is_id, module2, id];
+        } else {
+          is_id = false;
+          module2 = params[params.length - 1];
+          vals = [is_id, module2];
+        }
+        if (extract_param) {
+          vals.push(url[2]);
+        }
+        return vals;
+      }
+      function return_page() {
+        const url_id_check2 = url_id_check2();
+        const is_url = url_id_check2[0];
+        const module2 = url_id_check2[1];
+        let funct;
+        if (is_url) {
+          funct = window[`get_${module2}_page`];
+          funct(url_id_check2[2]);
+        } else {
+          funct = window[`get_${module2}`];
+          funct();
+        }
+      }
+      function return_auth_page(is_logged_in) {
+        if (is_logged_in) {
+          return_page();
+        } else {
+          window.location.replace = "http://host.docker.internal:8000/login";
+        }
+      }
+      function get_prop_by_string(obj, prop_string, return_null = false) {
+        if (!prop_string) {
+          if (return_null) {
+            return null;
+          } else {
+            return obj;
+          }
+        }
+        let props = prop_string.split(".");
+        for (let i = 0, i_len = props.length - 1; i < i_len; i++) {
+          let prop = props[i];
+          let candi = obj[prop];
+          if (candi !== void 0) {
+            obj = candi;
+          } else {
+            break;
+          }
+          return obj[props[i]];
+        }
+      }
+      module.export = { get_prop_by_string, return_page, return_auth_page, url_id_check, url_check };
+    }
+  });
+
+  // js/standard/sens.js
+  var sens_exports = {};
+  __export(sens_exports, {
+    check_user: () => check_user
+  });
+  function check_user() {
+    const is_logged_in = JSON.parse(localStorage.getItem("is_logged_in")) || false;
+    let withCredentials;
+    if (is_logged_in) {
+      withCredentials = true;
+    } else {
+      withCredentials = false;
+    }
+    return [is_logged_in, withCredentials];
+  }
+  var init_sens = __esm({
+    "js/standard/sens.js"() {
+    }
+  });
+
+  // js/standard/products.js
+  var require_products = __commonJS({
+    "js/standard/products.js"(exports) {
+      var axios = require_axios();
+      var $ = require_jquery();
+      var { return_page } = require_shared_gen_func();
+      var { check_user: check_user2 } = (init_sens(), __toCommonJS(sens_exports));
+      var is_logged_in = false;
+      var withCredentials = false;
+      $(() => {
+        [is_logged_in, withCredentials] = check_user2();
+        return_page();
+      });
+      function get_products(sort = null, brands = null, categories = null, city_id2 = null) {
+        let url = `http://host.docker.internal:3000/products/`;
+        let query_param_list = [];
+        if (sort !== null) {
+          let sort2 = `sort=${sort2}`;
+          query_param_list.push(sort2);
+        }
+        if (brands !== null) {
+          let brands2 = brands2.toString();
+          brands2 = `filter_brand=${brands2}`;
+          query_param_list.push(brands2);
+        }
+        if (categories !== null) {
+          let categories2 = categories2.toString();
+          categories2 = `filter_category=${categories2}`;
+          query_param_list.push(categories2);
+        }
+        if (city_id2 !== null) {
+          let city_id3 = `city_id=${city_id3}`;
+          query_param_list.push(city_id3);
+        }
+        if (query_param_list.length !== 0) {
+          let query_params = query_param_list.join("&");
+          url = `${url}?${query_params}`;
+        }
+        axios.get(url).then((response) => {
+          const products = response.data;
+          let product_html_array = [];
+          for (let product of products) {
+            let product_details = product[0].product;
+            let product_id = product_details.product_id;
+            let name = product_details.name;
+            let brand = product_details.brand_id;
+            let category = product_details.category_id;
+            let img = product_details.product_img_thumb;
+            let img_location = `/public/${img}`;
+            let shipping_rate_details = product[1].shipping_rate;
+            let shipping_rate;
+            if (shipping_rate_details !== void 0) {
+              shipping_rate = shipping_rate_details.base_charge;
+            } else {
+              shipping_rate = " ";
+            }
+            let html = `<div class="p-2" data-category-id="${category}" data-brand-id="${brand}" data-product-id="${product_id}" data-product-name="${name}">
+ <div class="card product_item">
+ <img class="card-img-top product_item_img" src="${img_location}">
+ <div class="card-body product_item_body">
+ <h2 class="product_item_header">${name}</h2>
+ <p class="product_shipping_amount">${shipping_rate}</p>
+ <a role="button" class="btn global_font_3 global_red_select_btn_2 product_item_view_btn global_remove_shadow" href="/products/${product_id}">VIEW</a>
+ </div>
+ <div>
+ </div>`;
+            product_html_array.push(html);
+          }
+          $(".product_item_row").empty().append(product_html_array);
+        }).catch((error) => {
+          console.log(error);
+        });
+      }
+      function detect_amount_for_config_price(product_price) {
+        let product_amount = $('select[name="amount_option"]').val();
+        let amount = product_price * product_amount;
+        $(".product_price_2").text(`R${amount}`);
+      }
+      $(".product_select_type").on("click", () => {
+        $(".product_select_type").removeClass("active");
+        $(exports).addClass("active");
+        let product_config_price = $(exports).attr("value");
+        detect_amount_for_config_price(product_config_price);
+      });
+      $(".product_price_qty_select").on("change", () => {
+        let product_price = $(".product_price_2").text();
+        detect_amount_for_config_price(product_price);
+      });
+      exports.get_products = get_products;
+    }
+  });
+
+  // js/standard/city_selector.js
+  var require_city_selector = __commonJS({
+    "js/standard/city_selector.js"(exports) {
+      var axios = require_axios();
+      var $ = require_jquery();
+      var { filter_on_change } = require_filter_sort_methods();
+      $(() => {
+        axios.get("http://host.docker.internal:3000/cities").then((res) => {
+          console.log(res);
+          const cities = res.data;
+          for (let city of cities) {
+            let city_id2 = city.city_id;
+            let city_value = city.city_value;
+            let html = `<button type="button" class="btn shop_options_location_option shop_options_location_option_btn global_font_3 global_remove_shadow" value="${city_id2}">${city_value}</button>`;
+            $(".shop_options_location_select").empty().append(html);
+            let html_mobi = `<button type="button" class="btn shop_options_location_option_mobi shop_options_location_option_btn global_font_3 global_remove_shadow" value="${city_id2}">${city_value}</button>`;
+            $(".shop_options_location_select_mobi").empty().append(html_mobi);
+          }
+        }).catch((err) => {
+          console.log(err);
+        });
+      });
+      $(".shop_options_location_option_btn").on("click", () => {
+        $(".shop_options_location_option_btn").removeClass("active");
+        $(exports).addClass("active");
+        let city_id2 = $(exports).val();
+        const url = window.location.pathname;
+        const id = url.substring(url.lastIndexOf("/") + 1);
+        if (url.includes(id)) {
+          let axios_url = `http://host.docker.internal:3000/products/${id}/get_shipping_rate_on_change?city_id=${city_id2}`;
+          axios.get(axios_url).then((res) => {
+          }).catch((err) => {
+            console.log(err);
+          });
+        } else {
+          filter_on_change();
+        }
+      });
+      function get_city_id() {
+        if ($(".shop_options_location_option_btn").hasClass("active")) {
+          let city_id2 = $(this).val();
+        } else {
+          city_id = null;
+        }
+        return city_id;
+      }
+      exports.get_city_id = get_city_id;
+    }
+  });
+
+  // js/standard/filter_sort_methods.js
+  var require_filter_sort_methods = __commonJS({
+    "js/standard/filter_sort_methods.js"() {
+      var axios = require_axios();
+      var $ = require_jquery();
+      var { get_products } = require_products();
+      var { get_city_id } = require_city_selector();
+      function place_filter_options(type, type_id, type_value) {
+        let ul_cont = `.shop_options_filter_submenu_${type}`;
+        let nav_line_class = `shop_options_filter_submenu_${type}_line`;
+        let input_id = `shop_options_filter_${type}_${type_value}`;
+        let universal_class = `shop_options_filter_${type}`;
+        let html = `<div class="row shop_options_filter_sub">
 
                     <div class="col">
 
@@ -8404,7 +8966,7 @@
 
                     <div class="col-2 shop_options_checkbox_col custom-control custom-checkbox">
 
-                        <input id="${input_id}" type="checkbox" name="filter_option" value="${type_id}" class="custom-control-input" />
+                        <input id="${input_id}" type="checkbox" name="filter_option" value="${type_value}" data-filter-option-type="${type}" class="custom-control-input" />
 
                         <label for="${input_id}" class="custom-control-label ${universal_class}">
 
@@ -8417,13 +8979,13 @@
                 </div>
 
                 <li class="nav_dropdown_line ${nav_line_class}"><img src="/public/global_assets/nav_assets/nav_line_dropdown.png" alt=""></li>`;
-    $(ul_cont).empty();
-    $(html).appendTo(ul_cont);
-    $(`.${nav_line_class}`).last().remove();
-    let ul_cont_mobi = `.shop_options_filter_submenu_mobi_${type}`;
-    let nav_line_class_mobi = `shop_options_filter_sub_${type}_line_2`;
-    let input_id_mobi = `${input_id}_mobi`;
-    let html_mobi = `<div class="row shop_options_filter_sub_mobi">
+        $(ul_cont).empty();
+        $(html).appendTo(ul_cont);
+        $(`.${nav_line_class}`).last().remove();
+        let ul_cont_mobi = `.shop_options_filter_submenu_mobi_${type}`;
+        let nav_line_class_mobi = `shop_options_filter_sub_${type}_line_2`;
+        let input_id_mobi = `${input_id}_mobi`;
+        let html_mobi = `<div class="row shop_options_filter_sub_mobi">
 
                         <div class="col shop_options_text_col_mobi my-auto">
 
@@ -8433,7 +8995,7 @@
 
                         <div class="col shop_options_checkbox_col_2_mobi custom-control custom-checkbox ml-auto my-auto">
 
-                            <input id="${input_id_mobi}" type="checkbox" name="filter_option" value="${type_id}" class="custom-control-input ${universal_class}" />
+                            <input id="${input_id_mobi}" type="checkbox" name="filter_option" value="${type_value}" data-filter-option-type="${type}" class="custom-control-input ${universal_class}" />
 
                             <label for="${input_id_mobi}" class="custom-control-label">
 
@@ -8446,80 +9008,77 @@
                     </div>
 
                     <li class="shop_options_filter_sub_line_2 ${nav_line_class_mobi}"><img src="/public/global_assets/nav_assets/nav_line_dropdown.png" alt=""></li>`;
-    $(ul_cont_mobi).empty();
-    $(html_mobi).appendTo(ul_cont_mobi);
-    $(`.${nav_line_class_mobi}`).last().remove();
-  }
-  $(function() {
-    axios.get("http://host.docker.internal:3000/brands/").then((response) => {
-      console.log(response);
-      const brands = response.data;
-      for (let item of brands) {
-        let brand = "brand";
-        let brand_id = item.brand_id;
-        let brand_value = item.brand_value;
-        place_filter_options(brand, brand_id, brand_value);
+        $(ul_cont_mobi).empty();
+        $(html_mobi).appendTo(ul_cont_mobi);
+        $(`.${nav_line_class_mobi}`).last().remove();
       }
-    }).catch((error) => {
-      console.log(error);
-    });
-    axios.get("http://host.docker.internal:3000/categories/").then((response) => {
-      console.log(response);
-      const categories = response.data;
-      for (let item of categories) {
-        let category = "category";
-        let category_id = item.category_id;
-        let category_value = item.category_value;
-        place_filter_options(category, category_id, category_value);
+      $(() => {
+        axios.get("http://host.docker.internal:3000/brands/").then((response) => {
+          console.log(response);
+          const brands = response.data;
+          for (let item of brands) {
+            let brand = "brand";
+            let brand_id = item.brand_id;
+            let brand_value = item.brand_value;
+            place_filter_options(brand, brand_id, brand_value);
+          }
+        }).catch((error) => {
+          console.log(error);
+        });
+        axios.get("http://host.docker.internal:3000/categories/").then((response) => {
+          console.log(response);
+          const categories = response.data;
+          for (let item of categories) {
+            let category = "category";
+            let category_id = item.category_id;
+            let category_value = item.category_value;
+            place_filter_options(category, category_id, category_value);
+          }
+        }).catch((error) => {
+          console.log(error);
+        });
+      });
+      function filter_on_change() {
+        let sort_value;
+        if ($("input:checkbox[name=sort_option]").is(":checked")) {
+          sort_value = $(this).val();
+        } else {
+          sort_value = null;
+        }
+        let brand_values;
+        let category_values;
+        $("input[name=filter_option]").on("click", function() {
+          let array;
+          let filter_type = $(this).attr("data-filter-option-type");
+          if (filter_type === "brand") {
+            array = brand_values;
+          }
+          if (filter_type === "category") {
+            array = category_values;
+          }
+          if ($(this).is(":checked")) {
+            array.push($(this).val());
+          } else {
+            if ((index = array.indexOf($(this).val())) !== -1) {
+              array.splice(index, 1);
+            }
+          }
+        });
+        if (brand_values.length === 0) {
+          brand_values = null;
+        }
+        if (category_values.length === 0) {
+          category_values = null;
+        }
+        let city_id2 = get_city_id();
+        get_products(sort_value, brand_values, category_values, city_id2);
       }
-    }).catch((error) => {
-      console.log(error);
-    });
-  });
-  $("input:checkbox").on("change", function() {
-    console.log("selected");
-    if ($(this).is(":checked")) {
-      let name_attr = $(this).attr("name");
-      console.log(name_attr);
-      const product_div = $(".product_item_row > .p-2");
-      const product_div_array = product_div.toArray();
-      const parent_product_div = $(".product_item_row");
-      if (name_attr === "sort_option") {
-        let sort_option_value = $(this).attr("value");
-        if (sort_option_value === "asc_sort") {
-          if (parent_product_div.hasClass("asc_sorted")) {
-          }
-          if (parent_product_div.hasClass("desc_sorted")) {
-            parent_product_div.removeClass("desc_sorted");
-            parent_product_div.addClass("asc_sort");
-            product_div_array.reverse();
-          }
-        }
-        if (sort_option_value === "desc_sort") {
-          if (parent_product_div.hasClass("desc_sorted")) {
-          }
-          if (parent_product_div.hasClass("asc_sorted")) {
-            parent_product_div.removeClass("asc_sorted");
-            parent_product_div.addClass("desc_sorted");
-            product_div_array.reverse();
-          }
-        }
-        console.log(product_div_array);
-        $(".product_item_row").empty().append(product_div_array);
-      }
-      if (name_attr === "filter_option") {
-        let filter_option_value = $(this).attr("value");
-        let filter_option_data_value;
-        if ($(this).hasClass("shop_options_filter_brand")) {
-          filter_option_data_value = `[data-brand-id=${filter_option_value}]`;
-        }
-        if ($(this).hasClass("shop_options_filter_category")) {
-          filter_option_data_value = `[data-category-id=${filter_option_value}]`;
-        }
-        product_divs.filter($(filter_option_data_value));
-      }
+      $("input:checkbox").on("change", () => {
+        filter_on_change();
+      });
     }
   });
+  require_filter_sort_methods();
 })();
 /*! Bundled license information:
 
