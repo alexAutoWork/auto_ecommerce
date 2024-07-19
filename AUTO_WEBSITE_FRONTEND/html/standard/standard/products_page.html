@@ -176,16 +176,16 @@
 					<div class="dropdown-menu">
 						<div class="container shop_options_cont shop_options_cart global_font_3">
 							<div class="container shop_options_cart_products">
-								<div class="row shop_options_cart_item">
-									<div class="col-4">
+								<div class="row shop_options_cart_item shopping_cart_product_cont_mini">
+									<div class="col-4 shop_options_cart_product_img">
 										insert image here
 									</div>
 									<div class="col">
 										<div class="container shop_options_cart_product_name_w_remove_cont">
 											<div class="row">
 												<div class="col">
-													<p class="global_font_3 shop_options_cart_product_name">BASE MODULE</p>
-													<p class="global_font_4 shop_options_cart_product_type">type: exchange unit</p>
+													<p class="global_font_3 shop_options_cart_product_name" data-insert-values="product_config_id.product_id.name" class="shop_options_cart_product_global">BASE MODULE</p>
+													<p class="global_font_4 shop_options_cart_product_type">type: <span data-insert-values="product_config_id.variation_value" class="shop_options_cart_product_global">exchange unit</span></p>
 												</div>
 												<div class="col-1">
 													<i class="fa-solid fa-trash"></i>
@@ -195,10 +195,10 @@
 										<div class="container shop_options_cart_product_price_qty_cont">
 											<div class="row">
 												<div class="col shop_options_cart_product_qty global_font_4">
-													QTY: 1
+													QTY: <span class="shop_options_cart_product_global" data-insert-values="quantity">1</span>
 												</div>
 												<div class="col shop_options_cart_product_price global_font_3">
-													R5000
+													R<span data-insert-values="total_price" class="shop_options_cart_product_global">5000</span>
 												</div>
 											</div>
 										</div>
@@ -277,9 +277,9 @@
 					<h2 class="global_font_2">R6000</h2>
 					<div class="container global_mobi_font_1 product_selected_type_cont">
 						<p class="product_selected_type_p">SELECTED TYPE:</p>
-						<button type="button" class="btn global_remove_shadow global_red_select_btn_1 global_mobi_font_1 product_select_type" id="product_select_exchange_unit">EXCHANGE UNIT</button>
+						<!-- <button type="button" class="btn global_remove_shadow global_red_select_btn_1 global_mobi_font_1 product_select_type" id="product_select_exchange_unit">EXCHANGE UNIT</button>
 						<button type="button" class="btn global_remove_shadow global_red_select_btn_1 global_mobi_font_1 product_select_type" id="product_select_sale">SALE</button><span class="product_selected_type_btn_br">
-						<button type="button" class="btn global_remove_shadow global_red_select_btn_1 product_selected_type_second_hand_btn global_mobi_font_1 product_select_type" id="product_select_second_hand">SECOND-HAND</button></span>
+						<button type="button" class="btn global_remove_shadow global_red_select_btn_1 product_selected_type_second_hand_btn global_mobi_font_1 product_select_type" id="product_select_second_hand">SECOND-HAND</button></span> -->
 					</div>
 					<div class="container global_mobi_font_1 product_repairable_cont">
 						<p>REPAIRABLE:<i class="fa-solid fa-check product_repairable_icon fa-lg"></i><button type="button" class="btn global_remove_shadow global_black_select_btn_2 product_request_repair_btn global_mobi_font_1">REQUEST A REPAIR</button></p>
@@ -288,16 +288,16 @@
 				<div class="col-12 col-sm-12 col-md-12 col-lg-3 global_red_summary product_price_info_cont global_font_3">
 					<div class="container product_price_info">
 						<h2 class="global_font_2 product_price_2">R6000</h2>
-						<p class="global_font_4 shipping_rate_user_city"><i class="fa-solid fa-location-dot"></i> Delivery to: Cape Town</p>
-						<p class="global_mobi_font_1 product_shipping_rate">SHIPPING COST: R120</p>
+						<p class="global_font_4 shipping_rate_user_city"><i class="fa-solid fa-location-dot"></i> Delivery to: <span class="product_shipping_city_name"></span>Cape Town</p>
+						<p class="global_mobi_font_1 product_shipping_rate">SHIPPING COST: R<span class="product_shipping_rate_inner">120</span></p>
 						<select class="form-control position-static global_remove_shadow custom-select global_qty_select_1 product_price_qty_select global_mobi_font_1" id="quantity_select">
-						  <option name="amount_option">1</option>
-						  <option name="amount_option">2</option>
-						  <option name="amount_option">3</option>
-						  <option name="amount_option">4</option>
-						  <option name="amount_option">5</option>
+						  <option name="amount_option" value="1">1</option>
+						  <option name="amount_option" value="2">2</option>
+						  <option name="amount_option" value="3">3</option>
+						  <option name="amount_option" value="4">4</option>
+						  <option name="amount_option" value="5">5</option>
 						</select>
-						<button type="button" class="btn global_remove_shadow global_black_select_btn_1 global_mobi_font_1">ADD TO CART</button>
+						<button type="button" class="btn global_remove_shadow global_black_select_btn_1 global_mobi_font_1 product_add_to_cart">ADD TO CART</button>
 					</div>
 				</div>
 			</div>
@@ -543,8 +543,8 @@
              COPYRIGHT @ 2023 AUTOLECTRONIX PTY LTD. ALL RIGHT RESERVED
         </div>
     </footer> <!-- end of footer -->
-	<script src="/public/global.js"></script>
 	<script src="/public/products_esbuild.js"></script>
+	<script src="/public/city_selector_esbuild.js"></script>
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 
 	<!-- Include all compiled plugins (below), or include individual files as needed -->

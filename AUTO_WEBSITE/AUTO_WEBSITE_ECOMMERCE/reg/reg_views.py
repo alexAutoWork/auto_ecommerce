@@ -145,7 +145,7 @@ class LoginView(views.APIView):
                 value=token.key,
                 max_age=datetime.timedelta(days=10),
                 httponly=True,
-                samesite='Strict'
+                samesite='None'
             )
             response.data = message
             response.status_code = status.HTTP_202_ACCEPTED

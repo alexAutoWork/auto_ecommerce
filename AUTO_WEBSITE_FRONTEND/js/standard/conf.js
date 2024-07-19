@@ -1,44 +1,41 @@
 const axios = require('axios');
 const $ = require('jquery');
-const {url_id_check, get_prop_by_string} = import('../shared/shared_gen_func.mjs');
-const {load_shipping_details} = import('../shared/shared_render_func.mjs');
+import {render_func} from '../shared/shared_render_func';
+import {gen_func} from '../shared/shared_gen_func';
 const {check_user} = require('./sens');
+const {global} = require('../../config.js');
 
-let is_logged_in = false;
-let withCredentials = false;
+let user_state = [false, false]
 
 $(() => {
-    [is_logged_in, withCredentials] = check_user();
-    if (is_logged_in) {
-        const url = url_id_check();
-        const is_url = url[0];
-        if (is_url) {
-            const type = url[1];
-            const type_id = url[2];
-            const axios_url = `http://host.docker.internal:3000/auth/checkout/${type_id}/render-conf`;
-            axios.get(axios_url, {
-                withCredentials: withCredentials
-            })
-            .then((res) => {
-                data = res.data;
-                $('.conf_default_message_cont').hide();
-                if (type === 'repair') {
-                    load_repair_items(data.product_id);
-                }
-                else {
-                    load_order_items(data.order_items);
-                }
-                load_details(data, type, type_id);
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-        }
-    }
-    else {
-        window.location.replace = 'http://host.docker.internal:8000/login';
-    }
+    user_state = check_user();
+    gen_func.return_auth_page(user_state, {render_1: main_load});
 })
+
+function main_load() {
+    const url = gen_func.url_id_check();
+    const is_url = url[0];
+    if (is_url) {
+        const type = url[1];
+        const type_id = url[2];
+        const axios_url = `${global.ngrok_api_url}/auth/checkout/${type_id}/render-conf`;
+        axios.get(axios_url, global.options)
+        .then((res) => {
+            data = res.data;
+            $('.conf_default_message_cont').hide();
+            if (type === 'repair') {
+                load_repair_items(data.product_id);
+            }
+            else {
+                load_order_items(data.order_items);
+            }
+            load_details(data, type, type_id);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+    }
+}
 
 function load_order_items(data) {
     let items = [];

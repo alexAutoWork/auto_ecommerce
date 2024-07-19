@@ -1,7 +1,7 @@
 const axios = require('axios');
 const $ = require('jquery');
-const {get_products} = require('./products.js');
-const {get_city_id} = require('./city_selector.js');
+const {product_func} = require('./products.js');
+const {global} = require('../../config.js');
 
 function place_filter_options(type, type_id, type_value) {
     let ul_cont = `.shop_options_filter_submenu_${type}`;
@@ -13,7 +13,7 @@ function place_filter_options(type, type_id, type_value) {
                         ${type_value}\n
                     </div>\n
                     <div class="col-2 shop_options_checkbox_col custom-control custom-checkbox">\n
-                        <input id="${input_id}" type="checkbox" name="filter_option" value="${type_value}" data-filter-option-type="${type}" class="custom-control-input" />\n
+                        <input id="${input_id}" type="checkbox" name="filter_option" data-filter-type-id="${type_id}" data-filter-option-type="${type}" class="custom-control-input" />\n
                         <label for="${input_id}" class="custom-control-label ${universal_class}">\n
                             <span class="sr-only"></span>\n
                         </label>\n
@@ -31,7 +31,7 @@ function place_filter_options(type, type_id, type_value) {
                             ${type_value}\n
                         </div>\n
                         <div class="col shop_options_checkbox_col_2_mobi custom-control custom-checkbox ml-auto my-auto">\n
-                            <input id="${input_id_mobi}" type="checkbox" name="filter_option" value="${type_value}" data-filter-option-type="${type}" class="custom-control-input ${universal_class}" />\n
+                            <input id="${input_id_mobi}" type="checkbox" name="filter_option" data-filter-type-id="${type_id}" data-filter-option-type="${type}" class="custom-control-input ${universal_class}" />\n
                             <label for="${input_id_mobi}" class="custom-control-label">\n
                                 <span class="sr-only"></span>\n
                             </label>\n
@@ -44,7 +44,9 @@ function place_filter_options(type, type_id, type_value) {
 };
 
 $(() => {
-    axios.get('http://host.docker.internal:3000/brands/')
+    axios.get(`${global.ngrok_api_url}/brands/`, {
+        headers: global.headers
+    })
     .then((response) => {
         console.log(response);
         const brands = response.data;
@@ -57,7 +59,9 @@ $(() => {
     }).catch((error) => {
         console.log(error);
     });
-    axios.get('http://host.docker.internal:3000/categories/')
+    axios.get(`${global.ngrok_api_url}/categories/`, {
+        headers: global.headers
+    })
     .then((response) => {
         console.log(response);
         const categories = response.data;
@@ -73,47 +77,137 @@ $(() => {
     });
 });
 
-function filter_on_change() {
-    let sort_value;
-    if ($('input:checkbox[name=sort_option]').is(':checked')) {
-        sort_value = $(this).val();
+function get_city_id() {
+    let city_id = $('.shop_options_location_option_btn.active').val();
+    if (city_id === undefined) {
+        city_id = null;
     }
-    else {
-        sort_value = null;
-    }
-    let brand_values;
-    let category_values;
-    $('input[name=filter_option]').on('click', function() {
-        let array;
-        let filter_type = $(this).attr('data-filter-option-type');
-        if (filter_type === 'brand') {
-            array = brand_values;
-        }
-        if (filter_type === 'category') {
-            array = category_values;
-        }
-        if ($(this).is(':checked')) {
-            array.push($(this).val());
-        }
-        else {
-            if ((index = array.indexOf($(this).val())) !== -1) {
-                array.splice(index, 1);
-            }
-        }
-    })
-    if (brand_values.length === 0) {
-        brand_values = null;
-    }
-    if (category_values.length === 0) {
-        category_values = null;
-    }
-    let city_id = get_city_id();
-    get_products(sort_value, brand_values, category_values, city_id);
+    return city_id;
 }
 
-$('input:checkbox').on('change', () => {
-    filter_on_change();
-});
+function filter_on_change(e) {
+    let sort_value;
+    console.log($(this));
+    if ($(this).prop('name') === 'sort_option') {
+        if ($(this).is(':checked')) {
+            $(`input:checkbox[name='sort_option']`).not(this).prop('checked', false);
+        }
+    }
+    kwargs = {};
+    sort_value = $(`input:checkbox[name='sort_option']:checked`).data('sort-value');
+    if (sort_value !== null || undefined) {
+        kwargs['sort'] = sort_value;
+    }
+    let brand_values = [];
+    let category_values = [];
+    $(`input:checkbox[name='filter_option']:checked`).each(() => {
+        let array;
+        let filter_type = $(this).data('filter-option-type');
+        if (typeof filter_type !== 'undefined') {
+            if (filter_type === 'category') {
+                array = category_values;
+            }
+            if (filter_type === 'brand') {
+                array = brand_values;
+            }
+            array.push($(this).data('filter-type-id'));
+        }
+    });
+    if (category_values.length !== 0) {
+        kwargs['filter_category'] = category_values;
+    }
+    console.log(category_values);
+    if (brand_values !== 0) {
+        kwargs['filter_brand'] = brand_values;
+    }
+    console.log(brand_values);
+    let city_id = get_city_id();
+    if (city_id !== null) {
+        kwargs['city_id'] = city_id;
+    }
+    product_func.get_products(kwargs);
+}
+
+// function filter_on_change(e) {
+//     let sort_value;
+//     console.log($(this));
+//     if ($(this).is(':checked')) {
+//         if ($(this).prop('name') === 'sort_option') {
+//             $(`input:checkbox[name='sort_option']`).not(this).prop('checked', false);
+//         }
+//     }
+//     sort_value = $(`input:checkbox[name='sort_option']`).val();
+//     if (sort_value === undefined || null) {
+//         sort_value = null;
+//     }
+//     let brand_values = [];
+//     let category_values = [];
+//     $(`input:checkbox[name='filter_option']:checked`).each(() => {
+//         let array;
+//         let filter_type = $(this).data('filter-option-type');
+//         if (filter_type === 'category') {
+//             array = category_values;
+//         }
+//         if (filter_type === 'brand') {
+//             array = brand_values;
+//         }
+//         array.push($(this).val());
+//     });
+//     if (category_values.length === 0) {
+//         category_values = null;
+//         console.log(category_values);
+//     }
+//     if (brand_values === 0) {
+//         brand_values = null;
+//         console.log(brand_values);
+//     }
+//     let city_id = get_city_id();
+//     product_func.get_products(sort_value, brand_values, category_values, city_id);
+// }
+
+$(document).on('change', 'input:checkbox', filter_on_change)
+
+export {filter_on_change}
+    // let sort_value;
+    // if ($('input:checkbox[name=sort_option]').is(':checked')) {
+    //     sort_value = $(this).val();
+    // }
+    // else {
+    //     sort_value = null;
+    // }
+    // let brand_values;
+    // let category_values;
+    // $('input[name=filter_option]').on('click', function() {
+    //     let array;
+    //     let filter_type = $(this).attr('data-filter-option-type');
+    //     if (filter_type === 'brand') {
+    //         array = brand_values;
+    //     }
+    //     if (filter_type === 'category') {
+    //         array = category_values;
+    //     }
+    //     if ($(this).is(':checked')) {
+    //         array.push($(this).val());
+    //     }
+    //     else {
+    //         if ((index = array.indexOf($(this).val())) !== -1) {
+    //             array.splice(index, 1);
+    //         }
+    //     }
+    // })
+    // if (brand_values.length === 0) {
+    //     brand_values = null;
+    // }
+    // if (category_values.length === 0) {
+    //     category_values = null;
+    // }
+    // let city_id = get_city_id();
+    // get_products(sort_value, brand_values, category_values, city_id);
+
+// $('input:checkbox').on('change', () => {
+//     filter_on_change();
+//     console.log('checkbox clicked');
+// });
 
 // function filter_or_sort() {
 //     if ($(this).is(':checked')) {

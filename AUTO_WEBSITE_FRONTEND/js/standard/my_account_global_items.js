@@ -1,16 +1,17 @@
 const axios = require('axios');
 const $ = require('jquery');
-const {get_prop_by_string} = import('../shared/shared_gen_func.mjs');
-const {load_shipping_details, load_summary, load_items, load_history} = import('../shared/shared_render_func.mjs')
+import {gen_func} from '../shared/shared_gen_func';
+import {render_func} from '../shared/shared_render_func';
+const {global} = require('../../config');
 
-function load_bulk(type, withCredentials) {
-    const axios_url = `http://host.docker.internal:3000/auth/${type}s`;
-    axios.get(axios_url, {withCredentials: withCredentials})
+function load_bulk(type) {
+    const axios_url = `${global.ngrok_api_url}/auth/${type}s`;
+    axios.get(axios_url, global.options)
     .then((res) => {
         data = res.data;
         for (let item of data) {
             let template = $('.my_account_main_item_cont').clone();
-            let type_id = get_prop_by_string(item, `${type}_id`);
+            let type_id = gen_func.get_prop(item, `${type}_id`);
             let status_value = item.status_value;
             let status_date = item.current_status_date;
             let detail_url = `/${type}/${type_id}`;
@@ -71,9 +72,9 @@ function load_bulk(type, withCredentials) {
 
 function page_main_load(data, type) {
     let template = $('my_account_main_indi_item_cont').clone();
-    let type_id = get_prop_by_string(data, `${type}_id`);
+    let type_id = gen_func.get_prop(data, `${type}_id`);
     let id_header = `${type} #${type_id}`
-    let date = get_prop_by_string(data, `${type}_date`);
+    let date = gen_func.get_prop(data, `${type}_date`);
     if (type === 'return') {
         let order_id = data.order_id;
         let sku_no = data.order_item_id.sku_no;
@@ -82,17 +83,17 @@ function page_main_load(data, type) {
     template.find('.my_account_main_indi_item_number_header').text(id_header);
     template.find('.my_account_main_indi_item_date').text(`${type} date: ${date}`);
     template.find('.my_account_main_indi_item_status').text(`status: ${data.current_status_value} / status date: ${data.current_status_date}`);
-    let shipping_tracking_id = get_prop_by_string(data, 'shipping_tracking_id', return_null=true);
+    let shipping_tracking_id = gen_func.get_prop(data, 'shipping_tracking_id', return_null=true);
     if (shipping_tracking_id !== null) {
         template.find('my_account_main_indi_item_tracking_number').show().text(`TRACKING NO #${shipping_tracking_id}`);
         template.find('my_account_main_indi_item_courier').show();
     }
-    let shipping_method_value = get_prop_by_string(data, 'shipping_method_value');
+    let shipping_method_value = gen_func.get_prop(data, 'shipping_method_value');
     if (shipping_method_value !== null) {
         template.find('my_account_main_indi_item_delivery').text(shipping_method_value);
         if (shipping_method_value === 'deliver with our courier') {
-            let shipping_address_id = get_prop_by_string(data, 'shipping_address_id');
-            let address_html = load_shipping_details(shipping_address_id);
+            let shipping_address_id = gen_func.get_prop(data, 'shipping_address_id');
+            let address_html = render_func.render_shipping(shipping_address_id);
             template.find('my_account_main_indi_item_shipping_cont').append(address_html).show();
         }
     }
@@ -117,9 +118,11 @@ function page_extra_load(data, type) {
         default:
             throw new Error('type is invalid!');
     }
-    load_items(item_data, is_repair);
-    history_data = get_prop_by_string(data, `${type}_history`, return_null=true);
+    render_func.render_items(item_data, is_repair);
+    history_data = gen_func.get_prop(data, `${type}_history`, return_null=true);
     if (history_data !== null) {
-        load_history(data);
+        render_func.render_history(data)
     }
 }
+
+export {load_bulk, page_extra_load}

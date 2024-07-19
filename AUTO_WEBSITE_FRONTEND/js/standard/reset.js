@@ -1,8 +1,9 @@
 const $ = require('jquery');
 const axios = require('axios');
-const {toggle_element_slide} = import('../shared/shared_event_func.mjs');
+import {event_func} from '../shared/shared_render_func';
+const {global} = require('../../config.js');
 
-function reset(reset_type, url, withCredentials) {
+function reset(reset_type, url) {
     // $('.reset_next_btn').on('click', () => {
     //     toggle_element_slide('next', reset_type);
     let user_field;
@@ -26,16 +27,13 @@ function reset(reset_type, url, withCredentials) {
     verify_cont.slideDown();
     $(`#verify_${user_field}_method_submit`).on('click', () => {
         let user_field_data = $(`input[name='verify_${user_field}_method_input']`).val();
-        if (user_field_data === null || undefined) {
+        if (user_field_data === null || typeof 'undefined') {
             const data = {
                 method: method,
                 reset_type: reset_type,
                 [user_field]: user_field_data
             }
-            axios.post(`${url}/reset/`, {
-                withCredentials: withCredentials,
-                data: data
-            })
+            axios.post(`${global.ngrok_api_url}${url}/reset/`, data, global.options)
             .then((res) => {
                 verify_cont.slideUp();
                 const code_cont = $('#reset_input_code_cont');
@@ -43,10 +41,7 @@ function reset(reset_type, url, withCredentials) {
                 $('#reset_input_code_submit').on('click', () => {
                     let user_input_otp = $(`input[name='reset_input_code']`).val();
                     const otp_data = {'user_input_otp': user_input_otp};
-                    axios.post(`${url}/verify_otp/`, {
-                        withCredentials: withCredentials,
-                        data: otp_data
-                    })
+                    axios.post(`${global.ngrok_api_url}${url}/verify_otp/`, otp_data, global.options)
                     .then((res) => {
                         console.log(res.data.message);
                         code_cont.slideUp();
@@ -58,10 +53,7 @@ function reset(reset_type, url, withCredentials) {
                                 [`new_${reset_type}`]: input_new,
                                 [`confirm_${reset_type}`]: input_conf,
                             }
-                            axios.post(`${url}/change/`, {
-                                withCredentials: withCredentials,
-                                data: input_data
-                            })
+                            axios.post(`${global.ngrok_api_url}${url}/change/`, input_data, global.options)
                             .then((res) => {
                                 console.log(res.data.message);
                             })

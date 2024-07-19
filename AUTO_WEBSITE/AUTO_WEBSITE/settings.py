@@ -33,7 +33,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'localhost:8080', 'host.docker.internal', 'host.docker.internal:3000', '1f9f-102-68-28-61.ngrok-free.app']
+ALLOWED_HOSTS = ['localhost', 'localhost:8080', 'host.docker.internal', 'host.docker.internal:3000', os.getenv('NGROK_API_URL')]
 
 # Application definition
 
@@ -215,15 +215,20 @@ REST_FRAMEWORK = {
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 SESSION_COOKIE_AGE = 86400
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
 
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:3000',
-# ]
-
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_HEADERS = list(default_headers) + [
-    'ngrok-skip-browser-warning'
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8080', 'http://host.docker.internal:3000', os.getenv('NGROK_FRONTEND_URL'), os.getenv('NGROK_ADMIN_URL') 
 ]
+
+# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'ngrok-skip-browser-warning',
+    'Set-Cookie'
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -297,3 +302,7 @@ PAYFAST_PASS_PHRASE = os.getenv('PAYFAST_PASS_PHRASE')
 CELERY_BROKER_URL = os.getenv('REDIS_DB2')
 CELERY_RESULT_BACKEND = os.getenv('REDIS_DB3')
 CELERY_TIMEZONE = os.getenv('CELERY_TIMEZONE')
+
+API_URL = os.getenv('NGROK_API_URL')
+FRONTEND_URL = os.getenv('NGROK_FRONTEND_URL')
+ADMIN_URL = os.getenv('NGROK_ADMIN_URL')

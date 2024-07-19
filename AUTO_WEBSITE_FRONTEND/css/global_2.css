@@ -78,6 +78,11 @@ body {
 	color: white;
 }
 
+.global_red_select_btn_1.active {
+	background-color: #BB3333;
+	color: white;
+}
+
 .global_red_select_btn_2 {
 	letter-spacing: 2px;
 	background-color: #BB3333;

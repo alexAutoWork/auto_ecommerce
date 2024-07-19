@@ -7,17 +7,18 @@ const BootstrapEmail = require('bootstrap-email');
 const server_funct = require('./server_functions');
 // const email_render = require('./js/shared/email_render.mjs');
 // import email_render from './js/shared/email_render.mjs';
-const email_render = import('./js/shared/email_render.mjs');
-const invoice_render = import('./js/shared/invoice_render.mjs');
+const {email_render} = import('./node_modules/shared/email_render.js');
+const {global} = require('./config.js');
 
-const whitelist = ['http://localhost:3000', 'http://host.docker.internal:3000', 'https://1f9f-102-68-28-61.ngrok-free.app'];
+const whitelist = ['http://localhost:3000', 'http://host.docker.internal:3000', global.ngrok_api_url];
 
-const allowed_headers = ['Content-Type', 'Accept', 'Authorization', 'ngrok-skip-browser-warning']
+const allowed_headers = ['Content-Type', 'Accept', 'Authorization', 'ngrok-skip-browser-warning', 'Set-Cookie']
 
 const cors_options = {
     origin: whitelist,
     optionsSuccessStatus: 200,
-    allowedHeaders: allowed_headers
+    allowedHeaders: allowed_headers,
+    credentials: true
 }
 
 const global_cors = cors(cors_options)
@@ -25,7 +26,6 @@ const global_cors = cors(cors_options)
 const app = express();
 
 app.use(global_cors);
-app.options('*', global_cors);
 app.use(express.json());
 
 app.use('/public', express.static('esbuild_js/standard'));

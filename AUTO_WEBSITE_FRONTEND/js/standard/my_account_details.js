@@ -2,30 +2,30 @@ const $ = require('jquery');
 const axios = require('axios');
 const {reset} = require('./reset');
 const {check_user} = require('./sens');
+import {gen_func} from '../shared/shared_gen_func';
+const {global} = require('../../config.js');
 
-let is_logged_in = false;
-let withCredentials = false;
+let user_state = [false, false]
 
 $(() => {
-    [is_logged_in, withCredentials] = check_user();
-    if (is_logged_in) {
-        axios.get('/user/details/', {withCredentials: withCredentials})
-        .then((res) => {
-            data = res.data;
-            for (let [key, value] of Object.entries(data)) {
-                let cont = $(`[data-field-type='${key}']`);
-                cont.find('.my_account_initial_value').text(value);
-                cont.find(`input[name='my_account_details_edit_${key}']`).val(value);
-            }
-        })
-        .catch((err) => {
-            console.log(err);
-        })
-    }
-    else {
-        window.location.replace = 'http://host.docker.internal:8000/login';
-    }
+    user_state = check_user();
+    gen_func.return_auth_page(user_state, {render_1: get_details});
 })
+
+function get_details() {
+    axios.get(`${global.ngrok_api_url}/user/details/`, global.options)
+    .then((res) => {
+        data = res.data;
+        for (let [key, value] of Object.entries(data)) {
+            let cont = $(`[data-field-type='${key}']`);
+            cont.find('.my_account_initial_value').text(value);
+            cont.find(`input[name='my_account_details_edit_${key}']`).val(value);
+        }
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+}
 
 $('.my_account_details_edit_btn').on('click', () => {
     const field_type = $(this).closest('[data-field-type]');
@@ -41,7 +41,7 @@ $('.my_account_details_edit_btn').on('click', () => {
             if (field_type === 'email') {
                 $('#verify_mobile_no_method_cont').show();
             }
-            reset(field_type, '/user/details', withCredentials);
+            reset(field_type, '/user/details');
         })
     }
     else {
@@ -50,10 +50,7 @@ $('.my_account_details_edit_btn').on('click', () => {
             let changed_value = $(`input[name='my_account_details_edit_${field_type}']`).val();
             if (changed_value !== initial_value) {
                 const data = {[field_type]: changed_value};
-                axios.patch('/user/details/', {
-                    data: data,
-                    withCredentials: withCredentials
-                })
+                axios.patch(`${global.ngrok_api_url}/user/details/`, global.options)
                 .then((res) => {
                     console.log(res.data.message);
                     location.reload();

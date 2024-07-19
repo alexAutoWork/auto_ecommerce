@@ -1,66 +1,66 @@
 const axios = require('axios');
 const $ = require('jquery');
-const {get_prop_by_string, url_id_check} = import('../shared/shared_gen_func.mjs');
+import {gen_func} from '../shared/shared_gen_func';
 const {check_user} = require('./sens');
+const {global} = require('../../config.js');
 
 let is_saved = false;
 let module;
 let id = null;
 let params = null;
 
-let is_logged_in = false;
-let withCredentials = false;
+let user_state = [false, false];
 
 $(() => {
-    [is_logged_in, withCredentials] = check_user();
-    if (is_logged_in) {
-        const url = url_id_check(true)
-        const is_id = url[0];
-        module = url[1];
-        let suffix = module;
-        if (is_id) {
-            id = url[2];
-            suffix = suffix + `/${id}`;
-            is_saved = true;
+    user_state = check_user();
+    gen_func.return_auth_page(user_state, {render_1: main_load});
+})
+
+function main_load() {
+    const url = gen_func.url_id_check(true)
+    const is_id = url[0];
+    module = url[1];
+    let suffix = module;
+    if (is_id) {
+        id = url[2];
+        suffix = suffix + `/${id}`;
+        is_saved = true;
+    }
+    else {
+        if (module === 'repair') {
+            params = url[2];
+            suffix = suffix + `/?${params}`;
         }
-        else {
-            if (module === 'repair') {
-                params = url[2];
-                suffix = suffix + `/?${params}`;
-            }
-        }
-        const axios_url = `http://host.docker.internal:3000/auth/checkout/${suffix}`;
-        axios.get(axios_url, {withCredentials: withCredentials})
-        .then((res) => {
-            const data = res.data;
-            const checkout_total = data.checkout_total;
-            const checkout_items = data.checkout_items;
-            const user_addresses = data.user_addresses;
-            const active_address = data.active_address.address_id;
-            if (module_type === 'repair') {
-                load_checkout_items(checkout_items, repair=true);
-                load_exchange_units(data.checkout_contains_ex);
-                const repair_saved = ['reason_repair', 'error_codes'];
-                for (let repair_val of repair_saved) {
-                    const data_val = get_prop_by_string(data, `saved_${repair_val}`, true);
-                    if (data_val !== null) {
-                        $(`input[name='${repair_val}']`).val(data_val);
-                    }
+    }
+    const axios_url = `${global.ngrok_api_url}/auth/checkout/${suffix}`;
+    axios.get(axios_url, global.options)
+    .then((res) => {
+        const data = res.data;
+        const checkout_total = data.checkout_total;
+        const checkout_items = data.checkout_items;
+        const user_addresses = data.user_addresses;
+        const active_address = data.active_address.address_id;
+        if (module_type === 'repair') {
+            load_checkout_items(checkout_items, repair=true);
+            load_exchange_units(data.checkout_contains_ex);
+            const repair_saved = ['reason_repair', 'error_codes'];
+            for (let repair_val of repair_saved) {
+                const data_val = gen_func.get_prop(data, `saved_${repair_val}`);
+                if (data_val !== null) {
+                    $(`input[name='${repair_val}']`).val(data_val);
                 }
             }
-            if (module_type === 'order') {
-                load_checkout_items(checkout_items);
-            }
-            load_checkout_total(checkout_total);
-            load_user_addresses(user_addresses, active_address);
-        })
-        .catch((err) => {
-            console.log(err);
-        })
-    } else {
-        window.location.replace = 'http://host.docker.internal:8000/login';
-    }
-})
+        }
+        if (module_type === 'order') {
+            load_checkout_items(checkout_items);
+        }
+        load_checkout_total(checkout_total);
+        load_user_addresses(user_addresses, active_address);
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+}
 
 function load_checkout_items(data, repair=false) {
     checkout_items_html_array = [];
@@ -212,11 +212,8 @@ function get_shipping_method(method_id, address_id=null) {
     if (address_id !== null) {
         data.append('shipping_address_id', address_id)
     }
-    const axios_url = 'http://host.docker.internal:3000/auth/checkout/get_shipping_method';
-    axios.post(axios_url, {
-        withCredentials: withCredentials,
-        data: data
-    })
+    const axios_url = `${global.ngrok_api_url}/auth/checkout/get_shipping_method/`;
+    axios.post(axios_url, data, global.options)
     .then((res) => {
         load_checkout_total(res.data);
     })
@@ -236,10 +233,7 @@ $('#checkout_exchange_unit_upload').on('change', () => {
         form_data.append(param);
     }
     form_data.append('file', file_data);
-    axios.post('http://host.docker.internal:3000/upload', {
-        withCredentials: withCredentials,
-        data: form_data
-    })
+    axios.post(`${global.ngrok_api_url}/upload/`, form_data, global.options)
     .then((res) => {
         let status = res.status;
         if (status === 200) {
@@ -264,8 +258,8 @@ $('.checkout_exchange_unit_photo_file_remove').on('click', () => {
     let file = $(this).parent();
     let internal_filename = file.data('internal-filename');
     $(`${btn}_submit`).on('click', () => {
-        let axios_url = `http://host.docker.internal:3000/upload?filename=${internal_filename}`;
-        axios.delete(axios_url, {withCredentials: withCredentials})
+        let axios_url = `${global.ngrok_api_url}/upload?filename=${internal_filename}`;
+        axios.delete(axios_url, global.options)
         .then((res) => {
             if (res.status === 200) {
                 file.hide();
@@ -318,17 +312,17 @@ $('#checkout_delivery_address_change_popup').on('click', () => {
     const popup = '.checkout_delivery_address_change_popup'
     const item = '.checkout_delivery_address_indi_item'
     $(popup).modal('show');
-    $(item).on('click', function() {
+    $(item).on('click', () => {
         $(item).not(this).removeClass('active');
         $(this).addClass('active');
     })
-    $('#checkout_change_delivery_address_cont_submit').on('click', function() {
+    $('#checkout_change_delivery_address_cont_submit').on('click', () => {
         let active_item = $(item).find('active');
         let shipping_address_id = $(active_item).data('shipping-address-id');
         let address = $(active_item).clone().find('div').remove();
         $('.checkout_delivery_address').text(address).data('shipping-address-id', shipping_address_id).trigger('get_shipping_method', [1, shipping_address_id]);
     })
-    $('#checkout_change_delivery_address_cont_close').on('click', function() {
+    $('#checkout_change_delivery_address_cont_close').on('click', () => {
         $(popup).modal('show');
     })
 })
@@ -341,7 +335,7 @@ $('#checkout_summary_payment_btn').on('click', () => {
         let exchange_unit_cont = `${exchange_unit}_cont`;
         let filenames = [];
         if ((exchange_unit_cont).is(':visible')) {
-            $(exchange_unit_cont).find(`${exchange_unit}_photo_file_cont`).children().each(function() {
+            $(exchange_unit_cont).find(`${exchange_unit}_photo_file_cont`).children().each(() => {
                 filenames.push($(this).data('internal-filename'));
             })
         }
@@ -369,14 +363,11 @@ $('#checkout_summary_payment_btn').on('click', () => {
     else {
         module_url = module;
     }
-    let axios_url = `http://host.docker.internal:3000/auth/checkout/${module_url}/initialize/`;
+    let axios_url = `${global.ngrok_api_url}/auth/checkout/${module_url}/initialize/`;
     if (params !== null) {
         axios_url = axios_url + `?${params}`;
     }
-    axios.post(axios_url, {
-        withCredentials: withCredentials,
-        data: data
-    })
+    axios.post(axios_url, data, global.options)
     .then((res) => {
         if (res.status === 200) {
             window.location.replace('/checkout-redirect');

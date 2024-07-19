@@ -33,15 +33,12 @@ class ShoppingCartViewSet(custom_mixins.TempMixin, viewsets.ViewSet):
 
     temp_name = 'shopping_cart_obj'
 
-    # shopping_cart_obj = None
-    # shopping_cart_items_obj = None
-
-    def __create_shopping_cart__(self, request):
+    def __create_shopping_cart(self, request):
         user = request.user
         shopping_cart_obj = self.__parent_model.objects.create(user_id=user)
         return True
 
-    def serialized_response(self, request, **kwargs):
+    def serialized_response(self, request, pk=None, **kwargs):
         '''
         serialized shopping cart data, for responses ONLY
 
@@ -51,16 +48,24 @@ class ShoppingCartViewSet(custom_mixins.TempMixin, viewsets.ViewSet):
         backend_req = kwargs.get('backend_req', False)
         exclude = kwargs.get('exclude', None)
         temp = kwargs.get('temp', None)
+        flag = kwargs.get('flag', None)
+        item = kwargs.get('item', None)
         if temp is not None:
             request.method = 'GET'
             if temp.shopping_cart_obj is not None:
                 serializer1 = self.__parent_serializer(temp.shopping_cart_obj)
                 data.update(**{'shopping_cart': serializer1.data})
-                if temp.shopping_cart_items_obj is not None:
-                    serializer2 = self.__child_serializer(temp.shopping_cart_items_obj, many=True, context={'request': request})
-                    data.update(**{'shopping_cart_items': serializer2.data})
+                context = {'request': request}
+                if item is not None:
+                    serializer2 = self.__child_serializer(item, context=context)
+                else:
+                    if temp.shopping_cart_items_obj is not None:
+                        serializer2 = self.__child_serializer(temp.shopping_cart_items_obj, many=True, context=context)
+                data.update(**{'shopping_cart_items': serializer2.data})
                 if exclude is not None:
                     data.pop(exclude, '')
+                if flag is not None:
+                    data.update(**{'flag': flag})
                 print(data)
                 if backend_req:
                     return data
@@ -71,17 +76,18 @@ class ShoppingCartViewSet(custom_mixins.TempMixin, viewsets.ViewSet):
         if temp.shopping_cart_obj is not None:
             prefetch_query = Prefetch('product_config_id', queryset=st_models.ProductConfig.objects.select_related('product_id', 'variation_id').filter(product_id__is_active=True))
             shopping_cart_items_obj = self.__child_model.objects.prefetch_related(prefetch_query).filter(shopping_cart_id=temp.shopping_cart_obj.pk)
+            shopping_cart_items_list = []
             if not shopping_cart_items_obj:
-                shopping_cart_items_obj = None
-            temp.shopping_cart_items_obj = shopping_cart_items_obj
-            # self.shopping_cart_items_obj = shopping_cart_items_obj
+                shopping_cart_items_list = None
+            else:
+                for item in shopping_cart_items_obj:
+                    shopping_cart_items_list.append(item)
+            temp.shopping_cart_items_obj = shopping_cart_items_list
 
     def list(self, request, backend_req=False, **kwargs):
         user = request.user
         try:
             shopping_cart_obj = self.__parent_model.objects.get(user_id=user.user_id)
-            # self.check_object_permissions(request, shopping_cart_obj)
-            # temp = super().init_temp(request)
             temp = kwargs.get('temp', super().init_temp(request))
             temp.shopping_cart_obj = shopping_cart_obj
             self.items_load(temp)
@@ -89,9 +95,7 @@ class ShoppingCartViewSet(custom_mixins.TempMixin, viewsets.ViewSet):
             if not backend_req:
                 return self.serialized_response(request, temp=temp)
         except self.__parent_model.DoesNotExist:
-        # if shopping_cart_obj.exists():
-        # else:
-            self.__create_shopping_cart__(request)
+            self.__create_shopping_cart(request)
             if True:
                 self.list(request)
 
@@ -103,21 +107,11 @@ class ShoppingCartViewSet(custom_mixins.TempMixin, viewsets.ViewSet):
                 obj = st_models.Products.objects.get(pk=pk)
         if obj is not None:
             return obj.product_config_id.has_stock
-        # quantity = kwargs.get('quantity', None)
-        # if obj is None:
-        #     if pk is not None:
-        #         obj = st_models.Products.objects.get(pk=pk)
-        # if quantity is not None:
-        #     if quantity >= obj.stock_available - 2:
-        #         return False
-        #     else:
-        #         return True
 
     def update(self, request, **kwargs):
         temp = kwargs.get('temp', None)
         if temp is not None:
             if temp.shopping_cart_obj is not None:
-                self.items_load(temp)
                 shopping_cart_items_cal = []
                 total_quantity = 0
                 subtotal = 0
@@ -125,15 +119,6 @@ class ShoppingCartViewSet(custom_mixins.TempMixin, viewsets.ViewSet):
                     for item in temp.shopping_cart_items_obj:
                         total_quantity += item.quantity
                         subtotal += item.total_price
-                    # quantity = item.quantity
-                    # total_price = item.total_price
-                    # total_price *= quantity
-                    # shopping_cart_items_cal.append([round(total_price, 2), quantity])
-                # subtotal = 0
-                # total_quantity = 0
-                # for item in shopping_cart_items_cal:
-                #     subtotal += item[0]
-                #     total_quantity += item[1]
                 subtotal = dec(subtotal)
                 vat = round((subtotal * vat_perc), 2)
                 total = subtotal + vat
@@ -148,8 +133,6 @@ class ShoppingCartViewSet(custom_mixins.TempMixin, viewsets.ViewSet):
                 temp.shopping_cart_obj.save()
                 temp.shopping_cart_obj.refresh_from_db()
                 super().set_temp(request, temp)
-                # self.shopping_cart_obj.update(subtotal=subtotal, vat=vat, total=total, total_quantity=total_quantity)
-                # self.shopping_cart_obj.refresh_from_db()
 
     def partial_update(self, request, pk=None, **kwargs):
         backend_req = kwargs.get('backend_req', False)
@@ -169,22 +152,26 @@ class ShoppingCartViewSet(custom_mixins.TempMixin, viewsets.ViewSet):
         if obj is not None:
             obj.quantity = int(quantity)
             obj.total_price = dec(obj.quantity) * obj.product_config_id.price
-            # obj.total_price = total_price
         check_quantity = self.check_quantity(obj=obj)
         if check_quantity:
             obj.save()
             self.update(request, temp=temp)
-            return self.serialized_response(request, temp=temp)
+            return self.serialized_response(request, temp=temp, item=obj, flag='updated')
         else:
             return Response({'message': 'not enough stock!'}, status=status.HTTP_400_BAD_REQUEST)
 
-    def __internal_create__(self, request, **kwargs):
+    def __internal_create(self, request, **kwargs):
         serializer = kwargs.get('serializer', None)
         temp = kwargs.get('temp', None)
         if serializer is not None:
-            serializer.save()
+            item = serializer.save()
+            item = self.__child_model.objects.select_related('product_config_id__product_id', 'product_config_id__variation_id').filter(pk=item.pk)[0]
+            if temp.shopping_cart_items_obj is not None:
+                temp.shopping_cart_items_obj.append(item)
+            else:
+                temp.shopping_cart_items_obj = [item]
             self.update(request, temp=temp)
-            return self.serialized_response(request, temp=temp)
+            return self.serialized_response(request, temp=temp, item=item, flag='created')
 
     def create(self, request):
         temp = super().get_temp(request)
@@ -205,29 +192,21 @@ class ShoppingCartViewSet(custom_mixins.TempMixin, viewsets.ViewSet):
                     for item in temp.shopping_cart_items_obj:
                         if item.product_config_id == data['product_config_id']:
                             return self.partial_update(request, obj=item, backend_req=True, quantity=quantity, total_price=total_price, temp=temp)
-                    return self.__internal_create__(request, serializer=serializer, temp=temp)
-                else:
-                    return self.__internal_create__(request, serializer=serializer, temp=temp)
-                    # serializer.save()
-                    # self.update(request, temp=temp)
-                    # return self.serialized_response(request, temp=temp)
-                        # else:
-                        #     serializer.save()
-                        #     self.update(request, temp=temp)
-                        #     return self.serialized_response(temp=temp)
+                return self.__internal_create(request, serializer=serializer, temp=temp)
+        else:
+            self.__create_shopping_cart(request)
+            if True:
+                self.create(request)
 
     def destroy(self, request, pk=None):
         temp = super().get_temp(request)
-        print(pk)
         if temp is not None:
-            print(temp)
             if temp.shopping_cart_obj is not None:
-                print(temp.shopping_cart_obj)
                 if temp.shopping_cart_items_obj is not None:
-                    print(temp.shopping_cart_items_obj)
                     for item in temp.shopping_cart_items_obj:
                         if item.pk == int(pk):
                             item.delete()
+                            temp.shopping_cart_items_obj.remove(item)
                             self.update(request, temp=temp)
                             return self.serialized_response(request, temp=temp)
 

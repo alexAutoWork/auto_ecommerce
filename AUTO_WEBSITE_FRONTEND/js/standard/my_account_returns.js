@@ -1,16 +1,16 @@
 const $ = require('jquery');
 const axios = require('axios');
 const {check_user} = require('./sens');
-const {load_bulk, page_main_load} = require('./my_account_global_items.js');
-const {return_auth_page} = import('../shared/shared_gen_func.mjs');
-const {toggle_element_slide} = import('../shared/shared_event_func.mjs');
+const {global} = require('../../config');
+const {load_bulk, page_main_load} = require('./my_account_global_items');
+import {gen_func} from '../shared/shared_gen_func';
+import {event_func} from '../shared/shared_event_func';
 
-let is_logged_in = false;
-let withCredentials = false;
+let user_state = [false, false]
 
-$(function() {
-    [is_logged_in, withCredentials] = check_user();
-    return_auth_page(is_logged_in);
+$(() => {
+    user_state = check_user();
+    gen_func.return_auth_page(user_state, {render_1: get_returns, render_2: get_returns_page});
 })
 
 function get_returns() {
@@ -18,8 +18,8 @@ function get_returns() {
 }
 
 function get_returns_page(return_id) {
-    const axios_url = `http://host.docker.internal:3000/auth/returns/${return_id}`
-    axios.get(axios_url, {withCredentials: true})
+    const axios_url = `${global.ngrok_api_url}/auth/returns/${return_id}/`
+    axios.get(axios_url, global.options)
     .then((res) => {
         data = res.data;
         page_main_load(data, 'return');
@@ -35,10 +35,10 @@ function get_returns_page(return_id) {
 $('.my_account_return_btn').on('click', () => {
     $('#my_account_apply_for_return_popup1').modal('show');
     $('.my_account_apply_for_return_back').on('click', () => {
-        toggle_element_slide('back');
+        event_func.toggle_slide('back');
     })
-    const axios_url = 'http://host.docker.internal:3000/auth/orders/';
-    axios.get(`${axios_url}?is_completed=True`, {withCredentials: withCredentials})
+    const axios_url = `${global.ngrok_api_url}/auth/orders/`;
+    axios.get(`${axios_url}?is_completed=True`, global.options)
     .then((res) => {
         const data = res.data;
         for (let item of data) {
@@ -59,8 +59,8 @@ $('.my_account_return_btn').on('click', () => {
         })
         $('#my_account_apply_for_return_select_order_next').on('click', () => {
             if (order_id !== null && order_date !== null) {
-                toggle_element_slide('next');
-                axios.get(`${axios_url}${order_id}/retrieve_items/`, {withCredentials: withCredentials})
+                event_func.toggle_slide('next');
+                axios.get(`${axios_url}${order_id}/retrieve_items/`, global.options)
                 .then((res) => {
                     const item_data = res.data;
                     for (let item of item_data) {
@@ -88,7 +88,7 @@ $('.my_account_return_btn').on('click', () => {
                     })
                     $('#my_account_apply_for_return_select_item_next').on('click', () => {
                         if (order_item_id !== null && order_item_preview !== null) {
-                            toggle_element_slide('next');
+                            event_func.toggle_slide('next');
                             order_item_preview.appendto('.my_account_apply_for_return_item_prev_cont');
                             let reason_return = $('#my_account_apply_for_return_reason_input').val();
                             let problem_product = $('#my_account_apply_for_return_problem_input').val();
@@ -103,7 +103,7 @@ $('.my_account_return_btn').on('click', () => {
                                     <p>${preferred_outcome}</p>\n`
                                 )
                                 $('#my_account_apply_for_return_review_return_next').on('click', () => {
-                                    toggle_element_slide('next');
+                                    event_func.toggle_slide('next');
                                     const data = {
                                         order_id: order_id,
                                         order_item_id: order_item_id,
@@ -111,10 +111,7 @@ $('.my_account_return_btn').on('click', () => {
                                         problem_product: problem_product,
                                         preferred_outcome: preferred_outcome
                                     }
-                                    axios.post('http://host.docker.internal:3000/auth/returns/', {
-                                        withCredentials: withCredentials,
-                                        data: data
-                                    })
+                                    axios.post(`${global.ngrok_api_url}/auth/returns/`, data, global.options)
                                     .then((res) => {
                                         $('.my_account_apply_for_return_res_message').text(res.data.message);
                                     })

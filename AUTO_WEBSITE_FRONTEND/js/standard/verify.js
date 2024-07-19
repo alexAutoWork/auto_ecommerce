@@ -1,23 +1,30 @@
 const $ = require('jquery');
 const axios = require('axios');
+const {global} = require('../../config.js');
+const {check_user} = require('./sens');
+import {gen_func} from '../shared/shared_gen_func.js';
 
-let is_logged_in = false;
-let withCredentials = false;
+let user_state = [false, false]
 
 $(() => {
-    [is_logged_in, withCredentials] = check_user();
-    if (!is_logged_in) {
-        window.location.replace = 'http://host.docker.internal:8000/login';
+    user_state = check_user();
+    if (!user_state[0]) {
+        // window.location.replace = 'http://host.docker.internal:8000/login';
+        gen_func.redirect(`${global.ngrok_frontend_url}/login/`);
+    }
+    if (user_state[0] && user_state[1]) {
+        gen_func.redirect(`${global.ngrok_frontend_url}/products/`);
     }
 })
 
 $('#signup_verif_select_submit, .signup_verify_resend_code').on('click', (e) => {
     let method = $('input[name=signup_verif_select_option]').filter(':checked').val();
-    method = {method: method};
-    axios.post('http://host.docker.internal:8000/verify_account/', {
-        withCredentials: withCredentials,
-        data: method
-    })
+    data = {method: method};
+    // axios.post('http://host.docker.internal:8000/verify_account/', {
+    //     withCredentials: withCredentials,
+    //     data: method
+    // })
+    axios.post(`${global.ngrok_api_url}/verify_account/`, method, global.options)
     .then((res) => {
         console.log(res);
         const message = res.data.message;
@@ -39,10 +46,11 @@ $('#signup_verif_select_submit, .signup_verify_resend_code').on('click', (e) => 
 $('#signup_verif_code_submit').on('click', () => {
     let user_otp = $('#signup_verify_code_input').val();
     user_otp = {user_input_otp: user_otp};
-    axios.post('http://host.docker.internal:3000/verify_otp/', {
-        withCredentials: withCredentials,
-        data: data
-    })
+    // axios.post('http://host.docker.internal:3000/verify_otp/', {
+    //     withCredentials: withCredentials,
+    //     data: data
+    // })
+    axios.post(`${global.ngrok_api_url}/verify/otp/`, data, global.options)
     .then((res) => {
         console.log(res);
         const message = res.data.message;
@@ -79,10 +87,7 @@ $('#signup_details_submit').on('click', () => {
             data.append(field, val);
         }
     })
-    axios.post('http://host.docker.internal:3000/user/details/', {
-        withCredentials: withCredentials,
-        data: data
-    })
+    axios.post(`${global.ngrok_api_url}/user/details/`, data, global.options)
     .then((res) => {
         console.log(res);
     })

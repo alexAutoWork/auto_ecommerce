@@ -119,7 +119,13 @@ class ProductsViewSet(viewsets.ViewSet):
         if sort_by is None:
             sort_by = 'name'
         if has_city_id:
-            sort_by = f'product_id__{sort_by}'
+            split = sort_by.split('-', 1)
+            sort_by = split[-1]
+            if len(split) > 1:
+                prefix = '-'
+            else:
+                prefix = ''
+            sort_by = f'{prefix}product_id__{sort_by}'
         queryset = queryset.filter(filter_list).order_by(sort_by)
         print(filter_list)
 
@@ -130,7 +136,9 @@ class ProductsViewSet(viewsets.ViewSet):
         serializer = st_serializers.ProductShippingRateComboSerializer(data=data, many=True)
         # make dict and run queryset through serializer
         if serializer.is_valid(raise_exception=True):
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            data = [serializer.data]
+            data.append(request.session.session_key)
+            return Response(data, status=status.HTTP_200_OK)
     
     def get_models(self, request, **kwargs):
         product_id = kwargs.get('product_id', None)

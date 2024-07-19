@@ -59,9 +59,9 @@ class PayfastIntegration(viewsets.ViewSet):
             data = {
                 'merchant_id': settings.PAYFAST_ID,
                 'merchant_key': settings.PAYFAST_KEY,
-                'return_url': f'http://localhost:8080/conf/{temp.checkout_instance_type}/{temp.checkout_instance_id}/',
-                'cancel_url': f'http://localhost:8080/cancel/{temp.checkout_instance_type}/{temp.checkout_instance_id}/',
-                'notify_url': f'http://localhost:3000/auth/checkout/{temp.checkout_instance_id}/recieve',
+                'return_url': f'{settings.FRONTEND_URL}/conf/{temp.checkout_instance_type}/{temp.checkout_instance_id}/',
+                'cancel_url': f'{settings.FRONTEND_URL}/cancel/{temp.checkout_instance_type}/{temp.checkout_instance_id}/',
+                'notify_url': f'https://{settings.API_URL}/auth/checkout/{temp.checkout_instance_id}/recieve',
                 'name_first': user_details.name,
                 'name_last': user_details.surname,
                 'email_address': user.email,

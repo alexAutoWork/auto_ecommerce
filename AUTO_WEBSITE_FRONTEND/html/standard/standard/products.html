@@ -414,7 +414,7 @@
 											A - Z
 										</div>
 										<div class="col-2 shop_options_checkbox_col custom-control custom-checkbox">
-											<input id="shop_options_sort_alphabet_asc" type="checkbox" name="sort_option" class="custom-control-input" value="asc_sort"/>
+											<input id="shop_options_sort_alphabet_asc" type="checkbox" name="sort_option" class="custom-control-input" data-sort-value="name"/>
 											<label for="shop_options_sort_alphabet_asc" class="custom-control-label">
 												<span class="sr-only"></span>
 											</label>
@@ -426,7 +426,7 @@
 										Z - A
 										</div>
 										<div class="col-2 shop_options_checkbox_col custom-control custom-checkbox">
-											<input id="shop_options_sort_alphabet_desc" type="checkbox" name="sort_option" class="custom-control-input" value="desc_sort"/>
+											<input id="shop_options_sort_alphabet_desc" type="checkbox" name="sort_option" class="custom-control-input" data-sort-value="-name"/>
 											<label for="shop_options_sort_alphabet_desc" class="custom-control-label">
 												<span class="sr-only"></span>
 											</label>
@@ -1191,6 +1191,7 @@
 	<script src="/public/global.js"></script>
 	<script src="/public/products_esbuild.js"></script>
 	<script src="/public/filter_sort_methods_esbuild.js"></script>
+	<script src="/public/city_selector_esbuild.js"></script>
 
 	<!-- Include all compiled plugins (below), or include individual files as needed -->
 	  

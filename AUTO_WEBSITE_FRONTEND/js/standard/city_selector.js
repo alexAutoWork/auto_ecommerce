@@ -1,19 +1,24 @@
 const axios = require('axios');
 const $ = require('jquery');
+import {gen_func} from '../../node_modules/shared/shared_gen_func';
 const {filter_on_change} = require('./filter_sort_methods.js');
+const {product_func} = require('./products.js');
+const {global} = require('../../config.js');
 
 $(() => {
-    axios.get('http://host.docker.internal:3000/cities')
+    axios.get(`${global.ngrok_api_url}/cities/`, global.options)
     .then((res) => {
         console.log(res);
         const cities = res.data;
+        const cont = '.shop_options_location_select';
+        const cont_mobi = '.shop_options_location_select_mobi';
+        $(cont).empty();
+        $(cont_mobi).empty();
         for (let city of cities) {
             let city_id = city.city_id;
             let city_value = city.city_value;
-            let html = `<button type="button" class="btn shop_options_location_option shop_options_location_option_btn global_font_3 global_remove_shadow" value="${city_id}">${city_value}</button>`;
-            $('.shop_options_location_select').empty().append(html);
-            let html_mobi = `<button type="button" class="btn shop_options_location_option_mobi shop_options_location_option_btn global_font_3 global_remove_shadow" value="${city_id}">${city_value}</button>`;
-            $('.shop_options_location_select_mobi').empty().append(html_mobi);
+            $(`<button type="button" class="btn shop_options_location_option shop_options_location_option_btn global_font_3 global_remove_shadow" value="${city_id}">${city_value}</button>`).appendTo(cont);
+            $(`<button type="button" class="btn shop_options_location_option_mobi shop_options_location_option_btn global_font_3 global_remove_shadow" value="${city_id}">${city_value}</button>`).appendTo(cont_mobi);
         }
     })
     .catch((err) => {
@@ -21,72 +26,27 @@ $(() => {
     })
 });
 
-// $('.shop_options_location_option_btn').on('click', function() {
-//     $('.shop_options_location_option_btn').removeClass('active');
-//     $(this).addClass('active');
-//     let city_id = $(this).attr('data-city-id');
-//     const url = window.location.pathname;
-//     const id = url.substring(url.lastIndexOf('/') + 1);
-//     let axios_url;
-//     if (url.includes(id)) {
-//         axios_url = `http://host.docker.internal:3000/products/${id}/get_shipping_rate_on_change?city_id=${city_id}`
-//         axios.get(axios_url)
-//         .then((response) => {
-//             console.log(response);
-//             // todo: make change method
-//         })
-//         .catch((error) => {
-//             console.log(error);
-//         })
-//     }
-//     else {
-//         axios_url = `http://host.docker.internal:3000/products/get_shipping_rates?city_id=${city_id}`
-//         axios.get(axios_url)
-//         .then((response) => {
-//             console.log(response);
-//             const products_w_shipping_list = response.data;
-//             for (let item of products_w_shipping_list) {
-//                 let product_details = item.product;
-//                 let shipping_details = item.shipping_rate;
-//                 $('.product_item').each(function() {
-//                     if ($('input[name=sort_option]') || $('input[name=filter_option]').is(':checked')) {
-//                         // todo: make filter method
-//                     }
-//                 })
-//             }
-//         })
-//     }
-// });
-
-$('.shop_options_location_option_btn').on('click', () => {
-    $('.shop_options_location_option_btn').removeClass('active');
+function change_on_selection(e) {
+    $('.shop_options_location_option_btn').not(this).removeClass('active');
     $(this).addClass('active');
     let city_id = $(this).val();
-    const url = window.location.pathname;
-    const id = url.substring(url.lastIndexOf('/') + 1);
-    if (url.includes(id)) {
-        let axios_url = `http://host.docker.internal:3000/products/${id}/get_shipping_rate_on_change?city_id=${city_id}`;
-        axios.get(axios_url)
+    const url = gen_func.url_id_check();
+    const is_id = url[0];
+    if (is_id) {
+        const id = url[2]
+        let axios_url = `${global.ngrok_api_url}/products/${id}/get_shipping_rate_on_change?city_id=${city_id}`;
+        axios.get(axios_url, global.options)
         .then((res) => {
-            //something
+            data = res.data;
+            product_func.render_shipping(data.base_charge, data.city_value);
         })
         .catch((err) => {
             console.log(err);
         })
     }
     else {
-        filter_on_change();
+        filter_on_change(e);
     }
-})
-
-function get_city_id() {
-    if ($('.shop_options_location_option_btn').hasClass('active')) {
-        let city_id = $(this).val();
-    }
-    else {
-        city_id = null;
-    }
-    return city_id;
 }
 
-exports.get_city_id = get_city_id;
+$(document).on('click', '.shop_options_location_option_btn', change_on_selection)
