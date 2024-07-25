@@ -486,7 +486,7 @@ DROP TABLE IF EXISTS `order_seq`;
 CREATE TABLE `order_seq` (
   `id` int NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -608,7 +608,7 @@ CREATE TABLE `product_config` (
   KEY `variation_id_idx` (`variation_id`),
   CONSTRAINT `product_id_fk_pc` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `variation_id_fk_pc` FOREIGN KEY (`variation_id`) REFERENCES `variations` (`variation_id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1016,7 +1016,7 @@ CREATE TABLE `shopping_cart` (
   PRIMARY KEY (`shopping_cart_id`),
   KEY `user_id_idx` (`user_id`),
   CONSTRAINT `user_id_fk_sc` FOREIGN KEY (`user_id`) REFERENCES `user_login` (`user_id`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1032,12 +1032,13 @@ CREATE TABLE `shopping_cart_items` (
   `product_config_id` int NOT NULL,
   `quantity` int NOT NULL,
   `total_price` decimal(12,2) NOT NULL,
+  `recently_modified` tinyint NOT NULL,
   PRIMARY KEY (`shopping_cart_item_id`),
   KEY `shopping_cart_id_idx` (`shopping_cart_id`),
   KEY `product_config_id_fk_sci_idx` (`product_config_id`),
   CONSTRAINT `products_config_id_fk_sci` FOREIGN KEY (`product_config_id`) REFERENCES `product_config` (`product_config_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `shopping_cart_id_fk_sci` FOREIGN KEY (`shopping_cart_id`) REFERENCES `shopping_cart` (`shopping_cart_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1081,7 +1082,7 @@ CREATE TABLE `user_addresses` (
   PRIMARY KEY (`address_id`),
   KEY `user_id_idx` (`user_id`),
   CONSTRAINT `user_id_fk_ua` FOREIGN KEY (`user_id`) REFERENCES `user_login` (`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1160,4 +1161,4 @@ CREATE TABLE `variations` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-07-05  9:12:53
+-- Dump completed on 2024-07-25 12:04:21
