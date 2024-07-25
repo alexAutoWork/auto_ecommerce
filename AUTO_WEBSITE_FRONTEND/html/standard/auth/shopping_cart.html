@@ -152,26 +152,26 @@
 				<div class="col-12 col-sm-12 col-md-12 col-lg col-xl" id="shopping_cart_product_cont_all">
 					<div class="container shopping_cart_product_cont">
                         <div class="row shopping_cart_product_cont_row">
-                            <div class="col-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 shopping_cart_product_cont_cols">
+                            <div class="col-12 col-sm-12 col-md-2 col-lg-2 col-xl-2 shopping_cart_product_cont_cols shopping_cart_product_img">
 								insert img here
                             </div>
 							<div class="col-12 col-sm-12 col-md-7 col-lg-7 col-xl-7 shopp ing_cart_product_cont_cols">
 								<div class="d-flex flex-column">
 									<div class="p-2 shopping_cart_product_name_cont">
-										<h2 class="global_font_2 shopping_cart_product_name">MERCEDES-BENZ BASE MODULE</h2>
+										<h2 class="global_font_2 shopping_cart_product_name shopping_cart_product_global" data-insert-values="product_config_id.product_id.name">MERCEDES-BENZ BASE MODULE</h2>
 									</div>
 									<div class="p-2 shopping_cart_product_type_cont">
-										<p class="global_font_4 shopping_cart_product_type">TYPE: EXCHANGE UNIT</p>
+										<p class="global_font_4 shopping_cart_product_type">TYPE: <span class="shopping_cart_product_global" data-insert-values="product_config_id.variation_value">EXCHANGE UNIT</span></p>
 									</div>
 								</div>
 							</div>
 							<div class="col-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 global_font_3 shopping_cart_product_price_qty_remove_cont shopping_cart_product_cont_cols">
 								<div class="d-flex shopping_cart_product_price_qty_remove flex-row flex-sm-row flex-md-column flex-wrap flex-sm-wrap flex-md-nowrap">
 									<div class="p-2 shopping_cart_product_price_cont global_font_2">
-										<h2 class="shopping_cart_product_price">R6000</h2>
+										<h2 class="shopping_cart_product_price">R<span class="shopping_cart_product_global" data-insert-values="total_price">6000</span></h2>
 									</div>
 									<div class="p-2 shopping_cart_product_qty_select_cont">
-										<select class="form-control position-static custom-select global_qty_select_1 global_remove_shadow shopping_cart_product_qty_select">
+										<select class="form-control position-static custom-select global_qty_select_1 global_remove_shadow shopping_cart_product_qty_select" data-insert-values="quantity" data-is-selection="true">
                                           <option>1</option>
                                           <option>2</option>
                                           <option>3</option>

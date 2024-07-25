@@ -2,7 +2,7 @@ const axios = require('axios');
 const $ = require('jquery');
 // const { return_page } = import('../shared/shared_gen_func.mjs');
 const {add_cart_item} = require('./shopping_cart.js');
-import {gen_func} from '../shared/shared_gen_func';
+import {gen_func} from '../shared/ES/shared_gen_func.js';
 const { check_user } = require('../standard/sens.js');
 const {global} = require('../../config.js');
 
@@ -55,7 +55,7 @@ $('.product_price_qty_select').on('change', () => {
 
 $('.product_add_to_cart').on('click', () => {
     let quantity = $('#quantity_select option:selected').val();
-    let product_config_id = $('.product_select_type.active').data('product_config_id');
+    let product_config_id = $('.product_select_type.active').data('product-config-id');
     const data = {
         quantity: quantity,
         product_config_id: product_config_id
@@ -91,7 +91,7 @@ const render_func = {
                 shipping_rate = shipping_rate_details.base_charge;
             }
             else {
-                shipping_rate = ' '
+                shipping_rate = ' ';
             }
             let html = `<div class="p-2" data-category-id="${category}" data-brand-id="${brand}" data-product-id="${product_id}" data-product-name="${name}">\n <div class="card product_item">\n <img class="card-img-top product_item_img" src="${img_location}">\n <div class="card-body product_item_body">\n <h2 class="product_item_header">${name}</h2>\n <p class="product_shipping_amount">${shipping_rate}</p>\n <a role="button" class="btn global_font_3 global_red_select_btn_2 product_item_view_btn global_remove_shadow" href="/products/${product_id}">VIEW</a>\n </div>\n <div>\n </div>`
             product_html_array.push(html);
@@ -207,6 +207,16 @@ function get_products_page(product_id) {
         console.log(error);
     })
 };
+
+$('.product_add_to_cart').on('click', () => {
+    const product_config_id = $('.product_select_type.active').data('product-config-id');
+    const quantity = $('#quantity_select option:selected').val();
+    const data = {
+        product_config_id: product_config_id,
+        quantity: quantity
+    };
+    add_cart_item(data);
+});
 
 let user_state = [false, false]
 

@@ -370,7 +370,7 @@ $('#checkout_summary_payment_btn').on('click', () => {
     axios.post(axios_url, data, global.options)
     .then((res) => {
         if (res.status === 200) {
-            window.location.replace('/checkout-redirect');
+            window.location.replace('/checkout_redirect');
             let form_inputs_hidden = [];
             for (let [key, value] of Object.entries(res.data)) {
                 html =

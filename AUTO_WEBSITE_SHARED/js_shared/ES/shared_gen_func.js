@@ -1,6 +1,6 @@
 const $ = import('jquery');
 const axios = import('axios');
-const {global} = import('../../config.js');
+const {global} = import('../../../config.js');
 
 const gen_func = {
     get_prop: function(obj, path) {

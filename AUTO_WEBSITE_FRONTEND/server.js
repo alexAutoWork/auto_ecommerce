@@ -5,10 +5,9 @@ const cors = require('cors');
 const fs = require('fs');
 const BootstrapEmail = require('bootstrap-email');
 const server_funct = require('./server_functions');
-// const email_render = require('./js/shared/email_render.mjs');
-// import email_render from './js/shared/email_render.mjs';
-const {email_render} = import('./node_modules/shared/email_render.js');
+const {email_render} = require('./js/shared/CJS/email_render');
 const {global} = require('./config.js');
+const {gen_func} = require('./js/shared/CJS/shared_gen_func');
 
 const whitelist = ['http://localhost:3000', 'http://host.docker.internal:3000', global.ngrok_api_url];
 
@@ -38,28 +37,119 @@ app.use('/public', express.static('node_modules/jquery/dist'));
 app.use('/public', express.static('node_modules/@fortawesome/fontawesome-free/css'));
 app.use('/public', express.static('node_modules/@fortawesome/fontawesome-free/js'));
 
-app.get('/products', (req, res) => {
-    const _retfile = path.join(__dirname, './html/standard/standard/products.html');
+const root = '/html/standard'
 
-    res.sendFile(_retfile);
-});
+const urls = {
+    products: {
+        1: `${root}/standard/products.html`,
+        2: `${root}/standard/products_page.html`,
+    },
+    register: {
+        1: `${root}/auth/sign_up.html`
+    },
+    login: {
+        1: `${root}/auth/login.html`
+    },
+    logout: {
+        1: `${root}/auth/logout.html`
+    },
+    verify: {
+        1: `${root}/auth/verify.html`
+    },
+    forgot: {
+        1: `${root}/auth/forgot.html`
+    },
+    details: {
+        1: `${root}/auth/my_account_account_details.html`
+    },
+    'address-book': {
+        1: `${root}/auth/my_account_address_book.html`
+    },
+    cart: {
+        1: `${root}/auth/shopping_cart.html`
+    },
+    orders: {
+        1: `${root}/auth/my_account_orders.html`,
+        2: `${root}/auth/my_account_orders_order_page.html`,
+    },
+    repairs: {
+        1: `${root}/auth/my_account_repairs.html`,
+        2: `${root}/auth/my_account_repairs_repair_page.html`,
+    },
+    returns: {
+        1: `${root}/auth/my_account_returns.html`,
+        2: `${root}/auth/my_account_returns_return_page.html`,
+    },
+    invoices: {
+        1: `${root}/auth/my_account_invoices.html`
+    },
+    checkout: {
+        order: {
+            1: `${root}/auth/checkout.html`
+        },
+        repair: {
+            1: `${root}/auth/request_repair.html`
+        },
+        redirect: {
+            1: `${root}/auth/checkout_redirect.html`
+        },
+        cancel: {
+            1: `${root}/auth/checkout_cancel.html`
+        }
+    },
+    conf: {
+        order: {
+            1: `${root}/auth/order_conf.html`
+        },
+        repair: {
+            1: `${root}/auth/repair_conf.html`
+        }
+    }
+}
 
-app.get('/products/:id', (req, res) => {
-    const _retfile = path.join(__dirname, './html/standard/standard/products_page.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/forgot', (req, res) => {
-    const _retfile = path.join(__dirname, './html/auth/forgot.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/repair/:id', (req, res) => {
-    const _retfile = path.join(__dirname, './html/auth/repair_conf.html');
-
-    res.sendFile(_retfile);
+app.get('/:base1/:base2?/:base3?', (req, res) => {
+    const params = req.params;
+    let has_id = false;
+    let param_list = [];
+    for (let value of Object.values(params)) {
+        if (/\d/.test(value)) {
+            has_id = true;
+        }
+        if (typeof value !== 'undefined') {
+            param_list.push(value);
+        }
+    }
+    console.log(has_id);
+    if (param_list.length === 1) {
+        param_list[1] = undefined;
+    }
+    console.log(param_list);
+    let last;
+    if (has_id) {
+        if (param_list[0] !== 'checkout' || 'conf') {
+            last = 2;
+        } else {
+            last = 1;
+        }
+    } else {
+        last = 1;
+    }
+    param_list[param_list.length - 1] = last;
+    console.log(param_list);
+    base_path = param_list.join('.');
+    console.log(base_path);
+    let _retfile = gen_func.get_prop(urls, base_path);
+    if (_retfile === null) {
+        _retfile = 1
+    }
+    console.log(_retfile);
+    if (_retfile === 1) {
+        res.end();
+        return;
+    } else {
+        res.sendFile(__dirname + _retfile);
+        return;
+    }
 })
 
 app.post('render-invoice', async (req, res) => {
@@ -114,150 +204,6 @@ app.post('/html-email', (req, res) => {
             console.log(err);
         }
     }
-})
-
-app.get('/test', async (req, res) => {
-    try {
-        const res = await axios.get('http://host.docker.internal:3000/products');
-        console.log(res);
-    }
-    catch (err) {
-        console.log(err);
-    }
-    // res.end();
-})
-
-app.get('/checkout/:type/:id', (req, res) => {
-    const type = req.params.type;
-    let _retfile;
-    if (type === 'order') {
-        _retfile = path.join(__dirname, './html/standard/auth/checkout.html');
-    }
-    if (type === 'repair') {
-        _retfile = path.join(__dirname, './html/standard/auth/request_repair.html');
-    }
-
-    res.sendFile(_retfile);
-})
-
-app.get('/:type1/:type2/:id', (req, res) => {
-    const type1 = req.params.type1;
-    const type2 = req.params.type2;
-    let _retfile;
-    if (type1 === 'conf') {
-        if (type2 === 'order') {
-            _retfile = path.join(__dirname, './html/standard/auth/checkout.html');
-        }
-        if (type2 === 'repair') {
-            _retfile = path.join(__dirname, './html/standard/auth/request_repair.html');
-        }
-    }
-    if (type1 === 'cancel') {
-        _retfile = path.join(__dirname, './html/standard/auth/checkout_cancel.html');
-    }
-    res.sendFile(_retfile);
-})
-
-app.get('/order-conf/:id', (req, res) => {
-    const _retfile = path.join(__dirname, './html/standard/other/order_conf.html');
-
-    res.sendFile(_retfile);
-})
-
-app.post('/pdf-email', (req, res) => {
-    const _retfile = path.join(__dirname, './html/standard/other/otp_email.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/register', (req, res) => {
-    const _retfile = path.join(__dirname, './html/standard/auth/sign_up.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/email-html', (req, res) => {
-    const _retfile = path.join(__dirname, './html/other/otp_email.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/email-html-2', (req, res) => {
-    const _retfile = path.join(__dirname, './html/other/status_email.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/order-conf-email', (req, res) => {
-    const _retfile = path.join(__dirname, './html/other/order_conf_email.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/return-conf-email', (req, res) => {
-    const _retfile = path.join(__dirname, './html/other/return_conf_email.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/repair-conf-email', (req, res) => {
-    const _retfile = path.join(__dirname, './html/other/repair_conf_email.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/invoice-email', (req, res) => {
-    const _retfile = path.join(__dirname, './html/other/invoice_email.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/order-conf', (req, res) => {
-    const _retfile = path.join(__dirname, './html/standard/auth/order_conf.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/repair-conf', (req, res) => {
-    const _retfile = path.join(__dirname, './html/auth/repair_conf.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/return-page', (req, res) => {
-    const _retfile = path.join(__dirname, './html/standard/auth/my_account_returns_return_page.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/order-page', (req, res) => {
-    const _retfile = path.join(__dirname, './html/standard/auth/my_account_orders_order_page.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/shopping-cart', (req, res) => {
-    const _retfile = path.join(__dirname, './html/standard/standard/auth/shopping_cart.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/invoice', (req, res) => {
-    const _retfile = path.join(__dirname, './html/standard/auth/invoice_download.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/admin-order-page', (req, res) => {
-    const _retfile = path.join(__dirname, './html/admin/admin_orders_order_page.html');
-
-    res.sendFile(_retfile);
-})
-
-app.get('/address-book', (req, res) => {
-    const _retfile = path.join(__dirname, './html/standard/auth/my_account_address_book.html');
-
-    res.sendFile(_retfile);
 })
 
 app.listen(8080, () => {

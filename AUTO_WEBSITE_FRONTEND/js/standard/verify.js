@@ -46,25 +46,13 @@ $('#signup_verif_select_submit, .signup_verify_resend_code').on('click', (e) => 
 $('#signup_verif_code_submit').on('click', () => {
     let user_otp = $('#signup_verify_code_input').val();
     user_otp = {user_input_otp: user_otp};
-    // axios.post('http://host.docker.internal:3000/verify_otp/', {
-    //     withCredentials: withCredentials,
-    //     data: data
-    // })
     axios.post(`${global.ngrok_api_url}/verify/otp/`, data, global.options)
     .then((res) => {
         console.log(res);
         const message = res.data.message;
         $('.signup_verify_res_text_2').text(message);
         if (message === 'VALID OTP!') {
-            // axios.get('http://host.docker.internal:8000/user/details/', {withCredentials: true})
-            // .then((res) => {
-            //     console.log(res);
-            //     data = res.data;
-                
-            // })
-            // .catch((err) => {
-            //     console.log(err);
-            // })
+            $('#signup_verif_code_cont').delay(1000).slideUp().$('#signup_details_cont').slideDown();
         }
     })
     .catch((err) => {
